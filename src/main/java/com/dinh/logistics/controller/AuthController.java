@@ -19,7 +19,7 @@ import com.dinh.logistics.dto.Authentication;
 import com.dinh.logistics.dto.LoginDto;
 import com.dinh.logistics.exception.RecordNotFoundException;
 import com.dinh.logistics.model.LoginUser;
-import com.dinh.logistics.model.User;
+import com.dinh.logistics.model.Users;
 import com.dinh.logistics.respository.UserRepository;
 import com.dinh.logistics.service.TokenGenerator;
 import com.dinh.logistics.service.TokenManager;
@@ -50,7 +50,9 @@ public class AuthController {
 		if(StringUtils.isEmpty(loginDto.getUsername()) || StringUtils.isEmpty(loginDto.getPassword())) {
 			return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, null);
 		}
-		User user = userRepository.findByUsername(loginDto.getUsername()).orElse(null);
+		Users user = userRepository.findByUserName(loginDto.getUsername()).orElse(null);
+		List<Users> user1 = userRepository.findAll();
+		Users user2 = userRepository.findUserByUserName(loginDto.getUsername());
         if (user != null){
         	try {
         		MessageDigest sha256 = MessageDigest.getInstance(loginDto.getPassword());
