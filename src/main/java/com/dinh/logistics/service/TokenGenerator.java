@@ -11,7 +11,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class TokenGenerator {
-    private static final String SECRET_KEY = ""; // Thay thế bằng khóa bí mật của bạn
+    private static final String SECRET_KEY = "wellComeToTaskMasterSuperSuperSuperSecretKeyHS256";
 
     //generate token
     public String generateToken(String username, String password) {
