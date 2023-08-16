@@ -1,7 +1,12 @@
 package com.dinh.logistics.model;
 
+import java.sql.Date;
+
 import javax.persistence.*;
 
+import lombok.Data;
+
+@Data
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -10,47 +15,39 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "first_name")
-    private String firstName;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "last_name")
-    private String lastName;
+    @Column(name = "age")
+    private Long age;
 
-    @Column(name = "email_address")
-    private String emailId;
+    @Column(name = "gender")
+    private String gender;
 
-    public Employee() {
-
-    }
-
-    public Employee(String firstName, String lastName, String emailId) {
-        super();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailId = emailId;
-    }
-    public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-    public String getFirstName() {
-        return firstName;
-    }
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-    public String getEmailId() {
-        return emailId;
-    }
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
-    }
+    @Column(name = "team_id")
+    private Long teamId;
+    
+    @Column(name = "num_address")
+    private String numAddress;
+    
+    @Column(name = "street_address")
+    private String streetAddress;
+    
+    @Column(name = "ward")
+    private String ward;
+    
+    @Column(name = "dist")
+    private String dist;
+    
+    @Column(name = "province")
+    private String province;
+    
+    @Column(name = "state")
+    private Long state;
+    
+    @Column(name = "start_date")
+    private Date startDate;
+    
+    @Column(name = "role")
+    private String role;
 }
