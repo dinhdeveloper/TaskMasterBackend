@@ -10,16 +10,16 @@ import lombok.Data;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long userId;
 
     @Column(name = "employee_id")
     private String employeeId;
 
-    @Column(name = "cus_id")
+    @Column(name = "custom_id")
     private String cusId;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "user_name")
+    private String userName;
     
     @Column(name = "password")
     private String password;

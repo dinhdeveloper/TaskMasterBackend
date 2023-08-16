@@ -74,7 +74,7 @@ public class AuthController {
         		return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, e);
         	}
         }else {
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, null);
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, "Khong tim thay user");
         }
     }
 	

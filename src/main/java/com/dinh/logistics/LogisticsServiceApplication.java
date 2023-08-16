@@ -23,7 +23,8 @@ public class LogisticsServiceApplication {
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(tokenInterceptor)
-                        .addPathPatterns("/api/**");  // Áp dụng cho tất cả các cuộc gọi API
+                        .addPathPatterns("/api/**")
+                        .excludePathPatterns("/api/auth/**");
             }
         };
     }
