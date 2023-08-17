@@ -13,7 +13,7 @@ import com.dinh.logistics.model.UserDevice;
 @Repository
 public interface UserDeviceRepository extends JpaRepository<UserDevice, Long>{
 	
-	Optional <UserDevice> findByUserId(Long userId);
+	Optional <UserDevice> findByUserId(Integer userId);
 	Optional <UserDevice> findByAccessTokenAndIsActiveAccessTokenTrue(String accessToken);
 	Optional <UserDevice> findByIsActiveAccessTokenTrue();
 

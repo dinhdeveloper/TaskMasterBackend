@@ -12,19 +12,19 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long empId;
+    private Integer empId;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "age")
-    private Long age;
+    private Integer age;
 
     @Column(name = "gender")
     private String gender;
 
     @Column(name = "team_id")
-    private Long teamId;
+    private Integer teamId;
     
     @Column(name = "num_address")
     private String numAddress;
@@ -42,7 +42,7 @@ public class Employee {
     private String province;
     
     @Column(name = "state")
-    private Long state;
+    private Integer state;
     
     @Column(name = "start_date")
     private Date startDate;

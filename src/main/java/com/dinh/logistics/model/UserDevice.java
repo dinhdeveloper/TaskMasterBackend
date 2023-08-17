@@ -17,7 +17,7 @@ public class UserDevice {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 	
 	@Column(name = "access_token")
 	private String accessToken;
