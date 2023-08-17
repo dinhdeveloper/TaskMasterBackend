@@ -7,24 +7,25 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Table(name = "Users")
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
+    private Integer user_id;
 
-    @Column(name = "employee_id")
-    private Long employeeId;
+    @Column(name = "Employee_id")
+    private Integer employeeId;
 
-    @Column(name = "custom_id")
-    private Long cusId;
+    @Column(name = "Custom_id")
+    private Integer cusId;
 
-    @Column(name = "user_name")
+    @Column(name = "User_name")
     private String userName;
     
-    @Column(name = "password")
+    @Column(name = "Password")
     private String password;
 
-    @Column(name = "state")
-    private Long state;
+    @Column(name = "State")
+    private Integer state;
 
 }

@@ -9,7 +9,7 @@ import javax.persistence.*;
 public class JobTypeModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Job_type_id;
+    private long JobTypeId;
 
     @Column(name = "Job_type_name")
     private String JobTypeName;
@@ -20,12 +20,12 @@ public class JobTypeModel {
     @Column(name = "State")
     private String State;
 
-    public long getJob_type_id() {
-        return Job_type_id;
+    public long getJobTypeId() {
+        return JobTypeId;
     }
 
-    public void setJob_type_id(long job_type_id) {
-        Job_type_id = job_type_id;
+    public void setJobTypeId(long jobTypeId) {
+        JobTypeId = jobTypeId;
     }
 
     public String getJobTypeName() {
