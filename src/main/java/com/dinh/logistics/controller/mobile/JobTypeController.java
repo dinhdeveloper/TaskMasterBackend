@@ -25,8 +25,12 @@ public class JobTypeController {
     JobRepository jobRepository;
 
     @PostMapping("/job_type/list")
-    public ResponseEntity<Object> uploadMedia(){
-        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS,
-                jobRepository.findAll(Sort.by(Sort.Direction.ASC, "Job_type_id")));
+    public ResponseEntity<Object> getListJobType(){
+//        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS,
+//                jobRepository.findAll(Sort.by(Sort.Direction.ASC, "job_type_id")));
+
+        Object data = jobRepository.findAll(Sort.by(Sort.Direction.ASC, "job_type_id"));
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, data);
     }
 }
