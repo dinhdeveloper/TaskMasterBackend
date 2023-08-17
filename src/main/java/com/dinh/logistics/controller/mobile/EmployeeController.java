@@ -23,11 +23,11 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+    private List<Employee> employeeList;
 
     // get all employees
     @GetMapping("/employees")
     public ResponseEntity<Object> getAllEmployees(){
-
         List<Employee> employeeList = employeeRepository.findAll();
         if (employeeList.isEmpty()){
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
@@ -39,7 +39,15 @@ public class EmployeeController {
     // get employee by id rest api
     @GetMapping("/employees/{id}")
     public ResponseEntity<Object> getEmployeeById(@PathVariable Integer id) {
-        List<Employee> employeeList = employeeService.getData(id);
-        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, employeeList);
+        if (id == -1){
+            employeeList = employeeRepository.findAll();
+        }else {
+            employeeList = employeeService.getData(id);
+        }
+        if (employeeList.isEmpty()){
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
+        }else {
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, employeeList);
+        }
     }
 }
