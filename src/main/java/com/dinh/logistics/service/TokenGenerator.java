@@ -2,6 +2,7 @@ package com.dinh.logistics.service;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -11,7 +12,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class TokenGenerator {
-    private static final String SECRET_KEY = "wellComeToTaskMasterSuperSuperSuperSecretKeyHS256";
+	@Value("${app.jwtSecret}")
+    private String jwtSecret;
 
     //generate token
     public String generateToken(String username, String password) {
@@ -23,7 +25,7 @@ public class TokenGenerator {
                 .setSubject(username)
                 .claim("password", password)
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
 
         return token;
@@ -32,7 +34,7 @@ public class TokenGenerator {
     // decode token
     public Claims decodeToken(String token) {
         Jws<Claims> claimsJws = Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(jwtSecret)
                 .parseClaimsJws(token);
 
         Claims claims = claimsJws.getBody();

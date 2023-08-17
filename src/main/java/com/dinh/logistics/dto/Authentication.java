@@ -6,4 +6,5 @@ import lombok.Data;
 public class Authentication {
 
 	private String tokenAuth;
+	private String tokenFirebase;
 }
