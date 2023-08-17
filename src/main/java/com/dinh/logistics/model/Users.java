@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId;
+    private Long user_id;
 
     @Column(name = "employee_id")
-    private String employeeId;
+    private Long employeeId;
 
     @Column(name = "custom_id")
-    private String cusId;
+    private Long cusId;
 
     @Column(name = "user_name")
     private String userName;
@@ -27,6 +27,6 @@ public class Users {
     private String password;
 
     @Column(name = "state")
-    private String state;
+    private Long state;
 
 }

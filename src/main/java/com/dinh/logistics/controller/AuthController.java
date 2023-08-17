@@ -55,7 +55,7 @@ public class AuthController {
 		Users user2 = userRepository.findUserByUserName(loginDto.getUsername());
         if (user != null){
         	try {
-        		MessageDigest sha256 = MessageDigest.getInstance(loginDto.getPassword());
+        		MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
 	            byte[] hash = sha256.digest(loginDto.getPassword().getBytes(StandardCharsets.UTF_8));
 	            
 	            // Convert the hash bytes to hexadecimal representation
