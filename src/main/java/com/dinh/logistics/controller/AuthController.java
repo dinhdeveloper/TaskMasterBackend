@@ -3,7 +3,9 @@ package com.dinh.logistics.controller;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Objects;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -48,8 +50,7 @@ public class AuthController {
 	@Autowired UserDeviceRepository userDeviceRepository;
 	
 	@PostMapping("/login")
-    public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginDto loginDto)
-            throws RecordNotFoundException {
+    public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginDto loginDto){
 		if(StringUtils.isEmpty(loginDto.getUsername()) || StringUtils.isEmpty(loginDto.getPassword())) {
 			return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, null);
 		}
@@ -68,7 +69,7 @@ public class AuthController {
 	            	String token = tokenGenerator.generateToken(loginDto.getUsername(), loginDto.getPassword());
 	            	UserDevice userDevice = userDeviceRepository.findByUserId(user.getUser_id()).orElse(new UserDevice());
 	            	userDevice.setAccessToken(token);
-	            	userDevice.setUserId(user.getUser_id());
+	            	userDevice.setUserId(user.getUser_id().intValue());
 	            	userDevice.setDeviceId(loginDto.getDeviceId());
 	            	tokenManager.addToken(userDevice);
 	            	Authentication auth = new Authentication();
@@ -82,6 +83,22 @@ public class AuthController {
         	}
         }else {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Tên đăng nhập không tồn tại");
+        }
+    }
+	
+	@PostMapping("/logout")
+    public ResponseEntity<Object> logoutUser(HttpServletRequest request){
+		String token = request.getHeader("Authorization");
+		if(StringUtils.isBlank(token)) {
+			return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, null);
+		}
+		String jwtToken = token.substring(7);
+		UserDevice userDevice = userDeviceRepository.findByAccessTokenAndIsActiveAccessTokenTrue(jwtToken).orElse(new UserDevice());
+        if (!Objects.isNull(userDevice)){
+        	userDeviceRepository.updateIsActiveAccessTokenByUserId(false, userDevice.getUserId());
+        	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
+        }else {
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, null);
         }
     }
 	

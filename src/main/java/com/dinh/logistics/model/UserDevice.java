@@ -23,10 +23,10 @@ public class UserDevice {
 	private String accessToken;
 	
 	@Column(name = "user_id")
-	private Long userId;
+	private int userId;
 	
 	@Column(name = "is_active_access_token")
-	private Boolean isActiveAccessToken;
+	private boolean isActiveAccessToken;
 	
 	@Column(name = "device_id")
 	private String deviceId;
