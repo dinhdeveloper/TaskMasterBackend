@@ -22,7 +22,7 @@ public class TokenManager {
     private static final Map<String, String> tokenMap = new ConcurrentHashMap<>();
 
     public void addToken(UserDevice userDevice) {
-    	userDevice.setIsActiveAccessToken(true);
+    	userDevice.setActiveAccessToken(true);
     	userDeviceRepository.save(userDevice);
     }
 
