@@ -1,7 +1,9 @@
 package com.dinh.logistics.respository.mobile;
 
-import com.dinh.logistics.model.JobTypeModel;
+import com.dinh.logistics.model.JobType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface JobRepository  extends JpaRepository<JobTypeModel, Long> {
+@Repository
+public interface JobRepository  extends JpaRepository<JobType, Integer> {
 }

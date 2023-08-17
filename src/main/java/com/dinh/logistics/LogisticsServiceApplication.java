@@ -24,6 +24,7 @@ public class LogisticsServiceApplication {
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(tokenInterceptor)
                         .addPathPatterns("/api/**")
+                        .excludePathPatterns("/api/mobile/**")
                         .excludePathPatterns("/api/auth/**");
             }
         };
