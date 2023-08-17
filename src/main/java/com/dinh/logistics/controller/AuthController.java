@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dinh.logistics.dto.Authentication;
 import com.dinh.logistics.dto.LoginDto;
 import com.dinh.logistics.exception.RecordNotFoundException;
-import com.dinh.logistics.model.LoginUser;
 import com.dinh.logistics.model.Users;
 import com.dinh.logistics.respository.UserRepository;
 import com.dinh.logistics.service.TokenGenerator;

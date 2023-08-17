@@ -1,7 +1,10 @@
 package com.dinh.logistics.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Entity
 public class JobTypeModel {
     @Id
@@ -9,10 +12,10 @@ public class JobTypeModel {
     private long Job_type_id;
 
     @Column(name = "Job_type_name")
-    private String Job_type_name;
+    private String JobTypeName;
 
     @Column(name = "Job_type_desc")
-    private Long Job_type_desc;
+    private Long JobTypeDesc;
 
     @Column(name = "State")
     private String State;
@@ -25,20 +28,20 @@ public class JobTypeModel {
         Job_type_id = job_type_id;
     }
 
-    public String getJob_type_name() {
-        return Job_type_name;
+    public String getJobTypeName() {
+        return JobTypeName;
     }
 
-    public void setJob_type_name(String job_type_name) {
-        Job_type_name = job_type_name;
+    public void setJobTypeName(String jobTypeName) {
+        JobTypeName = jobTypeName;
     }
 
-    public Long getJob_type_desc() {
-        return Job_type_desc;
+    public Long getJobTypeDesc() {
+        return JobTypeDesc;
     }
 
-    public void setJob_type_desc(Long job_type_desc) {
-        Job_type_desc = job_type_desc;
+    public void setJobTypeDesc(Long jobTypeDesc) {
+        JobTypeDesc = jobTypeDesc;
     }
 
     public String getState() {

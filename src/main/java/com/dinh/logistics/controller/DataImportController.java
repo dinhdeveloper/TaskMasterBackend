@@ -14,28 +14,28 @@ import java.io.IOException;
 @RequestMapping("/api/v1")
 public class DataImportController {
 
-    @Autowired
-    private DataImportService dataImportService;
-
-    @PostMapping("/import")
-    public String importData(@RequestParam("file") MultipartFile file) {
-        try {
-            dataImportService.importDataFromExcel(file);
-            return "Data imported successfully!";
-        } catch (IOException e) {
-            // Handle the exception appropriately
-            return "Error importing data: " + e.getMessage();
-        }
-    }
-
-    @GetMapping("/export")
-    public void exportData(HttpServletResponse response) {
-        try {
-            dataImportService.exportDataToExcelAndSave(response);
-        } catch (IOException e) {
-            // Handle the exception appropriately
-        }
-    }
+//    @Autowired
+//    private DataImportService dataImportService;
+//
+//    @PostMapping("/import")
+//    public String importData(@RequestParam("file") MultipartFile file) {
+//        try {
+//            dataImportService.importDataFromExcel(file);
+//            return "Data imported successfully!";
+//        } catch (IOException e) {
+//            // Handle the exception appropriately
+//            return "Error importing data: " + e.getMessage();
+//        }
+//    }
+//
+//    @GetMapping("/export")
+//    public void exportData(HttpServletResponse response) {
+//        try {
+//            dataImportService.exportDataToExcelAndSave(response);
+//        } catch (IOException e) {
+//            // Handle the exception appropriately
+//        }
+//    }
 }
 
 

@@ -14,17 +14,17 @@ import java.io.IOException;
 @RequestMapping("/api/v1")
 public class FileUploadController {
 
-    @Autowired
-    private FileUploadService fileUploadService;
-
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            fileUploadService.uploadFile(file);
-            return ResponseEntity.ok("File uploaded successfully.");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error uploading the file.");
-        }
-    }
+//    @Autowired
+//    private FileUploadService fileUploadService;
+//
+//    @PostMapping("/upload")
+//    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+//        try {
+//            fileUploadService.uploadFile(file);
+//            return ResponseEntity.ok("File uploaded successfully.");
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Error uploading the file.");
+//        }
+//    }
 }
