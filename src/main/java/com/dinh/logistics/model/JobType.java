@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class JobType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer job_type_id;
+    private Integer jobTypeId;
 
     @Column(name = "job_type_name")
     private String jobTypeName;

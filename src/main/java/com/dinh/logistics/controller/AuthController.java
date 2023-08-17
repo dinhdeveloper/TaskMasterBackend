@@ -69,13 +69,13 @@ public class AuthController {
 	            	auth.setTokenAuth(token);
 	            	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, auth);
 	            } else {
-	            	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, "Sai mat khau");
+	            	return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Sai mật khẩu");
 	            }
         	} catch (Exception e) {
-        		return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, e);
+        		return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);
         	}
         }else {
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, "Khong tim thay user");
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Tên đăng nhập không tồn tại");
         }
     }
 	
