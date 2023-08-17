@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dinh.logistics.dto.Authentication;
 import com.dinh.logistics.dto.LoginDto;
 import com.dinh.logistics.exception.RecordNotFoundException;
+import com.dinh.logistics.model.UserDevice;
 import com.dinh.logistics.model.Users;
+import com.dinh.logistics.respository.UserDeviceRepository;
 import com.dinh.logistics.respository.UserRepository;
 import com.dinh.logistics.service.TokenGenerator;
 import com.dinh.logistics.service.TokenManager;
@@ -43,6 +45,8 @@ public class AuthController {
 	@Autowired
 	TokenGenerator tokenGenerator;
 	
+	@Autowired UserDeviceRepository userDeviceRepository;
+	
 	@PostMapping("/login")
     public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginDto loginDto)
             throws RecordNotFoundException {
@@ -50,8 +54,6 @@ public class AuthController {
 			return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, null);
 		}
 		Users user = userRepository.findByUserName(loginDto.getUsername()).orElse(null);
-		List<Users> user1 = userRepository.findAll();
-		Users user2 = userRepository.findUserByUserName(loginDto.getUsername());
         if (user != null){
         	try {
         		MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
@@ -64,18 +66,22 @@ public class AuthController {
 	            }
 	            if(StringUtils.equals(user.getPassword(), hexString.toString())) {
 	            	String token = tokenGenerator.generateToken(loginDto.getUsername(), loginDto.getPassword());
-	            	tokenManager.addToken(loginDto.getUsername(), token);
+	            	UserDevice userDevice = userDeviceRepository.findByUserId(user.getUser_id()).orElse(new UserDevice());
+	            	userDevice.setAccessToken(token);
+	            	userDevice.setUserId(user.getUser_id());
+	            	userDevice.setDeviceId(loginDto.getDeviceId());
+	            	tokenManager.addToken(userDevice);
 	            	Authentication auth = new Authentication();
 	            	auth.setTokenAuth(token);
 	            	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, auth);
 	            } else {
-	            	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, "Sai mat khau");
+	            	return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Sai mật khẩu");
 	            }
         	} catch (Exception e) {
-        		return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, e);
+        		return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);
         	}
         }else {
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, "Khong tim thay user");
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Tên đăng nhập không tồn tại");
         }
     }
 	
