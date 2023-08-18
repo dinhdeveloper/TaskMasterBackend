@@ -49,7 +49,7 @@ public class testController {
             FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
             sendFirebaseData.setTitle("test");
             sendFirebaseData.setType("test");
-            sendFirebaseData.setData("Sống chết có số");
+            sendFirebaseData.setData("Con gà");
 
             Gson gson = new Gson();
             String jsonData = gson.toJson(sendFirebaseData);
@@ -69,24 +69,25 @@ public class testController {
     }
 	
 	@PostMapping("/test2")
-	public ResponseEntity<Object> test2(@RequestParam String token){
+	public ResponseEntity<Object> test2(@RequestParam String token,
+			@RequestParam String message){
 		try {
 			
 	        // Dữ liệu JSON để gửi
             FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
             sendFirebaseData.setTitle("test");
             sendFirebaseData.setType("test");
-            sendFirebaseData.setData("Sống chết có số");
+            sendFirebaseData.setData(message);
 
             Gson gson = new Gson();
             String jsonData = gson.toJson(sendFirebaseData);
             
             //Gửi
-            Message message = Message.builder()
+            Message mess = Message.builder()
             		.setToken(token)
             		.putData("data", jsonData)
             		.build();
-            String response = FirebaseMessaging.getInstance().send(message);
+            String response = FirebaseMessaging.getInstance().send(mess);
 
 	        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
 			
