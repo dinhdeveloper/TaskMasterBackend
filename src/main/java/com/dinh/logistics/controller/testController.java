@@ -34,9 +34,6 @@ import com.google.gson.Gson;
 @Transactional
 public class testController {
 	
-	@Value("${app.firebase.serverKey}")
-    private String fireBaseServerKey;
-	
 	@Autowired
 	UserDeviceRepository userDeviceRepository;
 
@@ -47,37 +44,23 @@ public class testController {
 			if(userDevice == null) {
 				return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Không tìm thấy device");
 			}
-			RestTemplate restTemplate = new RestTemplate();
-	        String apiUrl = "https://fcm.googleapis.com/fcm/send";
-
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.setContentType(MediaType.APPLICATION_JSON);
-	        headers.set("Authorization", "key=" + fireBaseServerKey);
 
 	        // Dữ liệu JSON để gửi
-//	        SendFirebaseDto sendFirebase = new SendFirebaseDto();
             FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
             sendFirebaseData.setTitle("test");
             sendFirebaseData.setType("test");
             sendFirebaseData.setData("Sống chết có số");
-//            sendFirebase.setTo(userDevice.getAccessToken());
-//            sendFirebase.setData(sendFirebaseData);
 
             Gson gson = new Gson();
             String jsonData = gson.toJson(sendFirebaseData);
             
-            //
+            // Gửi
             Message message = Message.builder()
             		.setToken(userDevice.getFirebase_token())
             		.putData("data", jsonData)
             		.build();
             String response = FirebaseMessaging.getInstance().send(message);
             
-//	        HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
-
-	        // Gửi yêu cầu POST và nhận phản hồi
-//	        String jsonResponse = restTemplate.postForObject(apiUrl, request, String.class);
-
 	        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
 
         } catch (Exception e) {
@@ -89,36 +72,21 @@ public class testController {
 	public ResponseEntity<Object> test2(@RequestParam String token){
 		try {
 			
-			RestTemplate restTemplate = new RestTemplate();
-	        String apiUrl = "https://fcm.googleapis.com/fcm/send";
-
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.setContentType(MediaType.APPLICATION_JSON);
-	        headers.set("Authorization", "key=" + fireBaseServerKey);
-
 	        // Dữ liệu JSON để gửi
-//	        SendFirebaseDto sendFirebase = new SendFirebaseDto();
             FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
             sendFirebaseData.setTitle("test");
             sendFirebaseData.setType("test");
             sendFirebaseData.setData("Sống chết có số");
-//            sendFirebase.setTo(token);
-//            sendFirebase.setData(sendFirebaseData);
 
             Gson gson = new Gson();
             String jsonData = gson.toJson(sendFirebaseData);
             
-            //
+            //Gửi
             Message message = Message.builder()
             		.setToken(token)
             		.putData("data", jsonData)
             		.build();
             String response = FirebaseMessaging.getInstance().send(message);
-            
-//	        HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
-
-	        // Gửi yêu cầu POST và nhận phản hồi
-//	        String jsonResponse = restTemplate.postForObject(apiUrl, request, String.class);
 
 	        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
 			
