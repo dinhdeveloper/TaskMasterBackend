@@ -1,8 +1,5 @@
 package com.dinh.logistics.controller.mobile;
 
-import com.dinh.logistics.dto.LoginDto;
-import com.dinh.logistics.respository.UserRepository;
-import com.dinh.logistics.respository.MediaRepository;
 import com.dinh.logistics.service.mobile.MediaService;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;
@@ -14,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,9 +18,6 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MediaController {
-
-    @Autowired
-    MediaRepository mediaRepository;
 
     @Autowired
     private MediaService mediaService;
@@ -40,14 +33,14 @@ public class MediaController {
             mediaService.uploadImages(jobId, images, mediaType, mediaCateId);
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         } catch (Exception e) {
-            return ResponseHandler.generateResponse(HttpStatus.INTERNAL_SERVER_ERROR, -99, StatusResult.ERROR, e.getMessage());
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e.getMessage());
         }
     }
 
     @PostMapping("/upload/video")
     public ResponseEntity<Object> uploadVideo(@RequestParam("video") MultipartFile video) {
         try {
-            mediaService.uploadVideo(video);
+            //mediaService.uploadVideo(video);
             return ResponseEntity.ok("Video uploaded successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload video");
