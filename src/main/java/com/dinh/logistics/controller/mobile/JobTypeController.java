@@ -2,8 +2,8 @@ package com.dinh.logistics.controller.mobile;
 
 import com.dinh.logistics.dto.LoginDto;
 import com.dinh.logistics.model.JobType;
-import com.dinh.logistics.respository.mobile.JobRepository;
-import com.dinh.logistics.respository.mobile.MediaRepository;
+import com.dinh.logistics.respository.JobRepository;
+import com.dinh.logistics.respository.MediaRepository;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;
 import lombok.extern.slf4j.Slf4j;

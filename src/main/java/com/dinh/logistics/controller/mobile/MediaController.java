@@ -2,7 +2,7 @@ package com.dinh.logistics.controller.mobile;
 
 import com.dinh.logistics.dto.LoginDto;
 import com.dinh.logistics.respository.UserRepository;
-import com.dinh.logistics.respository.mobile.MediaRepository;
+import com.dinh.logistics.respository.MediaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

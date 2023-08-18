@@ -2,7 +2,7 @@ package com.dinh.logistics.service.mobile;
 
 
 import com.dinh.logistics.model.Employee;
-import com.dinh.logistics.respository.mobile.EmployeeRepository;
+import com.dinh.logistics.respository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

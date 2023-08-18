@@ -2,7 +2,7 @@ package com.dinh.logistics.controller.mobile;
 
 import com.dinh.logistics.exception.ResourceNotFoundException;
 import com.dinh.logistics.model.Employee;
-import com.dinh.logistics.respository.mobile.EmployeeRepository;
+import com.dinh.logistics.respository.EmployeeRepository;
 import com.dinh.logistics.service.mobile.EmployeeService;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;

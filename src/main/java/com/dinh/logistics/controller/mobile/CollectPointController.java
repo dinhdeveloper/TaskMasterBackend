@@ -2,8 +2,8 @@ package com.dinh.logistics.controller.mobile;
 
 import com.dinh.logistics.model.CollectPoint;
 import com.dinh.logistics.model.Employee;
-import com.dinh.logistics.respository.mobile.CollectPointRepository;
-import com.dinh.logistics.respository.mobile.EmployeeRepository;
+import com.dinh.logistics.respository.CollectPointRepository;
+import com.dinh.logistics.respository.EmployeeRepository;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;
 import lombok.extern.slf4j.Slf4j;
