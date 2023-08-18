@@ -8,28 +8,31 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
-import com.dinh.logistics.dto.FirebaseBodyDto;
+import com.dinh.logistics.dto.FirebaseDataDto;
 import com.dinh.logistics.dto.SendFirebaseDto;
 import com.dinh.logistics.model.UserDevice;
 import com.dinh.logistics.respository.UserDeviceRepository;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
 import com.google.gson.Gson;
 
 @RestController
 @RequestMapping("/api/test")
 @Transactional
 public class testController {
-	
-	@Value("${app.firebase.serverKey}")
-    private String fireBaseServerKey;
 	
 	@Autowired
 	UserDeviceRepository userDeviceRepository;
@@ -41,36 +44,55 @@ public class testController {
 			if(userDevice == null) {
 				return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Không tìm thấy device");
 			}
-            URL url = new URL("https://fcm.googleapis.com/fcm/send");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "key=" + fireBaseServerKey);
-            conn.setRequestProperty("Content-Type", "application/json");
-
-            conn.setDoOutput(true);
-            
-            SendFirebaseDto sendFirebase = new SendFirebaseDto();
-            FirebaseBodyDto sendFirebaseBody = new FirebaseBodyDto();
-            sendFirebaseBody.setMessage("chúc mừng năm mới!!!");
-            sendFirebase.setTo(userDevice.getFirebase_token());
-            sendFirebase.setData(sendFirebaseBody);
+	        // Dữ liệu JSON để gửi
+            FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
+            sendFirebaseData.setTitle("test");
+            sendFirebaseData.setType("test");
+            sendFirebaseData.setData("Sống chết có số");
 
             Gson gson = new Gson();
-            String input = gson.toJson(sendFirebase);
-            OutputStream os = conn.getOutputStream();
-            os.write(input.getBytes());
-            os.flush();
-
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-            }
-
-            conn.disconnect();
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
+            String jsonData = gson.toJson(sendFirebaseData);
+            
+            // Gửi
+            Message message = Message.builder()
+            		.setToken(userDevice.getFirebase_token())
+            		.putData("data", jsonData)
+            		.build();
+            String response = FirebaseMessaging.getInstance().send(message);
+            
+	        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
 
         } catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);
         }
     }
+	
+	@PostMapping("/test2")
+	public ResponseEntity<Object> test2(@RequestParam String token){
+		try {
+			
+	        // Dữ liệu JSON để gửi
+            FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
+            sendFirebaseData.setTitle("test");
+            sendFirebaseData.setType("test");
+            sendFirebaseData.setData("Sống chết có số");
+
+            Gson gson = new Gson();
+            String jsonData = gson.toJson(sendFirebaseData);
+            
+            //Gửi
+            Message message = Message.builder()
+            		.setToken(token)
+            		.putData("data", jsonData)
+            		.build();
+            String response = FirebaseMessaging.getInstance().send(message);
+
+	        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
+			
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);
+        }
+    }
+	
 }

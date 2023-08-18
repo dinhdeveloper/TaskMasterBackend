@@ -6,6 +6,7 @@ import lombok.Data;
 public class SendFirebaseDto {
 
 	private String to;
-	private FirebaseBodyDto data;
+	private FirebaseNotificationDto notification;
+	private FirebaseDataDto data;
 	
 }
