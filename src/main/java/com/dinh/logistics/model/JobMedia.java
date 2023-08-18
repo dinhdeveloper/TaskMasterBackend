@@ -12,12 +12,15 @@ public class JobMedia {
     @Column(name = "job_media_id")
     private Integer jobMediaId;
 
+    @Column(name = "job_id")
+    private Integer jobId;
+
     @Column(name = "url")
     private String url;
 
     @Column(name = "media_type")
-    private String mediaType;
+    private Integer mediaType;
 
     @Column(name = "media_cate_id")
-    private String mediaCateId;
+    private Integer mediaCateId;
 }
