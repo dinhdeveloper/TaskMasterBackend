@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.dinh.logistics.model.UserDevice;
 
 @Repository
-public interface UserDeviceRepository extends JpaRepository<UserDevice, Long>{
+public interface UserDeviceRepository extends JpaRepository<UserDevice, Integer>{
 	
 	Optional <UserDevice> findByUserId(Integer userId);
 	Optional <UserDevice> findByAccessTokenAndIsActiveAccessTokenTrue(String accessToken);
@@ -19,6 +19,8 @@ public interface UserDeviceRepository extends JpaRepository<UserDevice, Long>{
 
 	@Modifying
 	@Query(value = "UPDATE user_devices SET is_active_access_token = ?1 WHERE user_id = ?2", nativeQuery = true)
-	void updateIsActiveAccessTokenByUserId(boolean isActive, int userId);
+	void updateIsActiveAccessTokenByUserId(boolean isActive, Integer userId);
+	
+	Optional <UserDevice> findByDeviceId(String deviceId);
 
 }

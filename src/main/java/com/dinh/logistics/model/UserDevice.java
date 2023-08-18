@@ -31,4 +31,7 @@ public class UserDevice {
 	@Column(name = "device_id")
 	private String deviceId;
 	
+	@Column(name = "firebase_token")
+	private String firebase_token;
+	
 }
