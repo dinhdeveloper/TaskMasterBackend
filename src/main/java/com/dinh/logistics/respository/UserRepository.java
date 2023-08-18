@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.dinh.logistics.model.Users;
 
 @Repository
-public interface UserRepository extends JpaRepository<Users, Long> {
+public interface UserRepository extends JpaRepository<Users, Integer> {
 	
 	Optional<Users> findByUserName(String username);
 	
