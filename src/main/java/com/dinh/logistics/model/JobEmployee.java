@@ -9,13 +9,14 @@ import javax.persistence.*;
 public class JobEmployee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "Job_emp_id")
+    private Integer JobEmpId;
 
     @Column(name = "job_id")
-    private String jobId;
+    private Integer jobId;
 
     @Column(name = "emp_id")
-    private String empId;
+    private Integer empId;
 
     @Column(name = "state")
     private Integer state;

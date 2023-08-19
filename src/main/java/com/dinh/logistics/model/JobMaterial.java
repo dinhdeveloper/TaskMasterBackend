@@ -21,6 +21,9 @@ public class JobMaterial {
     @Column(name = "weight")
     private Integer weight;
 
+    @Column(name = "weight_to_cus")
+    private Integer WeightToCus;
+
     @Column(name = "unit_price")
     private Integer unitPrice;
 

@@ -23,9 +23,15 @@ public class Employee {
     @Column(name = "gender")
     private String gender;
 
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "team_id")
     private Integer teamId;
-    
+
+    @Column(name = "pos_id")
+    private Integer posId;
+
     @Column(name = "num_address")
     private String numAddress;
     
@@ -47,6 +53,6 @@ public class Employee {
     @Column(name = "start_date")
     private Date startDate;
     
-    @Column(name = "role")
-    private String role;
+    @Column(name = "role_id")
+    private Integer role;
 }

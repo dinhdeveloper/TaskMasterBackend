@@ -15,9 +15,6 @@ public class Team {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "leader_phone")
-    private String leaderPhone;
-
     @Column(name = "territory")
     private String territory;
 
