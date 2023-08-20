@@ -70,13 +70,15 @@ public class testController {
 	
 	@PostMapping("/test2")
 	public ResponseEntity<Object> test2(@RequestParam String token,
+			@RequestParam String title,
+			@RequestParam String type,
 			@RequestParam String message){
 		try {
 			
 	        // Dữ liệu JSON để gửi
             FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
-            sendFirebaseData.setTitle("test");
-            sendFirebaseData.setType("test");
+            sendFirebaseData.setTitle(title);
+            sendFirebaseData.setType(type);
             sendFirebaseData.setData(message);
 
             Gson gson = new Gson();
