@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mobile")
@@ -25,14 +28,18 @@ public class JobTypeController {
 
     @GetMapping("/job_type/list")
     public ResponseEntity<Object> getListJobType(){
-//        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS,
-//                jobRepository.findAll(Sort.by(Sort.Direction.ASC, "job_type_id")));
-
         List<JobType> data = jobRepository.findAll();
         if (data.isEmpty()){
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
-        }else {
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, data);
+        } else {
+            List<JobType> dTOList = new ArrayList<>();
+            for (JobType jobType : data) {
+                dTOList.add(jobType);
+            }
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("listItem", dTOList);
+
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, responseData);
         }
     }
 }
