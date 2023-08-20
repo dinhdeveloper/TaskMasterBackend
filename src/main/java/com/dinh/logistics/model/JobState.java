@@ -16,5 +16,5 @@ public class JobState {
     private String jobStateDesc;
 
     @Column(name = "state")
-    private String state;
+    private boolean state;
 }

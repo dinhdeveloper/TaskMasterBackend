@@ -59,6 +59,6 @@ public class CollectPoint {
     private String useCusBank;
 
     @Column(name = "state")
-    private String state;
+    private boolean state;
 
 }

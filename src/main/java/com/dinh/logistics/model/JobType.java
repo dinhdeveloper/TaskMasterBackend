@@ -19,5 +19,5 @@ public class JobType {
     private String jobTypeDesc;
 
     @Column(name = "state")
-    private String state;
+    private boolean state;
 }

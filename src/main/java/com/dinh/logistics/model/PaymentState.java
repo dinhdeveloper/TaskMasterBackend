@@ -19,5 +19,5 @@ public class PaymentState {
     private String paymentStateDesc;
 
     @Column(name = "state")
-    private String state;
+    private boolean state;
 }
