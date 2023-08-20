@@ -25,13 +25,14 @@ public class MediaController {
     @PostMapping("/upload_image")
     public ResponseEntity<Object> uploadImages(
             @RequestParam("job_id") int jobId,
-            @RequestParam("url") List<MultipartFile> images,
+            @RequestParam("url_image") List<MultipartFile> images,
+            @RequestParam("url_video") MultipartFile videos,
             @RequestParam("media_type") int mediaType,
             @RequestParam("media_cate_id") int mediaCateId
     ) {
         try {
-            mediaService.uploadImages(jobId, images, mediaType, mediaCateId);
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
+            mediaService.uploadImages(jobId, images,videos, mediaType, mediaCateId);
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload thành công");
         } catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e.getMessage());
         }

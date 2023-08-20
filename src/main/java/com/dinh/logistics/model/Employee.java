@@ -48,11 +48,11 @@ public class Employee {
     private String province;
     
     @Column(name = "state")
-    private Integer state;
+    private boolean state;
     
     @Column(name = "start_date")
     private Date startDate;
     
     @Column(name = "role_id")
-    private boolean role;
+    private Integer role;
 }

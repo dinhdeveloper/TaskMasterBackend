@@ -28,7 +28,7 @@ public class MediaService {
     @Autowired
     private JobMediaRepository jobMediaRepository;
 
-    public void uploadImages(int jobId, List<MultipartFile> images, int mediaType, int mediaCateId){
+    public void uploadImages(int jobId, List<MultipartFile> images,MultipartFile videos, int mediaType, int mediaCateId){
         // Xử lý logic với jobId, mediaType, mediaCateId
     	int count = 0;
         for (MultipartFile image : images) {
