@@ -19,7 +19,7 @@ public class JobEmployee {
     private Integer empId;
 
     @Column(name = "state")
-    private Integer state;
+    private boolean state;
 
 
 }

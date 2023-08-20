@@ -16,6 +16,6 @@ public class MediaCategory {
     private String mediaDesc;
 
     @Column(name = "state")
-    private String state;
+    private boolean state;
 
 }

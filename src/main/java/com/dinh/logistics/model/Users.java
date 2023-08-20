@@ -26,6 +26,6 @@ public class Users {
     private String password;
 
     @Column(name = "State")
-    private Integer state;
+    private boolean state;
 
 }

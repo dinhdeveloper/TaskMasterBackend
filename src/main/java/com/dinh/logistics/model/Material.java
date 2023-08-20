@@ -23,5 +23,5 @@ public class Material {
 
 
     @Column(name = "state")
-    private String state;
+    private boolean state;
 }

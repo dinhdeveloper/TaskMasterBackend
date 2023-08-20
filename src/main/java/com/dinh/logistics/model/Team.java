@@ -15,10 +15,13 @@ public class Team {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "leader_id")
+    private String leaderId;
+
     @Column(name = "territory")
     private String territory;
 
     @Column(name = "state")
-    private String state;
+    private boolean state;
 
 }

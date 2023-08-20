@@ -40,6 +40,6 @@ public class Customers {
     private String bankAcctNumber;
 
     @Column(name = "state")
-    private Integer state;
+    private boolean state;
 
 }
