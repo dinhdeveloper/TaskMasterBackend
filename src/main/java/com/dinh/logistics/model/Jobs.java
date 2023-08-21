@@ -3,6 +3,8 @@ package com.dinh.logistics.model;
 import lombok.Data;
 
 import javax.persistence.*;
+
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -19,10 +21,7 @@ public class Jobs {
     @Column(name = "job_type_id")
     private Integer jobTypeId;
 
-    @Column(name = "job_media_id")
-    private Integer jobMediaId;
-
-    @Column(name = "payment_state_id")
+    @Column(name = "payment_state_id", nullable = false, columnDefinition = "integer default 1")
     private Integer paymentStateId;
 
     @Column(name = "payment_method")
@@ -41,19 +40,19 @@ public class Jobs {
     private Integer jobStateId;
 
     @Column(name = "creation_time")
-    private String creationTime;
+    private Timestamp creationTime;
 
     @Column(name = "assign_time")
-    private Date assignTime;
+    private Timestamp assignTime;
 
     @Column(name = "collect_finish_time")
-    private Date collectFinishTime;
+    private Timestamp collectFinishTime;
 
     @Column(name = "trans_time")
-    private Date transTime;
+    private Timestamp transTime;
 
     @Column(name = "finish_time")
-    private Date finishTime;
+    private Timestamp finishTime;
 
     @Column(name = "note")
     private String note;
