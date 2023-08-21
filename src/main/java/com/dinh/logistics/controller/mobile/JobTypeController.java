@@ -2,6 +2,7 @@ package com.dinh.logistics.controller.mobile;
 
 import com.dinh.logistics.model.JobType;
 import com.dinh.logistics.respository.JobRepository;
+import com.dinh.logistics.respository.JobTypeRepository;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +25,11 @@ import java.util.Map;
 public class JobTypeController {
 
     @Autowired
-    JobRepository jobRepository;
+    JobTypeRepository jobTypeRepository;
 
     @GetMapping("/job_type/list")
     public ResponseEntity<Object> getListJobType(){
-        List<JobType> data = jobRepository.findAll();
+        List<JobType> data = jobTypeRepository.findAll();
         if (data.isEmpty()){
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         } else {
