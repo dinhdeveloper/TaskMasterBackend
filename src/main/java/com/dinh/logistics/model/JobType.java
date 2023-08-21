@@ -20,4 +20,7 @@ public class JobType {
 
     @Column(name = "state")
     private boolean state;
+    
+    @Column(name = "code")
+    private String code;
 }
