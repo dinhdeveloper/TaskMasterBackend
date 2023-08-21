@@ -1,6 +1,5 @@
 package com.dinh.logistics.model;
 
-import io.swagger.models.auth.In;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,7 +19,4 @@ public class JobType {
 
     @Column(name = "state")
     private boolean state;
-    
-    @Column(name = "code")
-    private String code;
 }
