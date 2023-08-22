@@ -57,5 +57,8 @@ public class Jobs {
     @Column(name = "note")
     private String note;
 
+    @Column(name = "emp_assign_id")
+    private String empAssignId;
+
 
 }
