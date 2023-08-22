@@ -2,8 +2,12 @@ package com.dinh.logistics.service.portal;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +55,7 @@ public class ExcelFileService {
 	EmployeeRepository employeeRepository;
 
 	@SuppressWarnings("unused")
-	public void uploadJobs (MultipartFile file) {
+	public File uploadJobs (MultipartFile file) {
 		try {
             // Đọc dữ liệu từ tệp Excel và lưu vào cơ sở dữ liệu
             Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -81,6 +85,9 @@ public class ExcelFileService {
 //                	String column1Value = row.getCell(0).getStringCellValue();
 //                    String column2Value = row.getCell(1).getStringCellValue();
 //                    String column3Value = row.getCell(2).getStringCellValue();
+                	Cell cell1 = row.getCell(0);
+                	Cell cell2 = row.getCell(1);
+                	
                     Cell cell4 = row.getCell(3);
                     Cell cell5 = row.getCell(4);
                     Cell cell6 = row.getCell(5);
@@ -123,21 +130,22 @@ public class ExcelFileService {
                     	job.setCollePointId(getIntValueFromCell(cell4));
                     	job.setJobTypeId((getIntValueFromCell(cell5)));
                     	
-                    	Integer priority = (int) row.getCell(9).getNumericCellValue();
+                    	Double priorityDouble = cell9.getNumericCellValue();
+                    	Integer priority = priorityDouble.intValue();
                     	job.setPriority(priority);
                     	job.setNote(cell10.getStringCellValue());
+                    	job.setPaymentStateId(1);
                     	
-                    	Date now = new Date();
-                    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
-                        String strDateNow = formatter.format(now);
+                    	LocalDateTime currentDateTime = LocalDateTime.now();
+                        Timestamp currentTimestamp = Timestamp.valueOf(currentDateTime);
                         
-                        job.setCreationTime(strDateNow);
-                        job.setAssignTime(now);
+                        job.setCreationTime(currentTimestamp);
+                        job.setAssignTime(currentTimestamp);
                     	
                     	Jobs newJob = jobRepository.save(job);
                     	
                     	//luu vao excel
-                    	row.getCell(1).setCellValue(newJob.getJob_id().toString());
+                    	cell2.setCellValue(newJob.getJob_id().toString());
                     	
                     	//
                     	JobEmployee jobEmp1 = new JobEmployee();
@@ -162,7 +170,7 @@ public class ExcelFileService {
                     	
                     } else {
                     	//
-                    	row.getCell(0).setCellValue(validate);
+                    	cell1.setCellValue(validate);
                     	continue;
                     }
                     
@@ -170,9 +178,16 @@ public class ExcelFileService {
                 
             }
 
+         // Ghi dữ liệu đã sửa vào tệp mới
+            File outputFile = new File("CongViec-Upload-Report.xlsx");
+            try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+                workbook.write(outputStream);
+            }
             workbook.close();
+            return outputFile;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
 	}
 	
