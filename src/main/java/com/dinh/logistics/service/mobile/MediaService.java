@@ -2,6 +2,7 @@ package com.dinh.logistics.service.mobile;
 
 import com.dinh.logistics.dto.mobile.CollectPointDto;
 import com.dinh.logistics.dto.mobile.JobMediaDto;
+import com.dinh.logistics.model.JobMedia;
 import com.dinh.logistics.respository.JobMediaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +30,17 @@ public class MediaService {
     @Autowired
     private JobMediaRepository jobMediaRepository;
 
-    public boolean uploadVideos(int jobId, MultipartFile urlVideo, int mediaType, int mediaCateId){
+    public boolean uploadVideos(int jobId, MultipartFile urlVideo, int mediaType){
         try {
+
+            List<JobMedia> existingVideos = jobMediaRepository.getJobMediaByJobIdAndMediaType(jobId, 2);
+            if (existingVideos.size() > 0){
+                for (JobMedia existingVideo : existingVideos) {
+                    deleteMediaFile(existingVideo.getUrl());
+                    jobMediaRepository.deleteJobMediaByUrl(existingVideo.getUrl());
+                }
+            }
+
             if (urlVideo != null && !urlVideo.isEmpty()) {
                 String videoFilename = urlVideo.getOriginalFilename();
 
@@ -51,9 +61,8 @@ public class MediaService {
                     JobMediaDto videoJobMedia = new JobMediaDto();
                     videoJobMedia.setJobId(jobId);
                     videoJobMedia.setUrl(mediaFileLocation + "/" + newVideoFileName);
-                    videoJobMedia.setMediaType(mediaType);
-                    videoJobMedia.setMediaCateId(mediaCateId);
-                    jobMediaRepository.insertJobMedia(videoJobMedia.getUrl(), videoJobMedia.getMediaType(), videoJobMedia.getMediaCateId(), videoJobMedia.getJobId());
+                    videoJobMedia.setMediaType(2);
+                    jobMediaRepository.insertJobMedia(videoJobMedia.getUrl(), videoJobMedia.getMediaType(), videoJobMedia.getJobId());
                 } catch (IOException ex) {
                     // Xử lý ngoại lệ
                 }
@@ -64,8 +73,16 @@ public class MediaService {
         }
     }
 
-    public boolean uploadListImages(int jobId, List<MultipartFile> listUrlImage, int mediaType, int mediaCateId) {
+    public boolean uploadListImages(int jobId, List<MultipartFile> listUrlImage, int mediaType) {
         try {
+
+            List<JobMedia> existingImages = jobMediaRepository.getJobMediaByJobIdAndMediaType(jobId, 1);
+            if (existingImages.size() > 0) {
+                for (JobMedia existingImage : existingImages) {
+                    deleteMediaFile(existingImage.getUrl());
+                    jobMediaRepository.deleteJobMediaByUrl(existingImage.getUrl());
+                }
+            }
 
             int count = 0;
             for (MultipartFile image : listUrlImage) {
@@ -97,13 +114,64 @@ public class MediaService {
                 JobMediaDto jobMedia = new JobMediaDto();
                 jobMedia.setJobId(jobId);
                 jobMedia.setUrl(mediaFileLocation + "/" + newFileName);
-                jobMedia.setMediaType(mediaType);
-                jobMedia.setMediaCateId(mediaCateId);
-                jobMediaRepository.insertJobMedia(jobMedia.getUrl(), jobMedia.getMediaType(), jobMedia.getMediaCateId(), jobMedia.getJobId());
+                jobMedia.setMediaType(1);
+                jobMediaRepository.insertJobMedia(jobMedia.getUrl(), jobMedia.getMediaType(), jobMedia.getJobId());
             }
             return true; // Thêm dữ liệu thành công
         } catch (Exception e) {
             return false; // Thêm dữ liệu thất bại
+        }
+    }
+
+    public boolean uploadListImagesDeleteVideo(int jobId, List<MultipartFile> listUrlImage, int mediaType) {
+        try {
+            // First, delete existing video associated with the job
+            List<JobMedia> existingVideos = jobMediaRepository.getJobMediaByJobIdAndMediaType(jobId, 2);
+            if (existingVideos.size() > 0){
+                for (JobMedia existingVideo : existingVideos) {
+                    deleteMediaFile(existingVideo.getUrl());
+                    jobMediaRepository.deleteJobMediaByUrl(existingVideo.getUrl());
+                }
+            }
+            // Upload new images
+            if (uploadListImages(jobId, listUrlImage, mediaType)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean uploadVideosDeleteImage(int jobId, MultipartFile urlVideo, int mediaType) {
+        try {
+            // First, delete existing images associated with the job
+            List<JobMedia> existingImages = jobMediaRepository.getJobMediaByJobIdAndMediaType(jobId, 1);
+            if (existingImages.size() > 0){
+                for (JobMedia existingImage : existingImages) {
+                    deleteMediaFile(existingImage.getUrl());
+                    jobMediaRepository.deleteJobMediaByUrl(existingImage.getUrl());
+                }
+            }
+
+            // Upload new video
+            if (uploadVideos(jobId, urlVideo, mediaType)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void deleteMediaFile(String url) {
+        try {
+            Path filePath = Paths.get(url);
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            // Handle the exception here, e.g., log the error
         }
     }
 }
