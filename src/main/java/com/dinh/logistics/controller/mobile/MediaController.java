@@ -22,29 +22,78 @@ public class MediaController {
     @Autowired
     private MediaService mediaService;
 
-    @PostMapping("/upload_image")
-    public ResponseEntity<Object> uploadImages(
+    @PostMapping("/upload_image_video")
+    public ResponseEntity<Object> uploadMultiImageVideo(
             @RequestParam("job_id") int jobId,
-            @RequestParam("url_image") List<MultipartFile> images,
-            @RequestParam("url_video") MultipartFile videos,
-            @RequestParam("media_type") int mediaType,
-            @RequestParam("media_cate_id") int mediaCateId
+            @RequestParam("url_image") List<MultipartFile> listUrlImage,
+            @RequestParam("url_video") MultipartFile urlVideo,
+            @RequestParam("media_type") int mediaType
     ) {
         try {
-            mediaService.uploadImages(jobId, images,videos, mediaType, mediaCateId);
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload thành công");
+            if (mediaService.uploadVideos(jobId, urlVideo, mediaType)) {
+                if (mediaService.uploadListImages(jobId, listUrlImage, mediaType)){
+                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload thành công");
+                }else {
+                    return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Upload thất bại");
+                }
+            } else {
+                return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload thất bại");
+            }
         } catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e.getMessage());
         }
     }
 
-    @PostMapping("/upload/video")
-    public ResponseEntity<Object> uploadVideo(@RequestParam("video") MultipartFile video) {
+    @PostMapping("/upload_image")
+    public ResponseEntity<Object> uploadMultiImage(
+            @RequestParam("job_id") int jobId,
+            @RequestParam("url_image") List<MultipartFile> listUrlImage,
+            @RequestParam("media_type") int mediaType,
+            @RequestParam("close_video") boolean checkCloseVideos
+    ) {
         try {
-            //mediaService.uploadVideo(video);
-            return ResponseEntity.ok("Video uploaded successfully");
+            if (!checkCloseVideos){
+                if (mediaService.uploadListImagesDeleteVideo(jobId, listUrlImage, mediaType)){
+                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
+                }else {
+                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thất bại");
+                }
+            }else {
+                if (mediaService.uploadListImages(jobId, listUrlImage, mediaType)){
+                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload hình ảnh thành công");
+                }else {
+                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload hình ảnh thất bại");
+                }
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload video");
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/upload_video")
+    public ResponseEntity<Object> uploadVideo(
+            @RequestParam("job_id") int jobId,
+            @RequestParam("url_video") MultipartFile urlVideo,
+            @RequestParam("media_type") int mediaType,
+            @RequestParam("close_images") boolean checkCloseImage
+    ) {
+        try {
+            if (!checkCloseImage){
+                if (mediaService.uploadVideosDeleteImage(jobId, urlVideo, mediaType)) {
+                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload video thành công");
+                } else {
+                    return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Upload video thất bại");
+                }
+            }else {
+                if (mediaService.uploadVideos(jobId, urlVideo, mediaType)) {
+                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload video thành công");
+                } else {
+                    return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Upload video thất bại");
+                }
+            }
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e.getMessage());
         }
     }
 
