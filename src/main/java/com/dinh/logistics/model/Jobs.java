@@ -58,7 +58,7 @@ public class Jobs {
     private String note;
 
     @Column(name = "emp_assign_id")
-    private String empAssignId;
+    private Integer empAssignId;
 
 
 }
