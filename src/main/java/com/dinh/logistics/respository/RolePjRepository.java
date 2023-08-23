@@ -13,6 +13,7 @@ public interface RolePjRepository extends JpaRepository<RolePj, Integer>{
 
 	List<Integer> findByRoleCode(String string);
 
-	
-	
+	@Query(value = "select role_id from role_pj where role_code = ?1 and state = true", nativeQuery = true)
+	List<Integer> getListIdByRoleCode(String roleCode);
+
 }
