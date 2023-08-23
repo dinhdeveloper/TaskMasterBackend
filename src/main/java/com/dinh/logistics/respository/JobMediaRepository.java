@@ -1,6 +1,7 @@
 package com.dinh.logistics.respository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
@@ -38,5 +39,26 @@ public class JobMediaRepository {
                 .setParameter(1, url)
                 .executeUpdate();
     }
+
+    public JobMedia findByJobIdAndUrlAndMediaType(int jobId, String url, int mediaType) {
+        String jpql = "SELECT jm FROM JobMedia jm WHERE jm.jobId = :jobId AND jm.url = :url AND jm.mediaType = :mediaType";
+        try {
+            return entityManager.createQuery(jpql, JobMedia.class)
+                    .setParameter("jobId", jobId)
+                    .setParameter("url", url)
+                    .setParameter("mediaType", mediaType)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null; // Trả về null nếu không có kết quả thỏa mãn
+        }
+    }
+
+//    @Transactional
+//    public void deleteJobMediaByUrl(String url) {
+//        String sql = "DELETE FROM job_media WHERE url = :url";
+//        entityManager.createNativeQuery(sql)
+//                .setParameter("url", url)
+//                .executeUpdate();
+//    }
 }
 
