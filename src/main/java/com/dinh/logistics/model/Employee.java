@@ -54,5 +54,5 @@ public class Employee {
     private Date startDate;
     
     @Column(name = "role_id")
-    private Integer role;
+    private Integer roleId;
 }
