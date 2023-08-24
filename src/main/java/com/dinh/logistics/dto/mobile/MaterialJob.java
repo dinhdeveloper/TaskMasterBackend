@@ -6,6 +6,7 @@ public class MaterialJob {
     private Integer weight;
     private Integer weightToCus;
     private Integer price;
+    private String  name;
 
     public Integer getMateId() {
         return mateId;
@@ -45,5 +46,13 @@ public class MaterialJob {
 
     public void setPrice(Integer price) {
         this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
