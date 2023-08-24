@@ -1,5 +1,7 @@
 package com.dinh.logistics.controller.mobile;
 
+import com.dinh.logistics.dto.mobile.AddJobsDto;
+import com.dinh.logistics.dto.mobile.DeleteMediaRequest;
 import com.dinh.logistics.service.mobile.MediaService;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;
@@ -30,8 +32,8 @@ public class MediaController {
             @RequestParam("media_type") int mediaType
     ) {
         try {
-            if (mediaService.uploadVideos(jobId, urlVideo, mediaType)) {
-                if (mediaService.uploadListImages(jobId, listUrlImage, mediaType)){
+            if (mediaService.uploadVideos(jobId, urlVideo)) {
+                if (mediaService.uploadListImages(jobId, listUrlImage)){
                     return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload thành công");
                 }else {
                     return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Upload thất bại");
@@ -48,22 +50,13 @@ public class MediaController {
     public ResponseEntity<Object> uploadMultiImage(
             @RequestParam("job_id") int jobId,
             @RequestParam("url_image") List<MultipartFile> listUrlImage,
-            @RequestParam("media_type") int mediaType,
-            @RequestParam("close_video") boolean checkCloseVideos
+            @RequestParam("media_type") int mediaType
     ) {
         try {
-            if (!checkCloseVideos){
-                if (mediaService.uploadListImagesDeleteVideo(jobId, listUrlImage, mediaType)){
-                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
-                }else {
-                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thất bại");
-                }
+            if (mediaService.uploadListImages(jobId, listUrlImage)){
+                return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload hình ảnh thành công");
             }else {
-                if (mediaService.uploadListImages(jobId, listUrlImage, mediaType)){
-                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload hình ảnh thành công");
-                }else {
-                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload hình ảnh thất bại");
-                }
+                return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload hình ảnh thất bại");
             }
         } catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e.getMessage());
@@ -75,26 +68,25 @@ public class MediaController {
     public ResponseEntity<Object> uploadVideo(
             @RequestParam("job_id") int jobId,
             @RequestParam("url_video") MultipartFile urlVideo,
-            @RequestParam("media_type") int mediaType,
-            @RequestParam("close_images") boolean checkCloseImage
+            @RequestParam("media_type") int mediaType
     ) {
         try {
-            if (!checkCloseImage){
-                if (mediaService.uploadVideosDeleteImage(jobId, urlVideo, mediaType)) {
-                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload video thành công");
-                } else {
-                    return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Upload video thất bại");
-                }
-            }else {
-                if (mediaService.uploadVideos(jobId, urlVideo, mediaType)) {
-                    return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload video thành công");
-                } else {
-                    return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Upload video thất bại");
-                }
+            if (mediaService.uploadVideos(jobId, urlVideo)) {
+                return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Upload video thành công");
+            } else {
+                return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Upload video thất bại");
             }
         } catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e.getMessage());
         }
     }
 
+    @PostMapping("/delete_media")
+    public ResponseEntity<Object> deleteMedia(@RequestBody DeleteMediaRequest deleteMediaRequest) {
+        if (mediaService.deleteMedia(deleteMediaRequest.getJobId(), deleteMediaRequest.getUrl(), deleteMediaRequest.getMediaType())) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
+        } else {
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
+        }
+    }
 }

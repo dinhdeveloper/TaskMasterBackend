@@ -39,7 +39,10 @@ public class JobsController {
             @PathVariable Integer newStateId) {
         try {
             jobsService.updateStateJob(jobId, newStateId);
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
+            UpdateJobsResponse response = new UpdateJobsResponse();
+            response.setStateJobs(newStateId);
+            response.setDescription("Cập nhật thành công");
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
         } catch (Exception e) {
             log.error("Error updating job state: {}", e.getMessage());
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
