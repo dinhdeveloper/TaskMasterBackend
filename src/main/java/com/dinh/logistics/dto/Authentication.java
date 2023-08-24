@@ -7,4 +7,5 @@ public class Authentication {
 
 	private String tokenAuth;
 	private String tokenFirebase;
+	private String role;
 }

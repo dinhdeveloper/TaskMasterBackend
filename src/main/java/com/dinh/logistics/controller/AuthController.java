@@ -20,8 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dinh.logistics.dto.Authentication;
 import com.dinh.logistics.dto.LoginDto;
 import com.dinh.logistics.exception.RecordNotFoundException;
+import com.dinh.logistics.model.Employee;
+import com.dinh.logistics.model.RolePj;
 import com.dinh.logistics.model.UserDevice;
 import com.dinh.logistics.model.Users;
+import com.dinh.logistics.respository.EmployeeRepository;
+import com.dinh.logistics.respository.RolePjRepository;
 import com.dinh.logistics.respository.UserDeviceRepository;
 import com.dinh.logistics.respository.UserRepository;
 import com.dinh.logistics.service.TokenGenerator;
@@ -46,6 +50,12 @@ public class AuthController {
 	
 	@Autowired
 	TokenGenerator tokenGenerator;
+	
+	@Autowired
+	EmployeeRepository employeeRepository;
+	
+	@Autowired
+	RolePjRepository rolePjRepository;
 	
 	@Autowired UserDeviceRepository userDeviceRepository;
 	
@@ -73,8 +83,16 @@ public class AuthController {
 	            	userDevice.setDeviceId(loginDto.getDeviceId());
 	            	userDevice.setFirebase_token(null);
 	            	tokenManager.addToken(userDevice);
+	            	
+	            	
+	            	
 	            	Authentication auth = new Authentication();
 	            	auth.setTokenAuth(token);
+	            	Employee empl = employeeRepository.findById(user.getEmployeeId()).orElse(null);
+	            	if(empl != null) {
+	            		RolePj role = rolePjRepository.findById(empl.getRoleId()).orElse(null);
+	            		auth.setRole(role.getRoleCode());
+	            	}
 	            	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, auth);
 	            } else {
 	            	return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Sai mật khẩu");
