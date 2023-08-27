@@ -4,7 +4,6 @@ import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.MaterialJob;
 import com.dinh.logistics.dto.mobile.MediaDto;
 import com.dinh.logistics.model.Jobs;
-import io.swagger.models.auth.In;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -63,7 +62,7 @@ public class JobsRepositoryImp {
 
         String sqlQueryMaterial = "SELECT jm.jobMateId, jm.weight, jm.WeightToCus, jm.unitPrice, jm.jobId, m.name " +
                 "FROM JobMaterial jm " +
-                "LEFT JOIN Material m ON m.mate_id = jm.jobMateId WHERE jm.jobId = :jobId";
+                "LEFT JOIN Material m ON m.mate_id = jm.mateId WHERE jm.jobId = :jobId";
         Query queryMaterial = entityManager.createQuery(sqlQueryMaterial);
         queryMaterial.setParameter("jobId", job_id);
         List<Object[]> dataMaterial = queryMaterial.getResultList();

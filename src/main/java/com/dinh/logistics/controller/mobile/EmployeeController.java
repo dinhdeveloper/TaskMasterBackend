@@ -31,7 +31,7 @@ public class EmployeeController {
     // get all employees
     @GetMapping("/employees")
     public ResponseEntity<Object> getAllEmployees(){
-        List<Employee> data = employeeRepository.findAll();
+        List<Employee> data = employeeRepository.findEmployeesExcludingRoles();
         if (data.isEmpty()){
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         } else {
@@ -50,9 +50,9 @@ public class EmployeeController {
     @GetMapping("/employees/{id}")
     public ResponseEntity<Object> getEmployeeById(@PathVariable Integer id) {
         if (id == -1){
-            employeeList = employeeRepository.findAll();
+            employeeList = employeeRepository.findEmployeesExcludingRoles();
         }else {
-            employeeList = employeeService.getData(id);
+            employeeList = employeeService.findEmployeesExcludingRolesAndId(id);
         }
         if (employeeList.isEmpty()){
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
