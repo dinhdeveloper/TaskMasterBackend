@@ -40,7 +40,7 @@ public class FirebaseController {
 		String jwtToken = token.substring(7);
 		UserDevice userDevice = userDeviceRepository.findByAccessTokenAndIsActiveAccessTokenTrue(jwtToken).orElse(new UserDevice());
         if (!Objects.isNull(userDevice)){
-        	userDevice.setFirebase_token(firebaseToken);
+        	userDevice.setFirebaseToken(firebaseToken);
         	userDeviceRepository.save(userDevice);
         	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         }else {

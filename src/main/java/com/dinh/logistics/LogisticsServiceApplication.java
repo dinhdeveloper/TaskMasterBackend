@@ -39,6 +39,7 @@ public class LogisticsServiceApplication {
                         .excludePathPatterns("/api/portal/**")
                         .excludePathPatterns("/api/auth/login")
                         .excludePathPatterns("/api/test/**")
+                        .excludePathPatterns("/api/notification/**")
                         ;
             }
         };

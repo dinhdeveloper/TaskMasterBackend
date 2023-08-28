@@ -56,7 +56,7 @@ public class testController {
             
             // Gửi
             Message message = Message.builder()
-            		.setToken(userDevice.getFirebase_token())
+            		.setToken(userDevice.getFirebaseToken())
             		.putData("data", jsonData)
             		.build();
             String response = FirebaseMessaging.getInstance().send(message);

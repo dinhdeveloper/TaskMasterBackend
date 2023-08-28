@@ -33,6 +33,6 @@ public class UserDevice {
 	private String deviceId;
 	
 	@Column(name = "firebase_token")
-	private String firebase_token;
+	private String firebaseToken;
 	
 }

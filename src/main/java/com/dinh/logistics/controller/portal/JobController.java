@@ -92,4 +92,30 @@ public class JobController {
         }
     }
 	
+	@GetMapping("/jobsExport")
+    public ResponseEntity<Resource> jobsExport(@RequestParam(name = "page", defaultValue = "1") Integer page,
+			@RequestParam(name = "size", defaultValue = "1") Integer size,
+			@RequestParam(name = "fromDate",required = false,defaultValue = "")  String startDate,
+			@RequestParam(name = "toDate",required = false,defaultValue = "")  String endDate){
+		
+		try {
+			
+        	File outputFile = excelFileService.exportJobs(startDate, endDate, page, size);
+        	
+        	// Tạo ResponseEntity để trả về tệp xuất ra để tải về
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(outputFile));
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=job-export.xlsx");
+        	
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(outputFile.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } catch(Exception e) {
+        	e.printStackTrace();
+        	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+	
 }
