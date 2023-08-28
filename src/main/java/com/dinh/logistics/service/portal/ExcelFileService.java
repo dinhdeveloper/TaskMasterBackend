@@ -162,6 +162,7 @@ public class ExcelFileService {
                     	jobEmp1.setJobId(newJob.getJob_id());
                     	jobEmp1.setEmpId(getIntValueFromCell(cell6));
                     	jobEmp1.setState(true);
+                    	jobEmp1.setSerialNumber("1");;
                     	jobEmployeeRepository.save(jobEmp1);
                     	
                     	//
@@ -169,6 +170,7 @@ public class ExcelFileService {
                     	jobEmp2.setJobId(newJob.getJob_id());
                     	jobEmp2.setEmpId(getIntValueFromCell(cell7));
                     	jobEmp2.setState(true);
+                    	jobEmp2.setSerialNumber("2");
                     	jobEmployeeRepository.save(jobEmp2);
                     	
                     	//
@@ -176,6 +178,7 @@ public class ExcelFileService {
                     	jobEmp3.setJobId(newJob.getJob_id());
                     	jobEmp3.setEmpId(getIntValueFromCell(cell8));
                     	jobEmp3.setState(true);
+                    	jobEmp3.setSerialNumber("3");
                     	jobEmployeeRepository.save(jobEmp3);
                     	
                     } else {
