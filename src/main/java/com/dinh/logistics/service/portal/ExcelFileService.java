@@ -18,12 +18,16 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dinh.logistics.dao.JobDao;
+import com.dinh.logistics.dto.portal.JobListDto;
 import com.dinh.logistics.model.CollectPoint;
+import com.dinh.logistics.model.Employee;
 import com.dinh.logistics.model.JobEmployee;
 import com.dinh.logistics.model.Jobs;
 import com.dinh.logistics.respository.CollectPointRepository;
@@ -32,6 +36,7 @@ import com.dinh.logistics.respository.JobEmployeeRepository;
 import com.dinh.logistics.respository.JobRepository;
 import com.dinh.logistics.respository.JobTypeRepository;
 import com.dinh.logistics.respository.RolePjRepository;
+import com.dinh.logistics.ultils.AppConstants;
 
 @Service
 public class ExcelFileService {
@@ -53,8 +58,10 @@ public class ExcelFileService {
 	
 	@Autowired
 	EmployeeRepository employeeRepository;
+	
+	@Autowired
+	JobDao jobDao;
 
-	@SuppressWarnings("unused")
 	public File uploadJobs (MultipartFile file) {
 		try {
             // Đọc dữ liệu từ tệp Excel và lưu vào cơ sở dữ liệu
@@ -111,15 +118,18 @@ public class ExcelFileService {
                     if(column5Validate != null) {
                     	validate += column5Validate;
                     }
-                    if(column6Validate != null) {
-                    	validate += column6Validate;
+                    if( column6Validate != null && column7Validate != null && column8Validate != null) {
+                    	validate += "Phải có ít nhất 1 nhân viên";
                     }
-                    if(column7Validate != null) {
-                    	validate += column7Validate;
-                    }
-                    if(column8Validate != null) {
-                    	validate += column8Validate;
-                    }
+//                    if(column6Validate != null) {
+//                    	validate += column6Validate;
+//                    }
+//                    if(column7Validate != null) {
+//                    	validate += column7Validate;
+//                    }
+//                    if(column8Validate != null) {
+//                    	validate += column8Validate;
+//                    }
                     if(column9Validate != null) {
                     	validate += column9Validate;
                     }
@@ -186,6 +196,73 @@ public class ExcelFileService {
             workbook.close();
             return outputFile;
         } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+	}
+	
+	public File exportJobs(String startDate, String endDate, int page, int size) {
+		try {
+			//role_id tx
+			List<Integer> roleTxId = rolePjRepository.getListIdByRoleCode(AppConstants.ROLE_CODE_TX);
+			
+			//get job list
+			List<JobListDto> jobList = jobDao.getAllJobByFilter(startDate, endDate, page, size);
+					
+			//get employee
+			for (JobListDto job : jobList) {
+				List<JobEmployee> jobEmplList = jobEmployeeRepository.findAllByJobId(job.getId());
+				for (JobEmployee JobEmployee : jobEmplList) {
+					Employee employee = employeeRepository.findById(JobEmployee.getEmpId()).orElse(null);
+					if (employee != null) {
+						if (employee.getRoleId() == roleTxId.get(0)) {
+							job.setEmployee_3(employee.getName());
+						} else {
+							if (StringUtils.isEmpty(job.getEmployee_1())) {
+								job.setEmployee_1(employee.getName());
+							} else {
+								job.setEmployee_2(employee.getName());
+							}
+						}
+					}
+				}
+			}
+			
+			Workbook workbook = new XSSFWorkbook();
+	        Sheet sheet = workbook.createSheet("Data");
+
+	        int rowNum = 0;
+	        Row headerRow = sheet.createRow(rowNum++);
+	        headerRow.createCell(0).setCellValue("Mã công việc");
+	        headerRow.createCell(1).setCellValue("Địa điểm");
+	        headerRow.createCell(2).setCellValue("Ngày tạo");
+	        headerRow.createCell(3).setCellValue("Loại việc");
+	        headerRow.createCell(4).setCellValue("NV 1");
+	        headerRow.createCell(5).setCellValue("NV 2");
+	        headerRow.createCell(6).setCellValue("Tài xế");
+	        headerRow.createCell(7).setCellValue("Ưu tiên");
+	        headerRow.createCell(8).setCellValue("Ghi chú");
+
+	        for (JobListDto job : jobList) {
+	            Row row = sheet.createRow(rowNum++);
+	            row.createCell(0).setCellValue(job.getId());
+	            row.createCell(1).setCellValue(job.getCollectPoint());
+	            row.createCell(2).setCellValue(job.getCreateDate());
+	            row.createCell(3).setCellValue(job.getJobType());
+	            row.createCell(4).setCellValue(job.getEmployee_1());
+	            row.createCell(5).setCellValue(job.getEmployee_2());
+	            row.createCell(6).setCellValue(job.getEmployee_3());
+	            row.createCell(7).setCellValue(job.getPriority());
+	            row.createCell(8).setCellValue(job.getNote());
+	        }
+
+	        File outputFile = new File("export.xlsx");
+	        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+	            workbook.write(outputStream);
+	        }
+	        workbook.close();
+	        return outputFile;
+		} catch (IOException e) {
             e.printStackTrace();
             return null;
         }

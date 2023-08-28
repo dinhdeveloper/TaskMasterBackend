@@ -1,6 +1,7 @@
 package com.dinh.logistics.dao.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import com.dinh.logistics.dao.JobDao;
+import com.dinh.logistics.dto.UserDeviceDto;
 import com.dinh.logistics.dto.portal.JobListDto;
+import com.dinh.logistics.model.UserDevice;
 import com.dinh.logistics.ultils.DateHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +68,24 @@ public class JobDaoImpl implements JobDao{
         return total;
     }
     
+    @Override
+    public List<UserDeviceDto> getListUserDeviceToPushNotification(List<Integer> ids) {
+    	StringBuilder builder = new StringBuilder();
+
+        builder.append(" select distinct ud.* from user_devices ud ");
+        builder.append(" join users u on ud.user_id = u.user_id ");
+        builder.append(" join job_employee je on u.employee_id = je.emp_id ");
+        builder.append(" WHERE 1=1 ");
+        
+        generateSearchFilter(ids, builder);
+        Query query = entityManager.createNativeQuery(builder.toString());
+        setSearchFilter(ids, query);
+
+        List<Object[]> results = query.getResultList();
+
+        return convertUserDevice(results);
+    }
+    
     public void generateSearchFilter(String startDate,String endDate, StringBuilder stringBuilder, boolean isCount){
 
     	if (!StringUtils.isEmpty(startDate)) {
@@ -99,6 +120,37 @@ public class JobDaoImpl implements JobDao{
 						(Date) result[2], (String) result[3], null,
 						null, null, (BigDecimal) result[4], (String) result[5]);
 				return jobListDto;
+			}).collect(Collectors.toList());
+		} catch (Exception e) {
+        	log.error("convertJob: "+ e.getMessage());
+			return null;
+		}
+    }
+    
+    public void generateSearchFilter(List<Integer> ids, StringBuilder stringBuilder){
+
+    	if (ids != null) {
+            stringBuilder.append(" and je.job_id in (:ids) ");
+        }
+
+    	stringBuilder.append(" and ud.is_active_access_token = true ");
+    }
+    
+    public void setSearchFilter(List<Integer> ids, Query query){
+
+        if (!ids.isEmpty()) {
+            query.setParameter("ids",ids);
+        }
+
+    }
+    
+    public List<UserDeviceDto> convertUserDevice (List<Object[]> storedProcedureResults) {
+		try {
+			return storedProcedureResults.stream().map(result -> {
+				UserDeviceDto userDeviceDto = new UserDeviceDto((Integer) result[0], (String) result[1],
+						(Integer) result[2], (String) result[4], (String) result[5]);
+				
+				return userDeviceDto;
 			}).collect(Collectors.toList());
 		} catch (Exception e) {
         	log.error("convertJob: "+ e.getMessage());
