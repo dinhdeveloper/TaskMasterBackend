@@ -3,6 +3,8 @@ package com.dinh.logistics.respository.mobile;
 import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.MaterialJob;
 import com.dinh.logistics.dto.mobile.MediaDto;
+import com.dinh.logistics.model.EmployeeJob;
+import com.dinh.logistics.model.JobEmployee;
 import com.dinh.logistics.model.Jobs;
 import org.springframework.stereotype.Repository;
 
@@ -30,23 +32,25 @@ public class JobsRepositoryImp {
                     .setParameter(4, ghiChu)
                     .getSingleResult();
 
-            String sql2 = "INSERT INTO job_employee(job_id, emp_id) VALUES (?, ?)";
+            String sql2 = "INSERT INTO job_employee(job_id, emp_id, serial_number ) VALUES (?, ?, ?)";
             entityManager.createNativeQuery(sql2)
                     .setParameter(1, generatedId)
                     .setParameter(2, idNV1)
+                    .setParameter(3, 1)
                     .executeUpdate();
 
-            String sql3 = "INSERT INTO job_employee(job_id, emp_id) VALUES (?, ?)";
+            String sql3 = "INSERT INTO job_employee(job_id, emp_id, serial_number) VALUES (?, ?, ?)";
             entityManager.createNativeQuery(sql3)
                     .setParameter(1, generatedId)
                     .setParameter(2, idNV2)
+                    .setParameter(3, 2)
                     .executeUpdate();
 
         }
     }
 
     public JobDetailsDTO jobsDetails(Integer job_id) {
-        String query = "SELECT j.job_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note " +
+        String query = "SELECT j.job_id,jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note " +
                 "FROM jobs j " +
                 "LEFT JOIN job_state jt ON j.job_state_id = jt.job_state_id " +
                 "LEFT JOIN collect_point cp ON j.colle_point_id = cp.colle_point_id " +
@@ -66,6 +70,14 @@ public class JobsRepositoryImp {
         Query queryMaterial = entityManager.createQuery(sqlQueryMaterial);
         queryMaterial.setParameter("jobId", job_id);
         List<Object[]> dataMaterial = queryMaterial.getResultList();
+
+        String sqlQueryJobEmployee = "SELECT jm.serialNumber, m.name " +
+                "FROM JobEmployee jm " +
+                "LEFT JOIN Employee m ON m.empId = jm.empId WHERE jm.jobId = :jobId " +
+                "ORDER BY jm.serialNumber ASC";  // Sắp xếp theo serialNumber tăng dần
+        Query queryJobEmployee = entityManager.createQuery(sqlQueryJobEmployee);
+        queryJobEmployee.setParameter("jobId", job_id);
+        List<Object[]> dataJobEmployee = queryJobEmployee.getResultList();
 
         try {
             //media
@@ -90,17 +102,27 @@ public class JobsRepositoryImp {
                 data.setName((String) mediaData[5]);
                 materialDtoList.add(data);
             }
+            //List JobEmployee
+            List<EmployeeJob> employeeJobsList = new ArrayList<>();
+            for (Object[] dataJobEmObjects : dataJobEmployee) {
+                EmployeeJob data = new EmployeeJob();
+                data.setSerialNumber((String) dataJobEmObjects[0]);
+                data.setName((String) dataJobEmObjects[1]);
+                employeeJobsList.add(data);
+            }
             //JobDetails
             Object[] singleResult = (Object[]) nativeQuery.getSingleResult();
             JobDetailsDTO dto = new JobDetailsDTO();
             dto.setJobId((Integer) singleResult[0]);
-            dto.setStateDecs((String) singleResult[1]);
-            dto.setNumAddress((String) singleResult[2]);
-            dto.setNamePoint((String) singleResult[3]);
-            dto.setPriority((BigDecimal) singleResult[4]);
-            dto.setNoteJob((String) singleResult[5]);
+            dto.setJobStateId((Integer) singleResult[1]);
+            dto.setStateDecs((String) singleResult[2]);
+            dto.setNumAddress((String) singleResult[3]);
+            dto.setNamePoint((String) singleResult[4]);
+            dto.setPriority((BigDecimal) singleResult[5]);
+            dto.setNoteJob((String) singleResult[6]);
             dto.setJobMedia(mediaDtoList);
             dto.setJobMaterial(materialDtoList);
+            dto.setEmployeeJobs(employeeJobsList);
 
             return dto;
         } catch (NoResultException e) {

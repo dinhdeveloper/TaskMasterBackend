@@ -21,5 +21,7 @@ public class JobEmployee {
     @Column(name = "state")
     private boolean state;
 
+    @Column(name = "serial_number")
+    private String serialNumber;
 
 }
