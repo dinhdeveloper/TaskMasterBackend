@@ -1,6 +1,8 @@
 package com.dinh.logistics.controller.mobile;
 
 import com.dinh.logistics.dto.mobile.CollectPointDto;
+import com.dinh.logistics.dto.mobile.DeleteMaterialRequest;
+import com.dinh.logistics.dto.mobile.DeleteMediaRequest;
 import com.dinh.logistics.dto.mobile.MaterialDto;
 import com.dinh.logistics.model.Material;
 import com.dinh.logistics.respository.MaterialRepository;
@@ -55,6 +57,15 @@ public class MaterialController {
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Thêm vật liệu thành công");
         } else {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Thêm vật liệu thất bại");
+        }
+    }
+
+    @PostMapping("/delete_material")
+    public ResponseEntity<Object> deleteMaterial(@RequestBody DeleteMaterialRequest deleteMaterialRequest) {
+        if (materialService.deleteMaterial(deleteMaterialRequest.getJobMateId())) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Xóa thành công");
+        } else {
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Xóa thất bại");
         }
     }
 }

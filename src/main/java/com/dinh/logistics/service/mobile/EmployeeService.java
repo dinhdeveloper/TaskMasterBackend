@@ -14,10 +14,10 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public List<Employee> getData(Integer id) {
+    public List<Employee> findEmployeesExcludingRolesAndId(Integer id) {
         if (id != null) {
-            return employeeRepository.findAllByIdNot(id);
+            return employeeRepository.findEmployeesExcludingRolesAndId(id);
         }
-        return employeeRepository.findAll();
+        return employeeRepository.findEmployeesExcludingRoles();
     }
 }

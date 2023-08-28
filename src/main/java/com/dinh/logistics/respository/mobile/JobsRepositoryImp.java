@@ -4,7 +4,6 @@ import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.MaterialJob;
 import com.dinh.logistics.dto.mobile.MediaDto;
 import com.dinh.logistics.model.Jobs;
-import io.swagger.models.auth.In;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -61,7 +60,9 @@ public class JobsRepositoryImp {
         queryMedia.setParameter("jobId", job_id);
         List<Object[]> dataMedia = queryMedia.getResultList();
 
-        String sqlQueryMaterial = "SELECT jm.jobMateId, jm.weight, jm.WeightToCus,jm.unitPrice, jm.jobId FROM JobMaterial jm WHERE jm.jobId = :jobId";
+        String sqlQueryMaterial = "SELECT jm.jobMateId, jm.weight, jm.WeightToCus, jm.unitPrice, jm.jobId, m.name " +
+                "FROM JobMaterial jm " +
+                "LEFT JOIN Material m ON m.mate_id = jm.mateId WHERE jm.jobId = :jobId";
         Query queryMaterial = entityManager.createQuery(sqlQueryMaterial);
         queryMaterial.setParameter("jobId", job_id);
         List<Object[]> dataMaterial = queryMaterial.getResultList();
@@ -86,6 +87,7 @@ public class JobsRepositoryImp {
                 data.setWeightToCus((Integer) mediaData[2]);
                 data.setPrice((Integer) mediaData[3]);
                 data.setJobId((Integer) mediaData[4]);
+                data.setName((String) mediaData[5]);
                 materialDtoList.add(data);
             }
             //JobDetails
