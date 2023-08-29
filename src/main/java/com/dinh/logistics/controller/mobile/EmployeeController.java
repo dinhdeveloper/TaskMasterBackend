@@ -67,4 +67,26 @@ public class EmployeeController {
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, responseData);
         }
     }
+
+    // get employee by id rest api
+    @GetMapping("/employees/jobId/{jobId}")
+    public ResponseEntity<Object> getEmployeeByJobId(@PathVariable Integer jobId) {
+        if (jobId == -1){
+            employeeList = employeeRepository.findEmployeesExcludingRoles();
+        }else {
+            employeeList = employeeService.findEmployeesByJobId(jobId);
+        }
+        if (employeeList.isEmpty()){
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
+        } else {
+            List<Employee> dTOList = new ArrayList<>();
+            for (Employee jobType : employeeList) {
+                dTOList.add(jobType);
+            }
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("listItem", dTOList);
+
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, responseData);
+        }
+    }
 }

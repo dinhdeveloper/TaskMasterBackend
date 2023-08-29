@@ -3,9 +3,11 @@ package com.dinh.logistics.respository;
 import com.dinh.logistics.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query(value = "SELECT * FROM employee e JOIN role_pj rp ON e.role_id = rp.role_id WHERE rp.role_code NOT IN ('MASTER', 'ADMIN') AND e.emp_id != ?1", nativeQuery = true)
@@ -16,4 +18,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query(value = "SELECT * FROM employee e JOIN role_pj rp ON e.role_id = rp.role_id WHERE rp.role_code NOT IN ('MASTER', 'ADMIN')", nativeQuery = true)
     List<Employee> findEmployeesExcludingRoles();
+
 }
