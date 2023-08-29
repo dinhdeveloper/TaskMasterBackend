@@ -197,7 +197,14 @@ public class JobDaoImpl implements JobDao{
             stringBuilder.append(" and e.emp_id = :empId ");
         }
         if (status != null) {
-            stringBuilder.append(" and js.job_state_code = :status ");
+        	if(status == 1) {
+        		stringBuilder.append(" and js.job_state_code = 'NEW' or js.job_state_code = 'ASSIGNED' or js.job_state_code = 'ACCEPTED' or js.job_state_code = 'COMPACTED' or js.job_state_code = 'WEIGHTED' or js.job_state_code = 'ON_TRUCK' ");
+        	}else if(status == 2) {
+        		stringBuilder.append(" and js.job_state_code = 'DONE' or js.job_state_code = 'REJECTED' or js.job_state_code = 'CANCELED' ");
+        	}else {
+        		//
+        	}
+            
         }
         if (paymentStatus != null) {
             stringBuilder.append(" and ps.payment_state_status = :paymentStatus ");
@@ -229,9 +236,9 @@ public class JobDaoImpl implements JobDao{
             query.setParameter("empId",empId);
         }
 
-        if (status != null) {
-            query.setParameter("status",status);
-        }
+//        if (status != null) {
+//            query.setParameter("status",status);
+//        }
         
         if (paymentStatus != null) {
             query.setParameter("paymentStatus",paymentStatus);
