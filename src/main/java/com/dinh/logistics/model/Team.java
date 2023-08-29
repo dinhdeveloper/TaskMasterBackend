@@ -16,7 +16,7 @@ public class Team {
     private String name;
 
     @Column(name = "leader_id")
-    private String leaderId;
+    private Integer leaderId;
 
     @Column(name = "territory")
     private String territory;
