@@ -17,4 +17,7 @@ public class JobState {
 
     @Column(name = "state")
     private boolean state;
+
+    @Column(name = "job_state_code")
+    private String jobStateCode;
 }

@@ -4,7 +4,6 @@ import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.MaterialJob;
 import com.dinh.logistics.dto.mobile.MediaDto;
 import com.dinh.logistics.model.EmployeeJob;
-import com.dinh.logistics.model.JobEmployee;
 import com.dinh.logistics.model.Jobs;
 import org.springframework.stereotype.Repository;
 
@@ -71,7 +70,7 @@ public class JobsRepositoryImp {
         queryMaterial.setParameter("jobId", job_id);
         List<Object[]> dataMaterial = queryMaterial.getResultList();
 
-        String sqlQueryJobEmployee = "SELECT jm.serialNumber, m.name " +
+        String sqlQueryJobEmployee = "SELECT jm.empId, jm.serialNumber, m.name " +
                 "FROM JobEmployee jm " +
                 "LEFT JOIN Employee m ON m.empId = jm.empId WHERE jm.jobId = :jobId " +
                 "ORDER BY jm.serialNumber ASC";  // Sắp xếp theo serialNumber tăng dần
@@ -106,8 +105,9 @@ public class JobsRepositoryImp {
             List<EmployeeJob> employeeJobsList = new ArrayList<>();
             for (Object[] dataJobEmObjects : dataJobEmployee) {
                 EmployeeJob data = new EmployeeJob();
-                data.setSerialNumber((String) dataJobEmObjects[0]);
-                data.setName((String) dataJobEmObjects[1]);
+                data.setEmpId((Integer) dataJobEmObjects[0]);
+                data.setSerialNumber((String) dataJobEmObjects[1]);
+                data.setName((String) dataJobEmObjects[2]);
                 employeeJobsList.add(data);
             }
             //JobDetails

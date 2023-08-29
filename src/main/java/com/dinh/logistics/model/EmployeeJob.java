@@ -1,6 +1,7 @@
 package com.dinh.logistics.model;
 
 public class EmployeeJob {
+    private Integer empId;
     private String serialNumber;
     private String name;
 
@@ -18,5 +19,13 @@ public class EmployeeJob {
 
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
+    }
+
+    public Integer getEmpId() {
+        return empId;
+    }
+
+    public void setEmpId(Integer empId) {
+        this.empId = empId;
     }
 }
