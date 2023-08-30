@@ -86,12 +86,12 @@ public class JobDaoImpl implements JobDao{
 
         return convertUserDevice(results);
     }
-    
+
     @Override
     public List<JobSearchResponseDto> searchJobByFilter(Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(" select j.job_id, cp.name, e.name, js.job_state_desc, j.priority, j.creation_time ");
+        builder.append(" select j.job_id, cp.name as collect_point_name, e.name as employee_name, js.job_state_desc, j.priority, j.creation_time ");
         builder.append(" from jobs j ");
         builder.append(" join job_employee je on j.job_id = je.job_id ");
         builder.append(" join job_state js on j.job_state_id = js.job_state_id ");
@@ -104,13 +104,12 @@ public class JobDaoImpl implements JobDao{
 
         setSearchFilter(query, empId, status, paymentStatus, startDate,  endDate, jobId, collectPoint);
 
-//        query.setFirstResult((page - 1) * size);
-//        query.setMaxResults(size);
         List<Object[]> results = query.getResultList();
 
         return convertJobSearchResponse(results);
     }
-    
+
+
     public void generateSearchFilter(String startDate,String endDate, StringBuilder stringBuilder, boolean isCount){
 
     	if (!StringUtils.isEmpty(startDate)) {

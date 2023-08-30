@@ -47,10 +47,12 @@ public class JobsController {
         }
     }
 
-    @PutMapping("/update/update_state_job/{jobId}/{newStateId}")
+    @PutMapping("/update/update_state_job/{jobId}/{newStateId}/{dateCreate}")
     public ResponseEntity<Object> updateStateJob(
             @PathVariable Integer jobId,
-            @PathVariable Integer newStateId) {
+            @PathVariable Integer newStateId,
+            @PathVariable String dateCreate
+    ) {
         try {
             jobsService.updateStateJob(jobId, newStateId);
             UpdateJobsResponse response = new UpdateJobsResponse();
@@ -75,14 +77,14 @@ public class JobsController {
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestParam(name = "page", defaultValue = "1") Integer page,
 			@RequestParam(name = "size", defaultValue = "1") Integer size,
-			@RequestParam(name = "fromDate",required = false,defaultValue = "")  String startDate,
-			@RequestParam(name = "toDate",required = false,defaultValue = "")  String endDate,
-			@RequestParam(name = "toDate",required = false,defaultValue = "")  Integer empStatus,
-			@RequestParam(name = "toDate",required = false,defaultValue = "")  Integer empId,
-			@RequestParam(name = "toDate",required = false,defaultValue = "")  Integer status,
-			@RequestParam(name = "toDate",required = false,defaultValue = "")  Integer paymentStatus,
-			@RequestParam(name = "toDate",required = false,defaultValue = "")  Integer jobId,
-			@RequestParam(name = "toDate",required = false,defaultValue = "")  String collectPoint){
+			@RequestParam(name = "startDate",required = false,defaultValue = "")  String startDate,
+			@RequestParam(name = "endDate",required = false,defaultValue = "")  String endDate,
+			@RequestParam(name = "empStatus",required = false,defaultValue = "")  Integer empStatus,
+			@RequestParam(name = "empId",required = false,defaultValue = "")  Integer empId,
+			@RequestParam(name = "status",required = false,defaultValue = "")  Integer status,
+			@RequestParam(name = "paymentStatus",required = false,defaultValue = "")  Integer paymentStatus,
+			@RequestParam(name = "jobId",required = false,defaultValue = "")  Integer jobId,
+			@RequestParam(name = "collectPoint",required = false,defaultValue = "")  String collectPoint){
     	
     	JobSearchResponse jobSearchResponse = new JobSearchResponse();
     	jobSearchResponse = jobsService.searchJobByFilter(empStatus, empId, status, paymentStatus, startDate, endDate, jobId, collectPoint);

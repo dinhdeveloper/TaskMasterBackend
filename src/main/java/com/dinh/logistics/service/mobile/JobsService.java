@@ -6,6 +6,7 @@ import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.JobSearchResponse;
 import com.dinh.logistics.dto.mobile.JobSearchResponseDto;
 import com.dinh.logistics.model.Employee;
+import com.dinh.logistics.model.JobState;
 import com.dinh.logistics.model.Jobs;
 import com.dinh.logistics.model.Team;
 import com.dinh.logistics.respository.EmployeeRepository;
@@ -14,6 +15,8 @@ import com.dinh.logistics.respository.mobile.JobsRepositoryImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -39,6 +42,7 @@ public class JobsService {
                     addJobsDto.getJobType(),
                     addJobsDto.getNv1Id(),
                     addJobsDto.getNv2Id(),
+                    addJobsDto.getAssignId(),
                     addJobsDto.getListIdPoint(),
                     addJobsDto.getGhiChu());
             return true; // Thêm dữ liệu thành công
@@ -54,9 +58,23 @@ public class JobsService {
 
     @Transactional
     public void updateStateJob(Integer jobId, Integer newStateId) {
+
+        Date date = new Date();
+
         Jobs job = repositoryImp.findJobById(jobId);
+        JobState jobState = repositoryImp.findJobStateById(jobId);
         if (job != null) {
             job.setJobStateId(newStateId);
+            if (jobState.getJobStateCode() == "COMPACTED" || jobState.getJobStateId() == 15){
+                job.setCollectFinishTime(new Timestamp(date.getTime()));
+            }
+            if (jobState.getJobStateCode() == "WEIGHTED" || jobState.getJobStateId() == 20){
+                job.setWeightTime(new Timestamp(date.getTime()));
+            }
+            if (jobState.getJobStateCode() == "DONE" || jobState.getJobStateId() == 30){
+                job.setFinishTime(new Timestamp(date.getTime()));
+            }
+
             repositoryImp.saveJob(job);
         } else {
             // Handle the case when the job with the given ID doesn't exist

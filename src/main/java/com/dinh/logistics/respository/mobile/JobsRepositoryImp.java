@@ -4,6 +4,7 @@ import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.MaterialJob;
 import com.dinh.logistics.dto.mobile.MediaDto;
 import com.dinh.logistics.model.EmployeeJob;
+import com.dinh.logistics.model.JobState;
 import com.dinh.logistics.model.Jobs;
 import org.springframework.stereotype.Repository;
 
@@ -21,14 +22,15 @@ public class JobsRepositoryImp {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void insertCollectPoint(int jobType, int idNV1, int idNV2, List<Integer> listIdPoint, String ghiChu) {
+    public void insertCollectPoint(int jobType, int idNV1, int idNV2,int assignId, List<Integer> listIdPoint, String ghiChu) {
         for (int i = 0; i < listIdPoint.size(); i++) {
-            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note) VALUES (?, ?, ?,?) RETURNING job_id";
+            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id) VALUES (?, ?, ?, ?, ?) RETURNING job_id";
             Integer generatedId = (Integer) entityManager.createNativeQuery(sql)
                     .setParameter(1, listIdPoint.get(i))
                     .setParameter(2, jobType)
                     .setParameter(3, 1)
                     .setParameter(4, ghiChu)
+                    .setParameter(5, assignId)
                     .getSingleResult();
 
             String sql2 = "INSERT INTO job_employee(job_id, emp_id, serial_number ) VALUES (?, ?, ?)";
@@ -133,6 +135,10 @@ public class JobsRepositoryImp {
     public Jobs findJobById(Integer jobId) {
         return entityManager.find(Jobs.class, jobId);
     }
+    public JobState findJobStateById(Integer jobId) {
+        return entityManager.find(JobState.class, jobId);
+    }
+
 
     public Jobs saveJob(Jobs job) {
         return entityManager.merge(job);

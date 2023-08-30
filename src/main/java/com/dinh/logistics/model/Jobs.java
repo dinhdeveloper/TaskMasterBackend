@@ -42,6 +42,9 @@ public class Jobs {
     @Column(name = "creation_time")
     private Timestamp creationTime;
 
+    @Column(name = "weight_time")
+    private Timestamp weightTime;
+
     @Column(name = "assign_time")
     private Timestamp assignTime;
 
