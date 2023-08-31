@@ -98,7 +98,7 @@ public class JobDaoImpl implements JobDao{
         builder.append(" left join payment_state ps on j.payment_state_id = ps.payment_state_id ");
         builder.append(" left join collect_point cp on j.colle_point_id = cp.colle_point_id ");
         builder.append(" left join employee e on e.emp_id = je.emp_id ");
-        builder.append(" left WHERE 1=1 ");
+        builder.append(" WHERE 1=1 ");
         generateSearchFilter(builder, empId, status, paymentStatus, startDate,  endDate, jobId, collectPoint);
         Query query = entityManager.createNativeQuery(builder.toString());
 
@@ -212,7 +212,7 @@ public class JobDaoImpl implements JobDao{
             stringBuilder.append(" and j.job_id = :jobId ");
         }
         if (collectPoint != null) {
-            stringBuilder.append(" and cp.name like :collectPoint");
+            stringBuilder.append(" and lower(cp.name) like lower(:collectPoint) ");
         }
 
 //        if(isCount == false) {
