@@ -211,7 +211,7 @@ public class JobDaoImpl implements JobDao{
         if (jobId != null) {
             stringBuilder.append(" and j.job_id = :jobId ");
         }
-        if (collectPoint != null) {
+        if (!StringUtils.isEmpty(collectPoint)) {
             stringBuilder.append(" and lower(cp.name) like lower(:collectPoint) ");
         }
 
@@ -248,7 +248,7 @@ public class JobDaoImpl implements JobDao{
         }
         
         if (!StringUtils.isEmpty(collectPoint)) {
-            query.setParameter("collectPoint","%" + collectPoint + "%");
+            query.setParameter("collectPoint", "%" + collectPoint + "%");
         }
 
     }
