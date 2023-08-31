@@ -93,12 +93,12 @@ public class JobDaoImpl implements JobDao{
 
         builder.append(" select j.job_id, cp.name as collect_point_name, e.name as employee_name, js.job_state_desc, j.priority, j.creation_time ");
         builder.append(" from jobs j ");
-        builder.append(" join job_employee je on j.job_id = je.job_id ");
-        builder.append(" join job_state js on j.job_state_id = js.job_state_id ");
-        builder.append(" join payment_state ps on j.payment_state_id = ps.payment_state_id ");
-        builder.append(" join collect_point cp on j.colle_point_id = cp.colle_point_id ");
-        builder.append(" join employee e on e.emp_id = je.emp_id ");
-        builder.append(" WHERE 1=1 ");
+        builder.append(" left join job_employee je on j.job_id = je.job_id ");
+        builder.append(" left join job_state js on j.job_state_id = js.job_state_id ");
+        builder.append(" left join payment_state ps on j.payment_state_id = ps.payment_state_id ");
+        builder.append(" left join collect_point cp on j.colle_point_id = cp.colle_point_id ");
+        builder.append(" left join employee e on e.emp_id = je.emp_id ");
+        builder.append(" left WHERE 1=1 ");
         generateSearchFilter(builder, empId, status, paymentStatus, startDate,  endDate, jobId, collectPoint);
         Query query = entityManager.createNativeQuery(builder.toString());
 
@@ -212,7 +212,7 @@ public class JobDaoImpl implements JobDao{
             stringBuilder.append(" and j.job_id = :jobId ");
         }
         if (collectPoint != null) {
-            stringBuilder.append(" and cp.name like '%:collectPoint%' ");
+            stringBuilder.append(" and cp.name like :collectPoint");
         }
 
 //        if(isCount == false) {
@@ -248,7 +248,7 @@ public class JobDaoImpl implements JobDao{
         }
         
         if (!StringUtils.isEmpty(collectPoint)) {
-            query.setParameter("collectPoint",collectPoint);
+            query.setParameter("collectPoint","%" + collectPoint + "%");
         }
 
     }
