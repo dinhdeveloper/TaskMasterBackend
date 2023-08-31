@@ -38,7 +38,7 @@ public class JobsService {
 
     public boolean addJobs(AddJobsDto addJobsDto) {
         try {
-            repositoryImp.insertCollectPoint(
+            repositoryImp.addJobs(
                     addJobsDto.getJobType(),
                     addJobsDto.getNv1Id(),
                     addJobsDto.getNv2Id(),
@@ -51,8 +51,8 @@ public class JobsService {
         }
     }
 
-    public JobDetailsDTO jobsDetails(Integer id) {
-        return repositoryImp.jobsDetails(id);
+    public JobDetailsDTO jobsDetails(Integer jobId,Integer empId) {
+        return repositoryImp.jobsDetails(jobId,empId);
     }
 
 

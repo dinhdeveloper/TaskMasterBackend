@@ -16,16 +16,18 @@ public class JobSearchResponseDto {
 	private String status;
 	private Integer priority;
 	private String date;
-	
+	private Integer empId;
+
 	private String temp;
 	
-	public JobSearchResponseDto(Integer id, String collectPoint, String emp, String status, BigDecimal priority, Date date) {
+	public JobSearchResponseDto(Integer id, String collectPoint, String emp, String status, BigDecimal priority, Date date, Integer empId) {
 		this.jobId = id;
 		this.collectPoint = collectPoint;
 		this.emp = emp;
 		this.status = status;
 		this.priority = priority.intValue();
 		this.date = DateHelper.convertDateToStringJobList(date);
+		this.empId = empId;
 	}
 	
 }

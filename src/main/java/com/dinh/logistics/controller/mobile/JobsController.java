@@ -4,23 +4,22 @@ import com.dinh.logistics.dao.JobDao;
 import com.dinh.logistics.dto.mobile.AddJobsDto;
 import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.JobSearchResponse;
-import com.dinh.logistics.dto.mobile.JobSearchResponseDto;
 import com.dinh.logistics.dto.mobile.UpdateJobsResponse;
-import com.dinh.logistics.model.UserDevice;
+import com.dinh.logistics.model.NotifyTopic;
 import com.dinh.logistics.respository.UserDeviceRepository;
+import com.dinh.logistics.respository.mobile.UtilsNotification;
 import com.dinh.logistics.service.mobile.JobsService;
 import com.dinh.logistics.ultils.ResponseHandler;
 import com.dinh.logistics.ultils.StatusResult;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/mobile")
@@ -37,9 +36,16 @@ public class JobsController {
     @Autowired
     JobDao jobDao;
 
-    @GetMapping("/details/{id}")
-    public ResponseEntity<Object> jobsDetails(@PathVariable Integer id){
-        JobDetailsDTO jobDetails = jobsService.jobsDetails(id);
+    @Autowired
+    UtilsNotification utilsNotification;
+
+
+    @GetMapping("/details/{jobId}/{empId}")
+    public ResponseEntity<Object> jobsDetails(
+            @PathVariable Integer jobId,
+            @PathVariable Integer empId
+            ){
+        JobDetailsDTO jobDetails = jobsService.jobsDetails(jobId,empId);
         if (jobDetails != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, jobDetails);
         } else {
@@ -91,5 +97,12 @@ public class JobsController {
     	
     	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, jobSearchResponse);
     }
-    
+
+    @PostMapping("/mozi/{id}")
+    public ResponseEntity<Object> saveA(@PathVariable Integer id){
+        List<NotifyTopic> notifyTopic = utilsNotification.pushNotifyByEmpId(id, 8);
+        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, notifyTopic);
+    }
+
+
 }

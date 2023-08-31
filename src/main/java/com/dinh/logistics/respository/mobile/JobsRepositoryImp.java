@@ -1,11 +1,18 @@
 package com.dinh.logistics.respository.mobile;
 
+import com.dinh.logistics.dto.FirebaseDataDto;
 import com.dinh.logistics.dto.mobile.JobDetailsDTO;
 import com.dinh.logistics.dto.mobile.MaterialJob;
 import com.dinh.logistics.dto.mobile.MediaDto;
 import com.dinh.logistics.model.EmployeeJob;
 import com.dinh.logistics.model.JobState;
 import com.dinh.logistics.model.Jobs;
+import com.dinh.logistics.model.NotifyTopic;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.gson.Gson;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -22,7 +29,10 @@ public class JobsRepositoryImp {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void insertCollectPoint(int jobType, int idNV1, int idNV2,int assignId, List<Integer> listIdPoint, String ghiChu) {
+    @Autowired
+    UtilsNotification utilsNotification;
+
+    public void addJobs(int jobType, int idNV1, int idNV2,int assignId, List<Integer> listIdPoint, String ghiChu) {
         for (int i = 0; i < listIdPoint.size(); i++) {
             String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id) VALUES (?, ?, ?, ?, ?) RETURNING job_id";
             Integer generatedId = (Integer) entityManager.createNativeQuery(sql)
@@ -47,18 +57,47 @@ public class JobsRepositoryImp {
                     .setParameter(3, 2)
                     .executeUpdate();
 
+            List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(idNV1, generatedId);
+            for (NotifyTopic notifyTopic : notifyTopicList){
+
+                String content = "Nhân viên: " + notifyTopic.getName() +
+                                ", Loại công việc: " + notifyTopic.getJtName() +
+                                ", Địa điểm: " + notifyTopic.getCpName();
+
+                FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
+                sendFirebaseData.setTitle("Công việc mới");
+                sendFirebaseData.setType("WORK");
+                sendFirebaseData.setData(content);
+
+                Gson gson = new Gson();
+                String jsonData = gson.toJson(sendFirebaseData);
+
+                // Gửi
+                Message message = Message.builder()
+                        .setToken(notifyTopic.getFirebase_token())
+                        .putData("data", jsonData)
+                        .build();
+                try {
+                    FirebaseMessaging.getInstance().send(message);
+                } catch (FirebaseMessagingException e) {
+                    // Xử lý ngoại lệ ở đây
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    public JobDetailsDTO jobsDetails(Integer job_id) {
-        String query = "SELECT j.job_id,jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note " +
+    public JobDetailsDTO jobsDetails(Integer job_id, Integer emp_id) {
+        String query = "SELECT j.job_id, jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note " +
                 "FROM jobs j " +
                 "LEFT JOIN job_state jt ON j.job_state_id = jt.job_state_id " +
                 "LEFT JOIN collect_point cp ON j.colle_point_id = cp.colle_point_id " +
+                "LEFT JOIN job_employee jm ON j.job_id = jm.job_id AND jm.emp_id = :emp_id " +
                 "WHERE j.job_id = :job_id";
 
         Query nativeQuery = entityManager.createNativeQuery(query);
         nativeQuery.setParameter("job_id", job_id);
+        nativeQuery.setParameter("emp_id", emp_id);
 
         String sqlQueryMedia = "SELECT jm.jobMediaId, jm.url, jm.mediaType, jm.jobId FROM JobMedia jm WHERE jm.jobId = :jobId";
         Query queryMedia = entityManager.createQuery(sqlQueryMedia);

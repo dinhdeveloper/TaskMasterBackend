@@ -91,7 +91,7 @@ public class JobDaoImpl implements JobDao{
     public List<JobSearchResponseDto> searchJobByFilter(Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(" select j.job_id, cp.name as collect_point_name, e.name as employee_name, js.job_state_desc, j.priority, j.creation_time ");
+        builder.append(" select j.job_id, cp.name as collect_point_name, e.name as employee_name, js.job_state_desc, j.priority, j.creation_time, je.emp_id ");
         builder.append(" from jobs j ");
         builder.append(" left join job_employee je on j.job_id = je.job_id ");
         builder.append(" left join job_state js on j.job_state_id = js.job_state_id ");
@@ -256,9 +256,14 @@ public class JobDaoImpl implements JobDao{
     public List<JobSearchResponseDto> convertJobSearchResponse (List<Object[]> storedProcedureResults) {
 		try {
 			return storedProcedureResults.stream().map(result -> {
-				JobSearchResponseDto resultList = new JobSearchResponseDto((Integer) result[0], (String) result[1],
-						(String) result[2], (String) result[3],
-						(BigDecimal) result[4], (Date) result[5]);
+				JobSearchResponseDto resultList = new JobSearchResponseDto(
+				        (Integer) result[0],
+                        (String) result[1],
+						(String) result[2],
+                        (String) result[3],
+						(BigDecimal) result[4],
+                        (Date) result[5],
+                        (Integer)(result[6]));
 				return resultList;
 			}).collect(Collectors.toList());
 		} catch (Exception e) {
