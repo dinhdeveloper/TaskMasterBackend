@@ -73,12 +73,27 @@ public class UtilsNotification {
         qJobs.setParameter("jodID", jodID);
         Object[] jobsData = (Object[]) qJobs.getSingleResult();
 
+        //get master
+        String queryMaster = "SELECT e.emp_id, e.name, e.team_id, ud.firebase_token, ud.access_token, " +
+                "ud.device_id, ud.device_name, ud.is_active_access_token, t.leader_id " +
+                "FROM employee e " +
+                "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
+                "JOIN user_devices ud ON ud.user_id = uv.user_id " +
+                "JOIN role_pj rp ON rp.role_id = e.role_id " +
+                "JOIN team t ON t.team_code = 'OWNER'"+
+                "WHERE rp.role_code = 'MASTER'";
+
+        Query queryM = entityManager.createNativeQuery(queryMaster);
+        List<Object[]> masterData = queryM.getResultList();
+
         List<NotifyTopic> mediaDtoList = new ArrayList<>();
+        String nameEmp = null;
 
         for (Object[] mediaData : empData) {
             NotifyTopic mediaDto = new NotifyTopic();
             mediaDto.setEmp_id((Integer) mediaData[0]);
             mediaDto.setName((String) mediaData[1]);
+            nameEmp = (String) mediaData[1];
             mediaDto.setTeam_id((Integer) mediaData[2]);
             mediaDto.setFirebase_token((String) mediaData[3]);
             mediaDto.setAccess_token((String) mediaData[4]);
@@ -94,7 +109,7 @@ public class UtilsNotification {
         for (Object[] leaData : leaderData) {
             NotifyTopic mediaDto = new NotifyTopic();
             mediaDto.setEmp_id((Integer) leaData[0]);
-            mediaDto.setName((String) leaData[1]);
+            mediaDto.setName(nameEmp);
             mediaDto.setTeam_id((Integer) leaData[2]);
             mediaDto.setFirebase_token((String) leaData[3]);
             mediaDto.setAccess_token((String) leaData[4]);
@@ -102,6 +117,22 @@ public class UtilsNotification {
             mediaDto.setDevice_name((String) leaData[6]);
             mediaDto.setIs_active_access_token((Boolean) leaData[7]);
             mediaDto.setLeader_id(leaderId);
+            mediaDto.setCpName((String) jobsData[0]);
+            mediaDto.setJtName((String) jobsData[1]);
+            mediaDtoList.add(mediaDto);
+        }
+
+        for (Object[] masData : masterData) {
+            NotifyTopic mediaDto = new NotifyTopic();
+            mediaDto.setEmp_id((Integer) masData[0]);
+            mediaDto.setName(nameEmp);
+            mediaDto.setTeam_id((Integer) masData[2]);
+            mediaDto.setFirebase_token((String) masData[3]);
+            mediaDto.setAccess_token((String) masData[4]);
+            mediaDto.setDevice_id((String) masData[5]);
+            mediaDto.setDevice_name((String) masData[6]);
+            mediaDto.setIs_active_access_token((Boolean) masData[7]);
+            mediaDto.setLeader_id((Integer) masData[8]);
             mediaDto.setCpName((String) jobsData[0]);
             mediaDto.setJtName((String) jobsData[1]);
             mediaDtoList.add(mediaDto);

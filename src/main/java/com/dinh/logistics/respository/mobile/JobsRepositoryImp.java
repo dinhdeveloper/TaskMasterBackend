@@ -12,6 +12,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class JobsRepositoryImp {
 
@@ -57,17 +59,24 @@ public class JobsRepositoryImp {
                     .setParameter(3, 2)
                     .executeUpdate();
 
-            List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(idNV1, generatedId);
-            for (NotifyTopic notifyTopic : notifyTopicList){
+            pushNotifyNV(idNV1,generatedId, assignId);
+            pushNotifyNV(idNV2,generatedId, assignId);
+        }
+    }
 
+    private void pushNotifyNV(int idNV, int generatedJobId, int assignId){
+        List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(idNV, generatedJobId);
+        for (NotifyTopic notifyTopic : notifyTopicList){
+            if(notifyTopic.getEmp_id() != assignId){
                 String content = "Nhân viên: " + notifyTopic.getName() +
-                                ", Loại công việc: " + notifyTopic.getJtName() +
-                                ", Địa điểm: " + notifyTopic.getCpName();
+                        ", Loại công việc: " + notifyTopic.getJtName() +
+                        ", Địa điểm: " + notifyTopic.getCpName();
 
                 FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
                 sendFirebaseData.setTitle("Công việc mới");
                 sendFirebaseData.setType("WORK");
-                sendFirebaseData.setData(content);
+                sendFirebaseData.setBody(content);
+                sendFirebaseData.setData(String.valueOf(generatedJobId));
 
                 Gson gson = new Gson();
                 String jsonData = gson.toJson(sendFirebaseData);

@@ -98,9 +98,9 @@ public class JobsController {
     	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, jobSearchResponse);
     }
 
-    @PostMapping("/mozi/{id}")
-    public ResponseEntity<Object> saveA(@PathVariable Integer id){
-        List<NotifyTopic> notifyTopic = utilsNotification.pushNotifyByEmpId(id, 8);
+    @PostMapping("/mozi/{id}/{jobId}")
+    public ResponseEntity<Object> saveA(@PathVariable Integer id, @PathVariable Integer jobId){
+        List<NotifyTopic> notifyTopic = utilsNotification.pushNotifyByEmpId(id, jobId);
         return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, notifyTopic);
     }
 
