@@ -59,12 +59,12 @@ public class JobsRepositoryImp {
                     .setParameter(3, 2)
                     .executeUpdate();
 
-            pushNotifyNV(idNV1,generatedId, assignId);
-            pushNotifyNV(idNV2,generatedId, assignId);
+            pushNotifyAddTask(idNV1,generatedId, assignId);
+            pushNotifyAddTask(idNV2,generatedId, assignId);
         }
     }
 
-    private void pushNotifyNV(int idNV, int generatedJobId, int assignId){
+    private void pushNotifyAddTask(int idNV, int generatedJobId, int assignId){
         List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(idNV, generatedJobId);
         for (NotifyTopic notifyTopic : notifyTopicList){
             if(notifyTopic.getEmp_id() != assignId){
@@ -190,5 +190,48 @@ public class JobsRepositoryImp {
 
     public Jobs saveJob(Jobs job) {
         return entityManager.merge(job);
+    }
+
+    public void pushNotifyUpdateJobState(Jobs jobsNew) {
+        if (jobsNew == null) {
+            return;
+        }
+
+        String query = "SELECT je.empId FROM JobEmployee je WHERE je.jobId = :job_id";
+        Query queryData = entityManager.createQuery(query);
+        queryData.setParameter("job_id", jobsNew.getJob_id());
+        List<Integer> dataNVID = queryData.getResultList();
+
+        for (Integer data : dataNVID){
+            List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(data, jobsNew.getJob_id());
+            for (NotifyTopic notifyTopic : notifyTopicList){
+                if(notifyTopic.getEmp_id() != jobsNew.getEmpAssignId()){
+                    String content = "Nhân viên: " + notifyTopic.getName() +
+                            ", Loại công việc: " + notifyTopic.getJtName() +
+                            ", Địa điểm: " + notifyTopic.getCpName();
+
+                    FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
+                    sendFirebaseData.setTitle("Công việc mới");
+                    sendFirebaseData.setType("WORK");
+                    sendFirebaseData.setBody(content);
+                    sendFirebaseData.setData(String.valueOf(jobsNew.getJob_id()));
+
+                    Gson gson = new Gson();
+                    String jsonData = gson.toJson(sendFirebaseData);
+
+                    // Gửi
+                    Message message = Message.builder()
+                            .setToken(notifyTopic.getFirebase_token())
+                            .putData("data", jsonData)
+                            .build();
+                    try {
+                        FirebaseMessaging.getInstance().send(message);
+                    } catch (FirebaseMessagingException e) {
+                        // Xử lý ngoại lệ ở đây
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

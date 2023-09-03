@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.transaction.Transactional;
 
@@ -62,20 +63,21 @@ public class JobsService {
         Date date = new Date();
 
         Jobs job = repositoryImp.findJobById(jobId);
-        JobState jobState = repositoryImp.findJobStateById(jobId);
         if (job != null) {
+            JobState jobState = repositoryImp.findJobStateById(job.getJobStateId());
             job.setJobStateId(newStateId);
-            if (jobState.getJobStateCode() == "COMPACTED" || jobState.getJobStateId() == 15){
+            if (Objects.equals(jobState.getJobStateCode(), "COMPACTED") || jobState.getJobStateId() == 15){
                 job.setCollectFinishTime(new Timestamp(date.getTime()));
             }
-            if (jobState.getJobStateCode() == "WEIGHTED" || jobState.getJobStateId() == 20){
+            if (Objects.equals(jobState.getJobStateCode(), "WEIGHTED") || jobState.getJobStateId() == 20){
                 job.setWeightTime(new Timestamp(date.getTime()));
             }
-            if (jobState.getJobStateCode() == "DONE" || jobState.getJobStateId() == 30){
+            if (Objects.equals(jobState.getJobStateCode(), "DONE") || jobState.getJobStateId() == 30){
                 job.setFinishTime(new Timestamp(date.getTime()));
             }
 
-            repositoryImp.saveJob(job);
+            Jobs jobsNew = repositoryImp.saveJob(job);
+            repositoryImp.pushNotifyUpdateJobState(jobsNew);
         } else {
             // Handle the case when the job with the given ID doesn't exist
         }
