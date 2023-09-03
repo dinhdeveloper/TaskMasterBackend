@@ -1,10 +1,7 @@
 package com.dinh.logistics.service.mobile;
 
 import com.dinh.logistics.dao.JobDao;
-import com.dinh.logistics.dto.mobile.AddJobsDto;
-import com.dinh.logistics.dto.mobile.JobDetailsDTO;
-import com.dinh.logistics.dto.mobile.JobSearchResponse;
-import com.dinh.logistics.dto.mobile.JobSearchResponseDto;
+import com.dinh.logistics.dto.mobile.*;
 import com.dinh.logistics.model.Employee;
 import com.dinh.logistics.model.JobState;
 import com.dinh.logistics.model.Jobs;
@@ -102,5 +99,14 @@ public class JobsService {
     	
     	
     	return jobSearchResponse;
+    }
+
+    public Jobs updateJobSave(DataUpdateJobRequest dataUpdateJobRequest) {
+        try {
+            Jobs job = repositoryImp.findJobById(dataUpdateJobRequest.getJodId());
+           return repositoryImp.updateJobSave(dataUpdateJobRequest,job);
+        } catch (Exception e) {
+            return null; // Thêm dữ liệu thất bại
+        }
     }
 }

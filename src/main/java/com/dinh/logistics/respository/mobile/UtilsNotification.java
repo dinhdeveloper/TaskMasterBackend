@@ -80,7 +80,7 @@ public class UtilsNotification {
                 "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
                 "JOIN user_devices ud ON ud.user_id = uv.user_id " +
                 "JOIN role_pj rp ON rp.role_id = e.role_id " +
-                "JOIN team t ON t.team_code = 'OWNER'"+
+                "JOIN team t ON t.team_code = 'OWNER' "+
                 "WHERE rp.role_code = 'MASTER'";
 
         Query queryM = entityManager.createNativeQuery(queryMaster);
