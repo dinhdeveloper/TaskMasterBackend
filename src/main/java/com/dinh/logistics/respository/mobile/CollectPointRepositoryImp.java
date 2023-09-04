@@ -14,13 +14,12 @@ public class CollectPointRepositoryImp {
 
     @Transactional
     public void insertCollectPoint(String namePoint, String nameAddress, String nameContact, String phoneContact) {
-        String sql = "INSERT INTO collect_point(name, num_address, contact_name, phone, custom_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO collect_point(name, num_address, contact_name, phone) VALUES (?, ?, ?, ?)";
         entityManager.createNativeQuery(sql)
                 .setParameter(1, namePoint)
                 .setParameter(2, nameAddress)
                 .setParameter(3, nameContact)
                 .setParameter(4, phoneContact)
-                .setParameter(5, 1)
                 .executeUpdate();
     }
 }
