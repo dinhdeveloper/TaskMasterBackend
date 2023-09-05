@@ -29,8 +29,8 @@ public class Employee {
     @Column(name = "team_id")
     private Integer teamId;
 
-    @Column(name = "pos_id")
-    private Integer posId;
+//    @Column(name = "pos_id")
+//    private Integer posId;
 
     @Column(name = "num_address")
     private String numAddress;

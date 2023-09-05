@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -63,14 +64,14 @@ public class TableController {
 	
 	@PostMapping("/upload")
     public ResponseEntity<Object> uploadJobs(@RequestParam(name = "file", required = true) MultipartFile file,
-    		@RequestParam(name = "table", required = true) int table){
+    		@RequestParam(name = "tableName", required = true) String tableName){
         try {
         	//upload jobs
-        	if(table == 1) {
+        	if(StringUtils.equalsIgnoreCase(tableName, "customers")) {
         		excelFileService.uploadTableCustomers(file);
-        	}else if(table == 2) {
+        	}else if(StringUtils.equalsIgnoreCase(tableName, "collect_point")) {
         		excelFileService.uploadTableCollectPoint(file);
-        	}else if(table == 3) {
+        	}else if(StringUtils.equalsIgnoreCase(tableName, "users")) {
         		excelFileService.uploadTableUser(file);
         	}else {
         		return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Không tìm thấy bảng");
