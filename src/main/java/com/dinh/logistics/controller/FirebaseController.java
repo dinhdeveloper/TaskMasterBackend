@@ -32,7 +32,10 @@ public class FirebaseController {
 	
 	@PostMapping("/save")
 	public ResponseEntity<Object> save(HttpServletRequest request,
-			@RequestParam String firebaseToken){
+			@RequestParam String firebaseToken,
+			@RequestParam String deviceId,
+			@RequestParam String deviceName
+	){
 		String token = request.getHeader("Authorization");
 		if(StringUtils.isBlank(token)) {
 			return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, null);
@@ -41,11 +44,13 @@ public class FirebaseController {
 		UserDevice userDevice = userDeviceRepository.findByAccessTokenAndIsActiveAccessTokenTrue(jwtToken).orElse(new UserDevice());
         if (!Objects.isNull(userDevice)){
         	userDevice.setFirebaseToken(firebaseToken);
+        	userDevice.setDeviceId(deviceId);
+        	userDevice.setDeviceName(deviceName);
         	userDeviceRepository.save(userDevice);
         	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         }else {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, null);
         }
     }
-	
+
 }

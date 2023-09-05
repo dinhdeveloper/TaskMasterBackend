@@ -13,10 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/mobile")
@@ -30,23 +27,23 @@ public class CollectPointController {
     @Autowired
     private CollectPointService pointService;
 
-    // get all employees
     @GetMapping("/collect_point")
-    public ResponseEntity<Object> getAllCollectPoint(){
+    public ResponseEntity<Object> getAllCollectPoint() {
         List<CollectPoint> collectPoints = collectPointRepository.findAll();
-        if (collectPoints.isEmpty()){
+
+        if (collectPoints.isEmpty()) {
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         } else {
-            List<CollectPoint> dTOList = new ArrayList<>();
-            for (CollectPoint jobType : collectPoints) {
-                dTOList.add(jobType);
-            }
+            // Sắp xếp danh sách collectPoints theo trường 'name'
+            Collections.sort(collectPoints, Comparator.comparing(CollectPoint::getName));
+
             Map<String, Object> responseData = new HashMap<>();
-            responseData.put("listItem", dTOList);
+            responseData.put("listItem", collectPoints);
 
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, responseData);
         }
     }
+
 
     @PostMapping("/add_collect_point")
     public ResponseEntity<Object> addCollectPoint(@RequestBody CollectPointDto collectPoint){

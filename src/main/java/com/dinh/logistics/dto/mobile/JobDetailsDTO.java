@@ -15,6 +15,7 @@ public class JobDetailsDTO {
     private String namePoint;
     private BigDecimal priority;
     private String noteJob;
+    private String jobStateCode;
     private List<MediaDto> jobMedia;
     private List<MaterialJob> jobMaterial;
     private List<EmployeeJob> employeeJobs;

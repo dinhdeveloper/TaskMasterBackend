@@ -1,40 +1,18 @@
 package com.dinh.logistics.model;
 
+import lombok.Data;
+
+@Data
 public class NotifyTopic {
-    String title;
-    String type;
-    String receiver;
-    String content;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
+    Integer emp_id;
+    String name;
+    Integer team_id;
+    Integer leader_id;
+    String firebase_token;
+    String access_token;
+    String device_id;
+    String device_name;
+    Boolean is_active_access_token;
+    String cpName;
+    String jtName;
 }

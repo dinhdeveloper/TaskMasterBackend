@@ -1,10 +1,7 @@
 package com.dinh.logistics.service.mobile;
 
 import com.dinh.logistics.dao.JobDao;
-import com.dinh.logistics.dto.mobile.AddJobsDto;
-import com.dinh.logistics.dto.mobile.JobDetailsDTO;
-import com.dinh.logistics.dto.mobile.JobSearchResponse;
-import com.dinh.logistics.dto.mobile.JobSearchResponseDto;
+import com.dinh.logistics.dto.mobile.*;
 import com.dinh.logistics.model.Employee;
 import com.dinh.logistics.model.JobState;
 import com.dinh.logistics.model.Jobs;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.transaction.Transactional;
 
@@ -38,7 +36,7 @@ public class JobsService {
 
     public boolean addJobs(AddJobsDto addJobsDto) {
         try {
-            repositoryImp.insertCollectPoint(
+            repositoryImp.addJobs(
                     addJobsDto.getJobType(),
                     addJobsDto.getNv1Id(),
                     addJobsDto.getNv2Id(),
@@ -51,8 +49,8 @@ public class JobsService {
         }
     }
 
-    public JobDetailsDTO jobsDetails(Integer id) {
-        return repositoryImp.jobsDetails(id);
+    public JobDetailsDTO jobsDetails(Integer jobId,Integer empId) {
+        return repositoryImp.jobsDetails(jobId,empId);
     }
 
 
@@ -62,20 +60,21 @@ public class JobsService {
         Date date = new Date();
 
         Jobs job = repositoryImp.findJobById(jobId);
-        JobState jobState = repositoryImp.findJobStateById(jobId);
         if (job != null) {
+            JobState jobState = repositoryImp.findJobStateById(job.getJobStateId());
             job.setJobStateId(newStateId);
-            if (jobState.getJobStateCode() == "COMPACTED" || jobState.getJobStateId() == 15){
+            if (Objects.equals(jobState.getJobStateCode(), "COMPACTED") || jobState.getJobStateId() == 15){
                 job.setCollectFinishTime(new Timestamp(date.getTime()));
             }
-            if (jobState.getJobStateCode() == "WEIGHTED" || jobState.getJobStateId() == 20){
+            if (Objects.equals(jobState.getJobStateCode(), "WEIGHTED") || jobState.getJobStateId() == 20){
                 job.setWeightTime(new Timestamp(date.getTime()));
             }
-            if (jobState.getJobStateCode() == "DONE" || jobState.getJobStateId() == 30){
+            if (Objects.equals(jobState.getJobStateCode(), "DONE") || jobState.getJobStateId() == 30){
                 job.setFinishTime(new Timestamp(date.getTime()));
             }
 
-            repositoryImp.saveJob(job);
+            Jobs jobsNew = repositoryImp.saveJob(job);
+            repositoryImp.pushNotifyUpdateJobState(jobsNew);
         } else {
             // Handle the case when the job with the given ID doesn't exist
         }
@@ -100,5 +99,14 @@ public class JobsService {
     	
     	
     	return jobSearchResponse;
+    }
+
+    public Jobs updateJobSave(DataUpdateJobRequest dataUpdateJobRequest) {
+        try {
+            Jobs job = repositoryImp.findJobById(dataUpdateJobRequest.getJodId());
+           return repositoryImp.updateJobSave(dataUpdateJobRequest,job);
+        } catch (Exception e) {
+            return null; // Thêm dữ liệu thất bại
+        }
     }
 }
