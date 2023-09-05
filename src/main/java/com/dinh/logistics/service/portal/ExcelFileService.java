@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +20,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
@@ -27,15 +32,19 @@ import org.springframework.web.multipart.MultipartFile;
 import com.dinh.logistics.dao.JobDao;
 import com.dinh.logistics.dto.portal.JobListDto;
 import com.dinh.logistics.model.CollectPoint;
+import com.dinh.logistics.model.Customers;
 import com.dinh.logistics.model.Employee;
 import com.dinh.logistics.model.JobEmployee;
 import com.dinh.logistics.model.Jobs;
+import com.dinh.logistics.model.Users;
 import com.dinh.logistics.respository.CollectPointRepository;
 import com.dinh.logistics.respository.EmployeeRepository;
 import com.dinh.logistics.respository.JobEmployeeRepository;
 import com.dinh.logistics.respository.JobRepository;
 import com.dinh.logistics.respository.JobTypeRepository;
 import com.dinh.logistics.respository.RolePjRepository;
+import com.dinh.logistics.respository.UserRepository;
+import com.dinh.logistics.respository.CustomerRepository;
 import com.dinh.logistics.ultils.AppConstants;
 
 @Service
@@ -58,6 +67,12 @@ public class ExcelFileService {
 	
 	@Autowired
 	EmployeeRepository employeeRepository;
+	
+	@Autowired
+	CustomerRepository customerRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	@Autowired
 	JobDao jobDao;
@@ -110,7 +125,7 @@ public class ExcelFileService {
                     String column6Validate = validateUploadJobsCellString("NV TG 1", cell6, nvIds);
                     String column7Validate = validateUploadJobsCellString("NV TG 2", cell7, nvIds);
                     String column8Validate = validateUploadJobsCellString("Tài xế", cell8, txIds);
-                    String column9Validate = validateUploadJobsEmptyInt("Ưu tiên", cell9);
+                    String column9Validate = validateUploadJobsCellString2("Ưu tiên", cell9);
 
                     if(column4Validate != null) {
                     	validate += column4Validate;
@@ -140,8 +155,8 @@ public class ExcelFileService {
                     	job.setCollePointId(getIntValueFromCell(cell4));
                     	job.setJobTypeId((getIntValueFromCell(cell5)));
                     	
-                    	Double priorityDouble = cell9.getNumericCellValue();
-                    	Integer priority = priorityDouble.intValue();
+                    	String priorityString = cell9.getStringCellValue();
+                    	Integer priority = Integer.parseInt(priorityString);
                     	job.setPriority(priority);
                     	job.setNote(cell10.getStringCellValue());
                     	job.setPaymentStateId(1);
@@ -289,6 +304,18 @@ public class ExcelFileService {
 		}
 	}
 	
+public String validateUploadJobsCellString2(String columnName, Cell cell) {
+		
+		String result = null;
+		if(cell == null) {
+			return result = columnName + " không được để trống.";
+		}
+		if(StringUtils.isBlank(cell.getStringCellValue())) {
+			return result = columnName + " không được để trống.";
+		}
+		return result;
+	}
+	
 	@SuppressWarnings("unused")
 	public String validateUploadJobsEmptyInt(String columnName, Cell cell) {
 		
@@ -308,4 +335,374 @@ public class ExcelFileService {
 		Integer intValue = Integer.parseInt(parts[1]);
 		return intValue;
 	}
+	
+	public File exportToExcelWithResultSet(ResultSet resultSet, String excel_output_file, int row_start, int column_start){
+
+		List<String> headerValues=new ArrayList<String>();
+	    XSSFWorkbook workbook = new XSSFWorkbook();
+		try {
+			XSSFSheet spreadsheet = workbook.createSheet("data");
+			XSSFRow row = spreadsheet.createRow(0);
+			XSSFCell cell;
+			int cc = resultSet.getMetaData().getColumnCount();
+			for (int i = 1; i <= cc; i++) {
+				String headerVal = resultSet.getMetaData().getColumnName(i);
+				headerValues.add(headerVal);
+				cell = row.createCell(i - 1);
+				cell.setCellValue(resultSet.getMetaData().getColumnName(i));
+			}
+			// System.out.println(headerValues);
+			int i = row_start;
+			while (resultSet.next()) {
+				for (int j = 1; j <= cc + column_start; j++) {
+					// System.out.println(resultSet.getString(j));
+					XSSFRow row1 = spreadsheet.createRow((short) i);
+					row1.createCell((short) i)
+							.setCellValue(resultSet.getString(resultSet.getMetaData().getColumnName(j)));
+					i++;
+
+				}
+			}
+
+//			FileOutputStream out = new FileOutputStream(new File(excel_output_file));
+//			workbook.write(out);
+//			out.close();
+			// System.out.println("exceldatabase.xlsx written successfully");
+
+			// Ghi dữ liệu đã sửa vào tệp mới
+            File outputFile = new File(excel_output_file);
+            try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+                workbook.write(outputStream);
+            }
+            workbook.close();
+            return outputFile;
+
+	    }catch(Exception e){
+	    	e.printStackTrace();
+            return null;
+	    }
+	}
+	
+	public void uploadTableCustomers (MultipartFile file) {
+		try {
+            // Đọc dữ liệu từ tệp Excel và lưu vào cơ sở dữ liệu
+            Workbook workbook = WorkbookFactory.create(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Iterator<Row> rowIterator = sheet.iterator();
+            int count = 0;
+            
+            List<Customers> entityList = new ArrayList<>();
+            
+            while (rowIterator.hasNext()) {
+            	count++;
+                Row row = rowIterator.next();
+
+                if(count > 1) {
+                	
+                	Cell cell1 = row.getCell(0);
+                	Cell cell2 = row.getCell(1);
+                	Cell cell3 = row.getCell(2);
+                    Cell cell4 = row.getCell(3);
+                    Cell cell5 = row.getCell(4);
+                    Cell cell6 = row.getCell(5);
+                    Cell cell7 = row.getCell(6);
+                    Cell cell8 = row.getCell(7);
+                    Cell cell9 = row.getCell(8);
+                    Cell cell10 = row.getCell(9);
+                    Cell cell11 = row.getCell(10);
+                    
+                    //
+//                    Double idDouble = cell1.getNumericCellValue();
+//                	Integer id = idDouble.intValue();
+                    Customers entity = new Customers();
+                    if(cell1 != null) {
+                    	if(!StringUtils.isEmpty(cell1.getStringCellValue())) {
+                    		entity = customerRepository.findById(Integer.parseInt(cell1.getStringCellValue())).orElse(new Customers());
+                    		if(entity == null) {
+                        		continue;
+                        	}
+                    	}
+                    }
+                    if(cell2 != null) {
+                    	if(!StringUtils.isEmpty(cell2.getStringCellValue())) {
+                    		entity.setCustomName(cell2.getStringCellValue());
+                    	}
+                    }
+                    if(cell3 != null) {
+                    	if(!StringUtils.isEmpty(cell3.getStringCellValue())) {
+                    		entity.setContactName1(cell3.getStringCellValue());
+                    	}
+                    }
+                    if(cell4 != null) {
+                    	if(!StringUtils.isEmpty(cell4.getStringCellValue())) {
+                    		entity.setPhone1(cell4.getStringCellValue());
+                    	}
+                    }
+                    if(cell5 != null) {
+                    	if(!StringUtils.isEmpty(cell5.getStringCellValue())) {
+                    		entity.setContactName2(cell5.getStringCellValue());
+                    	}
+                    }
+                    if(cell6 != null) {
+                    	if(!StringUtils.isEmpty(cell6.getStringCellValue())) {
+                    		entity.setPhone2(cell6.getStringCellValue());
+                    	}
+                    }
+                    if(cell7 != null) {
+                    	if(!StringUtils.isEmpty(cell7.getStringCellValue())) {
+                    		entity.setType(Integer.parseInt(cell7.getStringCellValue()));
+                    	}
+                    }
+                    if(cell8 != null) {
+                    	if(!StringUtils.isEmpty(cell8.getStringCellValue())) {
+                    		entity.setBankAcctName(cell8.getStringCellValue());
+                    	}
+                    }
+                    if(cell9 != null) {
+                    	if(!StringUtils.isEmpty(cell9.getStringCellValue())) {
+                    		entity.setBankAcct(cell9.getStringCellValue());
+                    	}
+                    }
+                    if(cell10 != null) {
+                    	if(!StringUtils.isEmpty(cell10.getStringCellValue())) {
+                    		entity.setBankAcctNumber(cell10.getStringCellValue());
+                    	}
+                    }
+                	
+                	
+                	String cell11Val = cell11.getStringCellValue();
+                	if(StringUtils.equalsIgnoreCase(cell11Val, "true")) {
+                		entity.setState(true);
+                	}else {
+                		entity.setState(false);
+                	}
+                	
+                	entityList.add(entity);
+                }
+                
+            }
+            customerRepository.saveAll(entityList);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public void uploadTableCollectPoint (MultipartFile file) {
+		try {
+            // Đọc dữ liệu từ tệp Excel và lưu vào cơ sở dữ liệu
+            Workbook workbook = WorkbookFactory.create(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Iterator<Row> rowIterator = sheet.iterator();
+            int count = 0;
+            
+            List<CollectPoint> entityList = new ArrayList<>();
+            
+            while (rowIterator.hasNext()) {
+            	count++;
+                Row row = rowIterator.next();
+
+                if(count > 1) {
+                	
+                	Cell cell1 = row.getCell(0);
+                	Cell cell2 = row.getCell(1);
+                	Cell cell3 = row.getCell(2);
+                    Cell cell4 = row.getCell(3);
+                    Cell cell5 = row.getCell(4);
+                    Cell cell6 = row.getCell(5);
+                    Cell cell7 = row.getCell(6);
+                    Cell cell8 = row.getCell(7);
+                    Cell cell9 = row.getCell(8);
+                    Cell cell10 = row.getCell(9);
+                    Cell cell11 = row.getCell(10);
+                    Cell cell12 = row.getCell(11);
+                	Cell cell13 = row.getCell(12);
+                    Cell cell14 = row.getCell(13);
+                    Cell cell15 = row.getCell(14);
+                    Cell cell16 = row.getCell(15);
+                    Cell cell17 = row.getCell(16);
+                    Cell cell18 = row.getCell(17);
+                    
+                    CollectPoint entity = new CollectPoint();
+                    if(cell1 != null) {
+                    	if(!StringUtils.isEmpty(cell1.getStringCellValue())) {
+                    		entity = collectPointRepository.findById(Integer.parseInt(cell1.getStringCellValue())).orElse(new CollectPoint());
+                    		if(entity == null) {
+                        		continue;
+                        	}
+                    	}
+                    }
+                    if(cell2 != null) {
+                    	if(!StringUtils.isEmpty(cell2.getStringCellValue())) {
+                    		entity.setName(cell2.getStringCellValue());
+                    	}
+                    }
+                    if(cell3 != null) {
+                    	if(!StringUtils.isEmpty(cell3.getStringCellValue())) {
+                    		entity.setNumAddress(cell3.getStringCellValue());
+                    	}
+                    }
+                    if(cell4 != null) {
+                    	if(!StringUtils.isEmpty(cell4.getStringCellValue())) {
+                    		entity.setStreetAddress(cell4.getStringCellValue());
+                    	}
+                    }
+                    if(cell5 != null) {
+                    	if(!StringUtils.isEmpty(cell5.getStringCellValue())) {
+                    		entity.setWard(cell5.getStringCellValue());
+                    	}
+                    }
+                    if(cell6 != null) {
+                    	if(!StringUtils.isEmpty(cell6.getStringCellValue())) {
+                    		entity.setDist(cell6.getStringCellValue());
+                    	}
+                    }
+                    if(cell7 != null) {
+                    	if(!StringUtils.isEmpty(cell7.getStringCellValue())) {
+                    		entity.setProvince(cell7.getStringCellValue());
+                    	}
+                    }
+                    if(cell8 != null) {
+                    	if(!StringUtils.isEmpty(cell8.getStringCellValue())) {
+                    		entity.setRefPlace(cell8.getStringCellValue());
+                    	}
+                    }
+                    if(cell9 != null) {
+                    	if(!StringUtils.isEmpty(cell9.getStringCellValue())) {
+                    		entity.setContactName(cell9.getStringCellValue());
+                    	}
+                    }
+                    if(cell10 != null) {
+                    	if(!StringUtils.isEmpty(cell10.getStringCellValue())) {
+                    		entity.setPhone(cell10.getStringCellValue());
+                    	}
+                    }
+                    if(cell11 != null) {
+                    	if(!StringUtils.isEmpty(cell11.getStringCellValue())) {
+                    		entity.setCustomId(Integer.parseInt(cell11.getStringCellValue()));
+                    	}
+                    }
+                    if(cell12 != null) {
+                    	if(!StringUtils.isEmpty(cell12.getStringCellValue())) {
+                    		entity.setPosLong(cell12.getStringCellValue());
+                    	}
+                    }
+                    if(cell13 != null) {
+                    	if(!StringUtils.isEmpty(cell13.getStringCellValue())) {
+                    		entity.setPosLat(cell13.getStringCellValue());
+                    	}
+                    }
+                    if(cell14 != null) {
+                    	if(!StringUtils.isEmpty(cell14.getStringCellValue())) {
+                    		entity.setBankAcctName(cell14.getStringCellValue());
+                    	}
+                    }
+                    if(cell15 != null) {
+                    	if(!StringUtils.isEmpty(cell15.getStringCellValue())) {
+                    		entity.setBankAcct(cell15.getStringCellValue());
+                    	}
+                    }
+                    if(cell16 != null) {
+                    	if(!StringUtils.isEmpty(cell16.getStringCellValue())) {
+                    		entity.setBankAcctNumber(cell16.getStringCellValue());
+                    	}
+                    }
+                    if(cell17 != null) {
+                    	if(!StringUtils.isEmpty(cell17.getStringCellValue())) {
+                    		entity.setUseCusBank(Integer.parseInt(cell17.getStringCellValue()));
+                    	}
+                    }
+                    
+                	String cell18Val = cell18.getStringCellValue();
+                	if(StringUtils.equalsIgnoreCase(cell18Val, "true")) {
+                		entity.setState(true);
+                	}else {
+                		entity.setState(false);
+                	}
+                	
+                	entityList.add(entity);
+                }
+                
+            }
+            collectPointRepository.saveAll(entityList);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public void uploadTableUser (MultipartFile file) {
+		try {
+            // Đọc dữ liệu từ tệp Excel và lưu vào cơ sở dữ liệu
+            Workbook workbook = WorkbookFactory.create(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Iterator<Row> rowIterator = sheet.iterator();
+            int count = 0;
+            
+            List<Users> entityList = new ArrayList<>();
+            
+            while (rowIterator.hasNext()) {
+            	count++;
+                Row row = rowIterator.next();
+
+                if(count > 1) {
+                	
+                	Cell cell1 = row.getCell(0);
+                	Cell cell2 = row.getCell(1);
+                	Cell cell3 = row.getCell(2);
+                    Cell cell4 = row.getCell(3);
+                    Cell cell5 = row.getCell(4);
+                    Cell cell6 = row.getCell(5);
+                    
+                    Users entity = new Users();
+                    if(cell1 != null) {
+                    	if(!StringUtils.isEmpty(cell1.getStringCellValue())) {
+                    		entity = userRepository.findById(Integer.parseInt(cell1.getStringCellValue())).orElse(new Users());
+                    		if(entity == null) {
+                        		continue;
+                        	}
+                    	}
+                    }
+                    if(cell2 != null) {
+                    	if(!StringUtils.isEmpty(cell2.getStringCellValue())) {
+                    		entity.setEmployeeId(Integer.parseInt(cell2.getStringCellValue()));
+                    	}
+                    }
+                    if(cell3 != null) {
+                    	if(!StringUtils.isEmpty(cell3.getStringCellValue())) {
+                    		entity.setCusId(Integer.parseInt(cell3.getStringCellValue()));
+                    	}
+                    }
+                    if(cell4 != null) {
+                    	if(!StringUtils.isEmpty(cell4.getStringCellValue())) {
+                    		entity.setUserName(cell4.getStringCellValue());
+                    	}
+                    }
+                    if(cell5 != null) {
+                    	if(!StringUtils.isEmpty(cell5.getStringCellValue())) {
+                    		entity.setPassword(cell5.getStringCellValue());
+                    	}
+                    }
+                    
+                	String cell6Val = cell6.getStringCellValue();
+                	if(StringUtils.equalsIgnoreCase(cell6Val, "true")) {
+                		entity.setState(true);
+                	}else {
+                		entity.setState(false);
+                	}
+                	
+                	entityList.add(entity);
+                }
+                
+            }
+            userRepository.saveAll(entityList);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+	
 }
