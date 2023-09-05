@@ -27,6 +27,9 @@ public class CollectPoint {
 
     @Column(name = "dist")
     private String dist;
+    
+    @Column(name = "province")
+    private String province;
 
     @Column(name = "ref_place")
     private String refPlace;
@@ -56,7 +59,7 @@ public class CollectPoint {
     private String bankAcctNumber;
 
     @Column(name = "use_cus_bank")
-    private String useCusBank;
+    private Integer useCusBank;
 
     @Column(name = "state")
     private boolean state;
