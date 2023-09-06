@@ -3,6 +3,10 @@ package com.dinh.logistics.controller;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -18,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +49,9 @@ public class testController {
 	
 	@PersistenceContext
     private EntityManager entityManager;
+	
+	@Value("${app.file.sql-select-material-report}")
+    private String sqlSelectMaterialReportPath;
 
 	@PostMapping("/test1")
 	public ResponseEntity<Object> test1(@RequestParam String deviceId){
@@ -130,6 +138,28 @@ public class testController {
 	        List<Object[]> results = query.getResultList();
 
 	        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
+			
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);
+        }
+    }
+	
+	@GetMapping("/test4")
+	public ResponseEntity<Object> test4(){
+		try {
+			
+			// Sử dụng thư viện NIO để đọc nội dung từ tệp
+            Path path = Paths.get(sqlSelectMaterialReportPath);
+            byte[] bytes = Files.readAllBytes(path);
+
+            // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
+            String content = new String(bytes, StandardCharsets.UTF_8);
+
+            // In nội dung chuỗi ra màn hình
+//            System.out.println("Nội dung từ tệp:");
+//            System.out.println(content);
+
+	        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, content);
 			
         } catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);

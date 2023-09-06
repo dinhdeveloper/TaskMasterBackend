@@ -1,6 +1,10 @@
 package com.dinh.logistics.dao.impl;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +14,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.dinh.logistics.dao.ReportDao;
@@ -24,35 +29,37 @@ public class ReportDaoImpl implements ReportDao {
 	
 	@PersistenceContext
     private EntityManager entityManager;
+	
+	@Value("${app.file.sql-select-material-report}")
+    private String sqlSelectMaterialReportPath;
 
     @Override
-    public List<ReportListDto> getReportByFilter(String startDate,String endDate, String cusName) {
-        StringBuilder builder = new StringBuilder();
+    public List<Object[]> getReportByFilter(String startDate,String endDate, String cusName) {
+    	try {
+    		StringBuilder builder = new StringBuilder();
+            
+            Path path = Paths.get(sqlSelectMaterialReportPath);
+            byte[] bytes = Files.readAllBytes(path);
 
-        builder.append(" select c.custom_name, j.creation_time, jm1.weight as vl1, jm2.weight_to_cus as vl2, jm3.weight_to_cus as vl3, jm4.weight_to_cus as vl4, ");
-        builder.append(" (jm1.weight + jm2.weight + jm3.weight + jm4.weight) as total ");
-        builder.append(" from jobs j ");
-        builder.append(" join job_material jm1 on jm1.job_id = j.job_id ");
-        builder.append(" join job_material jm2 on jm2.job_id = j.job_id ");
-        builder.append(" join job_material jm3 on jm3.job_id = j.job_id ");
-        builder.append(" join job_material jm4 on jm4.job_id = j.job_id ");
-        builder.append(" join material m1 on jm1.mate_id = m1.mate_id and m1.code = 'BRICH' ");
-        builder.append(" join material m2 on jm2.mate_id = m2.mate_id and m2.code = 'ROCK' ");
-        builder.append(" join material m3 on jm3.mate_id = m3.mate_id and m3.code = 'CEMENT' ");
-        builder.append(" join material m4 on jm4.mate_id = m4.mate_id and m4.code = 'SAND' ");
-        builder.append(" join collect_point cp on j.colle_point_id = cp.colle_point_id ");
-        builder.append(" join customers c on cp.custom_id = c.custom_id ");
-        builder.append(" WHERE 1=1 ");
-        generateSearchFilter(builder, startDate, endDate, cusName);
-        Query query = entityManager.createNativeQuery(builder.toString());
+            // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
+            String content = new String(bytes, StandardCharsets.UTF_8);
 
-        setSearchFilter(query, startDate, endDate, cusName);
+            builder.append(content);
+//            generateSearchFilter(builder, startDate, endDate, cusName);
+            Query query = entityManager.createNativeQuery(builder.toString());
 
-//        query.setFirstResult((page - 1) * size);
-//        query.setMaxResults(size);
-        List<Object[]> results = query.getResultList();
+            setSearchFilter(query, startDate, endDate, cusName);
 
-        return convertJob(results);
+//            query.setFirstResult((page - 1) * size);
+//            query.setMaxResults(size);
+            List<Object[]> results = query.getResultList();
+
+            return results;
+//            return convertJob(results);
+    	}catch (Exception e) {
+    		return null;
+    	}
+        
     }
     
     @Override
@@ -78,15 +85,15 @@ public class ReportDaoImpl implements ReportDao {
     public void generateSearchFilter(StringBuilder stringBuilder, String startDate,String endDate, String cusName){
 
     	if (!StringUtils.isEmpty(startDate)) {
-            stringBuilder.append(" AND DATE_TRUNC('day', j.creation_time) >= TO_DATE(:startDate,'dd/MM/yyyy') ");
+            stringBuilder.append(" AND DATE_TRUNC('day', j.weight_time) >= TO_DATE(:startDate,'dd/MM/yyyy') ");
         }
 
         if (!StringUtils.isEmpty(endDate)) {
-            stringBuilder.append(" AND DATE_TRUNC('day', j.creation_time) <= TO_DATE(:endDate,'dd/MM/yyyy') ");
+            stringBuilder.append(" AND DATE_TRUNC('day', j.weight_time) <= TO_DATE(:endDate,'dd/MM/yyyy') ");
         }
         
         if (!StringUtils.isEmpty(cusName)) {
-            stringBuilder.append(" and lower(c.custom_name) like lower(:cusName) ");
+            stringBuilder.append(" and unaccent(c.custom_name) ilike unaccent(:cusName) ");
         }
 
 //        if(isCount == false) {

@@ -7,7 +7,7 @@ import com.dinh.logistics.dto.portal.ReportListDto;
 
 public interface ReportDao {
 
-	List<ReportListDto> getReportByFilter(String startDate, String endDate, String cusName);
+	List<Object[]> getReportByFilter(String startDate, String endDate, String cusName);
 
 	int getCountAllJobByFilter(String startDate, String endDate, String cusName);
 

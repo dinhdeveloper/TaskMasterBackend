@@ -21,15 +21,17 @@ public class ReportManagement {
 	@Autowired
 	ReportDao reportDao;
 	
-	public reportListResponseDto getReportListResponse(String startDate, String endDate, String cusName) {
+	public List<Object[]> getReportListResponse(String startDate, String endDate, String cusName) {
 		
 		reportListResponseDto jobListResponseDto = new reportListResponseDto();
 	
-		List<ReportListDto> reportList = reportDao.getReportByFilter(startDate, endDate, cusName);
+		List<Object[]> reportList = reportDao.getReportByFilter(startDate, endDate, cusName);
 		
-		jobListResponseDto.setData(reportList);
-	
-		return jobListResponseDto;
+//		jobListResponseDto.setData(reportList);
+//	
+//		return jobListResponseDto;
+		
+		return reportList;
 		
 	}
 
