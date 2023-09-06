@@ -1,0 +1,1369 @@
+select
+    tt.custom_name,
+    tt.weight_time,
+    tt.vlieu1,
+    tt.vlieu2,
+    tt.vlieu3,
+    tt.vlieu4,
+    tt.vlieu5,
+    tt.vlieu6,
+    tt.vlieu7,
+    tt.vlieu8,
+    tt.vlieu9,
+    tt.vlieu10,
+    tt.vlieu11,
+    tt.vlieu12,
+    tt.vlieu13,
+    tt.vlieu14,
+    tt.vlieu15,
+    tt.vlieu16,
+    tt.vlieu17,
+    tt.vlieu18,
+    tt.vlieu19,
+    tt.vlieu20,
+    tt.vlieu21,
+    tt.vlieu22,
+    tt.vlieu23,
+    tt.vlieu24,
+    tt.vlieu25,
+    tt.vlieu26,
+    tt.vlieu27,
+    tt.vlieu28,
+    tt.vlieu29,
+    tt.vlieu30,
+    tt.vlieu31,
+    tt.vlieu32,
+    tt.vlieu33,
+    tt.vlieu34,
+    tt.vlieu35,
+    tt.vlieu36,
+    tt.vlieu37,
+    tt.vlieu38,
+    tt.vlieu39,
+    tt.vlieu40,
+    coalesce(tt.vlieu1,	0) + coalesce(tt.vlieu2, 0) + coalesce(tt.vlieu3, 0) + coalesce(tt.vlieu4, 0)
+        + coalesce(tt.vlieu5,	0) + coalesce(tt.vlieu6, 0) + coalesce(tt.vlieu7, 0) + coalesce(tt.vlieu8, 0)
+        + coalesce(tt.vlieu9,	0) + coalesce(tt.vlieu10, 0)
+        + coalesce(tt.vlieu11, 0)
+        + coalesce(tt.vlieu12, 0)
+        + coalesce(tt.vlieu13, 0)
+        + coalesce(tt.vlieu14, 0)
+        + coalesce(tt.vlieu15, 0)
+        + coalesce(tt.vlieu16, 0)
+        + coalesce(tt.vlieu17, 0)
+        + coalesce(tt.vlieu18, 0)
+        + coalesce(tt.vlieu19, 0)
+        + coalesce(tt.vlieu20, 0)
+        + coalesce(tt.vlieu21, 0)
+        + coalesce(tt.vlieu22, 0)
+        + coalesce(tt.vlieu23, 0)
+        + coalesce(tt.vlieu24, 0)
+        + coalesce(tt.vlieu25, 0)
+        + coalesce(tt.vlieu26, 0)
+        + coalesce(tt.vlieu27, 0)
+        + coalesce(tt.vlieu28, 0)
+        + coalesce(tt.vlieu29, 0)
+        + coalesce(tt.vlieu30, 0)
+        + coalesce(tt.vlieu31, 0)
+        + coalesce(tt.vlieu32, 0)
+        + coalesce(tt.vlieu33, 0)
+        + coalesce(tt.vlieu34, 0)
+        + coalesce(tt.vlieu35, 0)
+        + coalesce(tt.vlieu36, 0)
+        + coalesce(tt.vlieu37, 0)
+        + coalesce(tt.vlieu38, 0)
+        + coalesce(tt.vlieu39, 0)
+        + coalesce(tt.vlieu40, 0)
+        total
+from
+    (
+        select
+            distinct c.custom_name,
+                     j.weight_time weight_time,
+                     sum(m1.weight) vlieu1,
+                     sum(m2.weight) vlieu2,
+                     sum(m3.weight) vlieu3,
+                     sum(m4.weight) vlieu4,
+                     sum(m5.weight) vlieu5,
+                     sum(m6.weight) vlieu6,
+                     sum(m7.weight) vlieu7,
+                     sum(m8.weight) vlieu8,
+                     sum(m9.weight) vlieu9,
+                     sum(m10.weight) vlieu10,
+                     sum(m11.weight) vlieu11,
+                     sum(m12.weight) vlieu12,
+                     sum(m13.weight) vlieu13,
+                     sum(m14.weight) vlieu14,
+                     sum(m15.weight) vlieu15,
+                     sum(m16.weight) vlieu16,
+                     sum(m17.weight) vlieu17,
+                     sum(m18.weight) vlieu18,
+                     sum(m19.weight) vlieu19,
+                     sum(m20.weight) vlieu20,
+                     sum(m21.weight) vlieu21,
+                     sum(m22.weight) vlieu22,
+                     sum(m23.weight) vlieu23,
+                     sum(m24.weight) vlieu24,
+                     sum(m25.weight) vlieu25,
+                     sum(m26.weight) vlieu26,
+                     sum(m27.weight) vlieu27,
+                     sum(m28.weight) vlieu28,
+                     sum(m29.weight) vlieu29,
+                     sum(m30.weight) vlieu30,
+                     sum(m31.weight) vlieu31,
+                     sum(m32.weight) vlieu32,
+                     sum(m33.weight) vlieu33,
+                     sum(m34.weight) vlieu34,
+                     sum(m35.weight) vlieu35,
+                     sum(m36.weight) vlieu36,
+                     sum(m37.weight) vlieu37,
+                     sum(m38.weight) vlieu38,
+                     sum(m39.weight) vlieu39,
+                     sum(m40.weight) vlieu40
+        from
+            customers c,
+            collect_point cp,
+            jobs j
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 1) m1
+            on
+                    j.job_id = m1.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 2) m2
+            on
+                    j.job_id = m2.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 3) m3
+            on
+                    j.job_id = m3.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 4) m4
+            on
+                    j.job_id = m4.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 5) m5
+            on
+                    j.job_id = m5.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 6) m6
+            on
+                    j.job_id = m6.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 7) m7
+            on
+                    j.job_id = m7.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 8) m8
+            on
+                    j.job_id = m8.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 9) m9
+            on
+                    j.job_id = m9.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 10) m10
+            on
+                    j.job_id = m10.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 11) m11
+            on
+                    j.job_id = m11.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 12) m12
+            on
+                    j.job_id = m12.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 13) m13
+            on
+                    j.job_id = m13.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 14) m14
+            on
+                    j.job_id = m14.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 15) m15
+            on
+                    j.job_id = m15.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 16) m16
+            on
+                    j.job_id = m16.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 17) m17
+            on
+                    j.job_id = m17.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 18) m18
+            on
+                    j.job_id = m18.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 19) m19
+            on
+                    j.job_id = m19.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 20) m20
+            on
+                    j.job_id = m20.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 21) m21
+            on
+                    j.job_id = m21.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 22) m22
+            on
+                    j.job_id = m22.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 23) m23
+            on
+                    j.job_id = m23.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 24) m24
+            on
+                    j.job_id = m24.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 25) m25
+            on
+                    j.job_id = m25.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 26) m26
+            on
+                    j.job_id = m26.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 27) m27
+            on
+                    j.job_id = m27.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 28) m28
+            on
+                    j.job_id = m28.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 29) m29
+            on
+                    j.job_id = m29.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 30) m30
+            on
+                    j.job_id = m30.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 31) m31
+            on
+                    j.job_id = m31.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 32) m32
+            on
+                    j.job_id = m32.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 33) m33
+            on
+                    j.job_id = m33.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 34) m34
+            on
+                    j.job_id = m34.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 35) m35
+            on
+                    j.job_id = m35.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 36) m36
+            on
+                    j.job_id = m36.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 37) m37
+            on
+                    j.job_id = m37.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 38) m38
+            on
+                    j.job_id = m38.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 39) m39
+            on
+                    j.job_id = m39.job_id
+                left join
+            (
+                select
+                    jm.job_id,
+                    jm.mate_id,
+                    jm.weight
+                from
+                    job_material jm
+                where
+                        jm.mate_id = 40) m40
+            on
+                    j.job_id = m40.job_id
+        where
+                j.colle_point_id = cp.colle_point_id
+          and cp.custom_id = c.custom_id
+          and DATE_TRUNC('day', j.weight_time) >= TO_DATE(:startDate,'dd/MM/yyyy')
+          and DATE_TRUNC('day', j.weight_time) <= TO_DATE(:endDate,'dd/MM/yyyy')
+          and unaccent(c.custom_name) ILIKE unaccent(:cusName)
+          --and c.custom_id = 2
+        group by
+            c.custom_id, --c.custom_name,
+            j.weight_time
+    ) tt
+group by
+    tt.custom_name,
+    tt.weight_time,
+    tt.vlieu1,
+    tt.vlieu2,
+    tt.vlieu3,
+    tt.vlieu4,
+    tt.vlieu5,
+    tt.vlieu6,
+    tt.vlieu7,
+    tt.vlieu8,
+    tt.vlieu9,
+    tt.vlieu10,
+    tt.vlieu11,
+    tt.vlieu12,
+    tt.vlieu13,
+    tt.vlieu14,
+    tt.vlieu15,
+    tt.vlieu16,
+    tt.vlieu17,
+    tt.vlieu18,
+    tt.vlieu19,
+    tt.vlieu20,
+    tt.vlieu21,
+    tt.vlieu22,
+    tt.vlieu23,
+    tt.vlieu24,
+    tt.vlieu25,
+    tt.vlieu26,
+    tt.vlieu27,
+    tt.vlieu28,
+    tt.vlieu29,
+    tt.vlieu30,
+    tt.vlieu31,
+    tt.vlieu32,
+    tt.vlieu33,
+    tt.vlieu34,
+    tt.vlieu35,
+    tt.vlieu36,
+    tt.vlieu37,
+    tt.vlieu38,
+    tt.vlieu39,
+    tt.vlieu40
+union
+select
+    'Total by vlieu',
+    null,
+    sum(coalesce(ttt.vlieu1, 0)),
+    sum(coalesce(ttt.vlieu2, 0)),
+    sum(coalesce(ttt.vlieu3, 0)),
+    sum(coalesce(ttt.vlieu4, 0)),
+    sum(coalesce(ttt.vlieu5, 0)),
+    sum(coalesce(ttt.vlieu6, 0)),
+    sum(coalesce(ttt.vlieu7, 0)),
+    sum(coalesce(ttt.vlieu8, 0)),
+    sum(coalesce(ttt.vlieu9, 0)),
+    sum(coalesce(ttt.vlieu10, 0)),
+    sum(coalesce(ttt.vlieu11, 0)),
+    sum(coalesce(ttt.vlieu12, 0)),
+    sum(coalesce(ttt.vlieu13, 0)),
+    sum(coalesce(ttt.vlieu14, 0)),
+    sum(coalesce(ttt.vlieu15, 0)),
+    sum(coalesce(ttt.vlieu16, 0)),
+    sum(coalesce(ttt.vlieu17, 0)),
+    sum(coalesce(ttt.vlieu18, 0)),
+    sum(coalesce(ttt.vlieu19, 0)),
+    sum(coalesce(ttt.vlieu20, 0)),
+    sum(coalesce(ttt.vlieu21, 0)),
+    sum(coalesce(ttt.vlieu22, 0)),
+    sum(coalesce(ttt.vlieu23, 0)),
+    sum(coalesce(ttt.vlieu24, 0)),
+    sum(coalesce(ttt.vlieu25, 0)),
+    sum(coalesce(ttt.vlieu26, 0)),
+    sum(coalesce(ttt.vlieu27, 0)),
+    sum(coalesce(ttt.vlieu28, 0)),
+    sum(coalesce(ttt.vlieu29, 0)),
+    sum(coalesce(ttt.vlieu30, 0)),
+    sum(coalesce(ttt.vlieu31, 0)),
+    sum(coalesce(ttt.vlieu32, 0)),
+    sum(coalesce(ttt.vlieu33, 0)),
+    sum(coalesce(ttt.vlieu34, 0)),
+    sum(coalesce(ttt.vlieu35, 0)),
+    sum(coalesce(ttt.vlieu36, 0)),
+    sum(coalesce(ttt.vlieu37, 0)),
+    sum(coalesce(ttt.vlieu38, 0)),
+    sum(coalesce(ttt.vlieu39, 0)),
+    sum(coalesce(ttt.vlieu40, 0)),
+    sum(coalesce(ttt.total, 0))
+from
+    (
+        select
+            tt.custom_name,
+            tt.weight_time,
+            tt.vlieu1,
+            tt.vlieu2,
+            tt.vlieu3,
+            tt.vlieu4,
+            tt.vlieu5,
+            tt.vlieu6,
+            tt.vlieu7,
+            tt.vlieu8,
+            tt.vlieu9,
+            tt.vlieu10,
+            tt.vlieu11,
+            tt.vlieu12,
+            tt.vlieu13,
+            tt.vlieu14,
+            tt.vlieu15,
+            tt.vlieu16,
+            tt.vlieu17,
+            tt.vlieu18,
+            tt.vlieu19,
+            tt.vlieu20,
+            tt.vlieu21,
+            tt.vlieu22,
+            tt.vlieu23,
+            tt.vlieu24,
+            tt.vlieu25,
+            tt.vlieu26,
+            tt.vlieu27,
+            tt.vlieu28,
+            tt.vlieu29,
+            tt.vlieu30,
+            tt.vlieu31,
+            tt.vlieu32,
+            tt.vlieu33,
+            tt.vlieu34,
+            tt.vlieu35,
+            tt.vlieu36,
+            tt.vlieu37,
+            tt.vlieu38,
+            tt.vlieu39,
+            tt.vlieu40,
+            coalesce(tt.vlieu1,	0) + coalesce(tt.vlieu2, 0) + coalesce(tt.vlieu3, 0) + coalesce(tt.vlieu4, 0)
+                + coalesce(tt.vlieu5,	0) + coalesce(tt.vlieu6, 0) + coalesce(tt.vlieu7, 0) + coalesce(tt.vlieu8, 0)
+                + coalesce(tt.vlieu9,	0) + coalesce(tt.vlieu10, 0)
+                + coalesce(tt.vlieu11, 0)
+                + coalesce(tt.vlieu12, 0)
+                + coalesce(tt.vlieu13, 0)
+                + coalesce(tt.vlieu14, 0)
+                + coalesce(tt.vlieu15, 0)
+                + coalesce(tt.vlieu16, 0)
+                + coalesce(tt.vlieu17, 0)
+                + coalesce(tt.vlieu18, 0)
+                + coalesce(tt.vlieu19, 0)
+                + coalesce(tt.vlieu20, 0)
+                + coalesce(tt.vlieu21, 0)
+                + coalesce(tt.vlieu22, 0)
+                + coalesce(tt.vlieu23, 0)
+                + coalesce(tt.vlieu24, 0)
+                + coalesce(tt.vlieu25, 0)
+                + coalesce(tt.vlieu26, 0)
+                + coalesce(tt.vlieu27, 0)
+                + coalesce(tt.vlieu28, 0)
+                + coalesce(tt.vlieu29, 0)
+                + coalesce(tt.vlieu30, 0)
+                + coalesce(tt.vlieu31, 0)
+                + coalesce(tt.vlieu32, 0)
+                + coalesce(tt.vlieu33, 0)
+                + coalesce(tt.vlieu34, 0)
+                + coalesce(tt.vlieu35, 0)
+                + coalesce(tt.vlieu36, 0)
+                + coalesce(tt.vlieu37, 0)
+                + coalesce(tt.vlieu38, 0)
+                + coalesce(tt.vlieu39, 0)
+                + coalesce(tt.vlieu40, 0)
+                total
+        from
+            (
+                select
+                    distinct c.custom_name,
+                             j.weight_time weight_time,
+                             sum(m1.weight) vlieu1,
+                             sum(m2.weight) vlieu2,
+                             sum(m3.weight) vlieu3,
+                             sum(m4.weight) vlieu4,
+                             sum(m5.weight) vlieu5,
+                             sum(m6.weight) vlieu6,
+                             sum(m7.weight) vlieu7,
+                             sum(m8.weight) vlieu8,
+                             sum(m9.weight) vlieu9,
+                             sum(m10.weight) vlieu10,
+                             sum(m11.weight) vlieu11,
+                             sum(m12.weight) vlieu12,
+                             sum(m13.weight) vlieu13,
+                             sum(m14.weight) vlieu14,
+                             sum(m15.weight) vlieu15,
+                             sum(m16.weight) vlieu16,
+                             sum(m17.weight) vlieu17,
+                             sum(m18.weight) vlieu18,
+                             sum(m19.weight) vlieu19,
+                             sum(m20.weight) vlieu20,
+                             sum(m21.weight) vlieu21,
+                             sum(m22.weight) vlieu22,
+                             sum(m23.weight) vlieu23,
+                             sum(m24.weight) vlieu24,
+                             sum(m25.weight) vlieu25,
+                             sum(m26.weight) vlieu26,
+                             sum(m27.weight) vlieu27,
+                             sum(m28.weight) vlieu28,
+                             sum(m29.weight) vlieu29,
+                             sum(m30.weight) vlieu30,
+                             sum(m31.weight) vlieu31,
+                             sum(m32.weight) vlieu32,
+                             sum(m33.weight) vlieu33,
+                             sum(m34.weight) vlieu34,
+                             sum(m35.weight) vlieu35,
+                             sum(m36.weight) vlieu36,
+                             sum(m37.weight) vlieu37,
+                             sum(m38.weight) vlieu38,
+                             sum(m39.weight) vlieu39,
+                             sum(m40.weight) vlieu40
+                from
+                    customers c,
+                    collect_point cp,
+                    jobs j
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 1) m1
+                    on
+                            j.job_id = m1.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 2) m2
+                    on
+                            j.job_id = m2.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 3) m3
+                    on
+                            j.job_id = m3.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 4) m4
+                    on
+                            j.job_id = m4.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 5) m5
+                    on
+                            j.job_id = m5.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 6) m6
+                    on
+                            j.job_id = m6.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 7) m7
+                    on
+                            j.job_id = m7.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 8) m8
+                    on
+                            j.job_id = m8.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 9) m9
+                    on
+                            j.job_id = m9.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 10) m10
+                    on
+                            j.job_id = m10.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 11) m11
+                    on
+                            j.job_id = m11.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 12) m12
+                    on
+                            j.job_id = m12.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 13) m13
+                    on
+                            j.job_id = m13.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 14) m14
+                    on
+                            j.job_id = m14.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 15) m15
+                    on
+                            j.job_id = m15.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 16) m16
+                    on
+                            j.job_id = m16.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 17) m17
+                    on
+                            j.job_id = m17.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 18) m18
+                    on
+                            j.job_id = m18.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 19) m19
+                    on
+                            j.job_id = m19.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 20) m20
+                    on
+                            j.job_id = m20.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 21) m21
+                    on
+                            j.job_id = m21.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 22) m22
+                    on
+                            j.job_id = m22.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 23) m23
+                    on
+                            j.job_id = m23.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 24) m24
+                    on
+                            j.job_id = m24.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 25) m25
+                    on
+                            j.job_id = m25.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 26) m26
+                    on
+                            j.job_id = m26.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 27) m27
+                    on
+                            j.job_id = m27.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 28) m28
+                    on
+                            j.job_id = m28.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 29) m29
+                    on
+                            j.job_id = m29.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 30) m30
+                    on
+                            j.job_id = m30.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 31) m31
+                    on
+                            j.job_id = m31.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 32) m32
+                    on
+                            j.job_id = m32.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 33) m33
+                    on
+                            j.job_id = m33.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 34) m34
+                    on
+                            j.job_id = m34.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 35) m35
+                    on
+                            j.job_id = m35.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 36) m36
+                    on
+                            j.job_id = m36.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 37) m37
+                    on
+                            j.job_id = m37.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 38) m38
+                    on
+                            j.job_id = m38.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 39) m39
+                    on
+                            j.job_id = m39.job_id
+                        left join
+                    (
+                        select
+                            jm.job_id,
+                            jm.mate_id,
+                            jm.weight
+                        from
+                            job_material jm
+                        where
+                                jm.mate_id = 40) m40
+                    on
+                            j.job_id = m40.job_id
+                where
+                        j.colle_point_id = cp.colle_point_id
+                  and cp.custom_id = c.custom_id
+                  and DATE_TRUNC('day', j.weight_time) >= TO_DATE(:startDate,'dd/MM/yyyy')
+                  and DATE_TRUNC('day', j.weight_time) <= TO_DATE(:endDate,'dd/MM/yyyy')
+                  and unaccent(c.custom_name) ILIKE unaccent(:cusName)
+                  --and c.custom_id = 2
+                group by
+                    c.custom_id, --c.custom_name,
+                    j.weight_time
+            ) tt
+        group by
+            tt.custom_name,
+            tt.weight_time,
+            tt.vlieu1,
+            tt.vlieu2,
+            tt.vlieu3,
+            tt.vlieu4,
+            tt.vlieu5,
+            tt.vlieu6,
+            tt.vlieu7,
+            tt.vlieu8,
+            tt.vlieu9,
+            tt.vlieu10,
+            tt.vlieu11,
+            tt.vlieu12,
+            tt.vlieu13,
+            tt.vlieu14,
+            tt.vlieu15,
+            tt.vlieu16,
+            tt.vlieu17,
+            tt.vlieu18,
+            tt.vlieu19,
+            tt.vlieu20,
+            tt.vlieu21,
+            tt.vlieu22,
+            tt.vlieu23,
+            tt.vlieu24,
+            tt.vlieu25,
+            tt.vlieu26,
+            tt.vlieu27,
+            tt.vlieu28,
+            tt.vlieu29,
+            tt.vlieu30,
+            tt.vlieu31,
+            tt.vlieu32,
+            tt.vlieu33,
+            tt.vlieu34,
+            tt.vlieu35,
+            tt.vlieu36,
+            tt.vlieu37,
+            tt.vlieu38,
+            tt.vlieu39,
+            tt.vlieu40
+    ) ttt
+;

@@ -1,5 +1,8 @@
 package com.dinh.logistics.controller.portal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +38,27 @@ public class ReportController {
 			@RequestParam(name = "cusName",required = false,defaultValue = "")  String cusName
 			){
 		try {
-			reportListResponseDto response = new reportListResponseDto();
+//			reportListResponseDto response = new reportListResponseDto();
 			
-			response = reportManagement.getReportListResponse(startDate, endDate, cusName);
+			List<Object[]> listObj = reportManagement.getReportListResponse(startDate, endDate, cusName);
 			
-			return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
+			// Tạo danh sách mới để chứa danh sách con List<String>
+	        List<List<String>> resultList = new ArrayList<>();
+
+	        // Trích xuất giá trị từ danh sách ban đầu và chuyển đổi thành danh sách con
+	        for (Object[] itemArray : listObj) {
+	            List<String> subList = new ArrayList<>();
+	            for (Object item : itemArray) {
+	            	if(item == null) {
+	            		subList.add(null);
+	            	}else {
+	            		subList.add(item.toString()); // Chuyển đổi thành chuỗi
+	            	}
+	            }
+	            resultList.add(subList);
+	        }
+			
+			return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, resultList);
         }catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);
         }
