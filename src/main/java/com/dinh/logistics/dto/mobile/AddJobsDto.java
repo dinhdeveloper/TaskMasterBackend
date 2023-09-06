@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class AddJobsDto {
     private int jobType;
+    private int jobStateId;
     private int nv1Id;
     private int nv2Id;
     private int assignId;

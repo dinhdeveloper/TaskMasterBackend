@@ -41,11 +41,11 @@ public class UtilsNotification {
                         " ud.device_id, ud.device_name, ud.is_active_access_token " +
                         "FROM employee e " +
                         "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
-                        "JOIN user_devices ud ON ud.user_id = uv.user_id " +
+                        "LEFT JOIN user_devices ud ON ud.user_id = uv.user_id " +
                         "WHERE e.emp_id = :empID";
         Query queryEmp = entityManager.createNativeQuery(queryEmployee);
         queryEmp.setParameter("empID", empID);
-        List<Object[]> empData = queryEmp.getResultList();
+        List<Object[]> empResultList = queryEmp.getResultList();
 
 
         // Lấy thông tin leader:
@@ -53,7 +53,7 @@ public class UtilsNotification {
                 " ud.device_id, ud.device_name, ud.is_active_access_token " +
                 "FROM employee e " +
                 "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
-                "JOIN user_devices ud ON ud.user_id = uv.user_id " +
+                "LEFT JOIN user_devices ud ON ud.user_id = uv.user_id " +
                 "WHERE e.emp_id = :leaderId";
 
         Query queryLead = entityManager.createNativeQuery(queryLeader);
@@ -80,30 +80,30 @@ public class UtilsNotification {
                 "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
                 "JOIN user_devices ud ON ud.user_id = uv.user_id " +
                 "JOIN role_pj rp ON rp.role_id = e.role_id " +
-                "JOIN team t ON t.team_code = 'OWNER' "+
+                "JOIN team t ON t.team_code = 'MASTER' "+
                 "WHERE rp.role_code = 'MASTER'";
 
         Query queryM = entityManager.createNativeQuery(queryMaster);
         List<Object[]> masterData = queryM.getResultList();
 
-        List<NotifyTopic> mediaDtoList = new ArrayList<>();
+        List<NotifyTopic> notifyTopicList = new ArrayList<>();
         String nameEmp = null;
 
-        for (Object[] mediaData : empData) {
+        for (Object[] empData : empResultList) {
             NotifyTopic mediaDto = new NotifyTopic();
-            mediaDto.setEmp_id((Integer) mediaData[0]);
-            mediaDto.setName((String) mediaData[1]);
-            nameEmp = (String) mediaData[1];
-            mediaDto.setTeam_id((Integer) mediaData[2]);
-            mediaDto.setFirebase_token((String) mediaData[3]);
-            mediaDto.setAccess_token((String) mediaData[4]);
-            mediaDto.setDevice_id((String) mediaData[5]);
-            mediaDto.setDevice_name((String) mediaData[6]);
-            mediaDto.setIs_active_access_token((Boolean) mediaData[7]);
+            mediaDto.setEmp_id((Integer) empData[0]);
+            mediaDto.setName((String) empData[1]);
+            nameEmp = (String) empData[1];
+            mediaDto.setTeam_id((Integer) empData[2]);
+            mediaDto.setFirebase_token((String) empData[3]);
+            mediaDto.setAccess_token((String) empData[4]);
+            mediaDto.setDevice_id((String) empData[5]);
+            mediaDto.setDevice_name((String) empData[6]);
+            mediaDto.setIs_active_access_token((Boolean) empData[7]);
             mediaDto.setLeader_id(leaderId);
             mediaDto.setCpName((String) jobsData[0]);
             mediaDto.setJtName((String) jobsData[1]);
-            mediaDtoList.add(mediaDto);
+            notifyTopicList.add(mediaDto);
         }
 
         for (Object[] leaData : leaderData) {
@@ -119,7 +119,7 @@ public class UtilsNotification {
             mediaDto.setLeader_id(leaderId);
             mediaDto.setCpName((String) jobsData[0]);
             mediaDto.setJtName((String) jobsData[1]);
-            mediaDtoList.add(mediaDto);
+            notifyTopicList.add(mediaDto);
         }
 
         for (Object[] masData : masterData) {
@@ -135,11 +135,14 @@ public class UtilsNotification {
             mediaDto.setLeader_id((Integer) masData[8]);
             mediaDto.setCpName((String) jobsData[0]);
             mediaDto.setJtName((String) jobsData[1]);
-            mediaDtoList.add(mediaDto);
+            notifyTopicList.add(mediaDto);
         }
 
-        return mediaDtoList;
+        return notifyTopicList;
     }
 
+    public void insertDataToNotification(Integer data, Integer jobId) {
+        //làm phase 2
+    }
 }
 

@@ -38,6 +38,7 @@ public class JobsService {
         try {
             repositoryImp.addJobs(
                     addJobsDto.getJobType(),
+                    addJobsDto.getJobStateId(),
                     addJobsDto.getNv1Id(),
                     addJobsDto.getNv2Id(),
                     addJobsDto.getAssignId(),
@@ -74,7 +75,10 @@ public class JobsService {
             }
 
             Jobs jobsNew = repositoryImp.saveJob(job);
-            repositoryImp.pushNotifyUpdateJobState(jobsNew);
+            if (newStateId != 30){
+                repositoryImp.pushNotifyUpdateJobState(jobsNew);
+            }
+
         } else {
             // Handle the case when the job with the given ID doesn't exist
         }

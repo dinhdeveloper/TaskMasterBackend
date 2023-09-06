@@ -18,12 +18,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Repository
+@Transactional
 public class JobsRepositoryImp {
 
     @PersistenceContext
@@ -32,15 +34,16 @@ public class JobsRepositoryImp {
     @Autowired
     UtilsNotification utilsNotification;
 
-    public void addJobs(int jobType, int idNV1, int idNV2, int assignId, List<Integer> listIdPoint, String ghiChu) {
+    public void addJobs(int jobType,int jobStateId, int idNV1, int idNV2, int assignId, List<Integer> listIdPoint, String ghiChu) {
         for (int i = 0; i < listIdPoint.size(); i++) {
-            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id) VALUES (?, ?, ?, ?, ?) RETURNING job_id";
+            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id,job_state_id ) VALUES (?, ?, ?, ?, ?,?) RETURNING job_id";
             Integer generatedId = (Integer) entityManager.createNativeQuery(sql)
                     .setParameter(1, listIdPoint.get(i))
                     .setParameter(2, jobType)
                     .setParameter(3, 1)
                     .setParameter(4, ghiChu)
                     .setParameter(5, assignId)
+                    .setParameter(6, jobStateId)
                     .getSingleResult();
 
             String sql2 = "INSERT INTO job_employee(job_id, emp_id, serial_number ) VALUES (?, ?, ?)";
@@ -50,15 +53,17 @@ public class JobsRepositoryImp {
                     .setParameter(3, 1)
                     .executeUpdate();
 
-            String sql3 = "INSERT INTO job_employee(job_id, emp_id, serial_number) VALUES (?, ?, ?)";
-            entityManager.createNativeQuery(sql3)
-                    .setParameter(1, generatedId)
-                    .setParameter(2, idNV2)
-                    .setParameter(3, 2)
-                    .executeUpdate();
-
             pushNotifyAddTask(idNV1, generatedId, assignId);
-            pushNotifyAddTask(idNV2, generatedId, assignId);
+
+            if (idNV2 != -1){
+                String sql3 = "INSERT INTO job_employee(job_id, emp_id, serial_number) VALUES (?, ?, ?)";
+                entityManager.createNativeQuery(sql3)
+                        .setParameter(1, generatedId)
+                        .setParameter(2, idNV2)
+                        .setParameter(3, 2)
+                        .executeUpdate();
+                pushNotifyAddTask(idNV2, generatedId, assignId);
+            }
         }
     }
 
@@ -80,13 +85,17 @@ public class JobsRepositoryImp {
                 String jsonData = gson.toJson(sendFirebaseData);
 
                 // Gửi
-                if (notifyTopic.getIs_active_access_token()) {
+                if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()){
                     Message message = Message.builder()
                             .setToken(notifyTopic.getFirebase_token())
                             .putData("data", jsonData)
                             .build();
                     try {
                         FirebaseMessaging.getInstance().send(message);
+//                        String response = FirebaseMessaging.getInstance().send(message);
+//                        if (response != null){
+//                            utilsNotification.insertDataToNotification(data,jobsNew.getJob_id());
+//                        }
                     } catch (FirebaseMessagingException e) {
                         // Xử lý ngoại lệ ở đây
                         e.printStackTrace();
@@ -97,7 +106,7 @@ public class JobsRepositoryImp {
     }
 
     public JobDetailsDTO jobsDetails(Integer job_id, Integer emp_id) {
-        String query = "SELECT j.job_id, jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note,jt.job_state_code  " +
+        String query = "SELECT j.job_id, jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note,jt.job_state_code,j.amount_paid_emp  " +
                 "FROM jobs j " +
                 "LEFT JOIN job_state jt ON j.job_state_id = jt.job_state_id " +
                 "LEFT JOIN collect_point cp ON j.colle_point_id = cp.colle_point_id " +
@@ -171,6 +180,7 @@ public class JobsRepositoryImp {
             dto.setPriority((BigDecimal) singleResult[5]);
             dto.setNoteJob((String) singleResult[6]);
             dto.setJobStateCode((String) singleResult[7]);
+            dto.setAmountPaidEmp((BigDecimal) singleResult[8]);
             dto.setJobMedia(mediaDtoList);
             dto.setJobMaterial(materialDtoList);
             dto.setEmployeeJobs(employeeJobsList);
@@ -222,15 +232,21 @@ public class JobsRepositoryImp {
                     String jsonData = gson.toJson(sendFirebaseData);
 
                     // Gửi
-                    Message message = Message.builder()
-                            .setToken(notifyTopic.getFirebase_token())
-                            .putData("data", jsonData)
-                            .build();
-                    try {
-                        FirebaseMessaging.getInstance().send(message);
-                    } catch (FirebaseMessagingException e) {
-                        // Xử lý ngoại lệ ở đây
-                        e.printStackTrace();
+                    if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()){
+                        Message message = Message.builder()
+                                .setToken(notifyTopic.getFirebase_token())
+                                .putData("data", jsonData)
+                                .build();
+                        try {
+                            FirebaseMessaging.getInstance().send(message);
+//                        String response = FirebaseMessaging.getInstance().send(message);
+//                        if (response != null){
+//                            utilsNotification.insertDataToNotification(data,jobsNew.getJob_id());
+//                        }
+                        } catch (FirebaseMessagingException e) {
+                            // Xử lý ngoại lệ ở đây
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
