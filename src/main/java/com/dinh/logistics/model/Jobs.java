@@ -5,7 +5,6 @@ import lombok.Data;
 import javax.persistence.*;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Data
 @Entity
@@ -31,10 +30,10 @@ public class Jobs {
     private Integer priority;
 
     @Column(name = "amount_paid_emp")
-    private Integer amountPaidEmp;
+    private Long amountPaidEmp;
 
     @Column(name = "amount")
-    private Integer amount;
+    private Long amount;
 
     @Column(name = "job_state_id")
     private Integer jobStateId;

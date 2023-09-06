@@ -51,20 +51,26 @@ public class JobsController {
         }
     }
 
-    @PutMapping("/update/update_state_job/{jobId}/{newStateId}/{dateCreate}")
-    public ResponseEntity<Object> updateStateJob(
-            @PathVariable Integer jobId,
-            @PathVariable Integer newStateId,
-            @PathVariable String dateCreate
-    ) {
+    @PutMapping("/update/update_state_job")
+    public ResponseEntity<Object> updateStateJob(@RequestBody UpdateStateRequest updateStateRequest) {
         try {
-            jobsService.updateStateJob(jobId, newStateId);
+            jobsService.updateStateJob(updateStateRequest);
             UpdateJobsResponse response = new UpdateJobsResponse();
-            response.setStateJobs(newStateId);
+            response.setStateJobs(updateStateRequest.getStateJob());
             response.setDescription("Cập nhật thành công");
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
         } catch (Exception e) {
             log.error("Error updating job state: ", e.getMessage());
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
+        }
+    }
+
+    @PostMapping("/update_job_detail")
+    public ResponseEntity<Object> updateJobSave(@RequestBody DataUpdateJobRequest dataUpdateJobRequest){
+        Jobs jobs = jobsService.updateJobSave(dataUpdateJobRequest);
+        if (jobs != null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
+        } else {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
         }
     }
@@ -100,15 +106,5 @@ public class JobsController {
     public ResponseEntity<Object> saveA(@PathVariable Integer id, @PathVariable Integer jobId){
         List<NotifyTopic> notifyTopic = utilsNotification.pushNotifyByEmpId(id, jobId);
         return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, notifyTopic);
-    }
-
-    @PostMapping("/update_job_detail")
-    public ResponseEntity<Object> updateJobSave(@RequestBody DataUpdateJobRequest dataUpdateJobRequest){
-        Jobs jobs = jobsService.updateJobSave(dataUpdateJobRequest);
-        if (jobs != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
-        } else {
-            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
-        }
     }
 }

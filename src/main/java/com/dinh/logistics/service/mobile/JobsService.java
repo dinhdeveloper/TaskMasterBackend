@@ -2,10 +2,7 @@ package com.dinh.logistics.service.mobile;
 
 import com.dinh.logistics.dao.JobDao;
 import com.dinh.logistics.dto.mobile.*;
-import com.dinh.logistics.model.Employee;
-import com.dinh.logistics.model.JobState;
-import com.dinh.logistics.model.Jobs;
-import com.dinh.logistics.model.Team;
+import com.dinh.logistics.model.*;
 import com.dinh.logistics.respository.EmployeeRepository;
 import com.dinh.logistics.respository.TeamRepository;
 import com.dinh.logistics.respository.mobile.JobsRepositoryImp;
@@ -56,27 +53,49 @@ public class JobsService {
 
 
     @Transactional
-    public void updateStateJob(Integer jobId, Integer newStateId) {
+    public void updateStateJob(UpdateStateRequest updateStateRequest) {
 
         Date date = new Date();
 
-        Jobs job = repositoryImp.findJobById(jobId);
+        Jobs job = repositoryImp.findJobById(updateStateRequest.getJobsId());
         if (job != null) {
             JobState jobState = repositoryImp.findJobStateById(job.getJobStateId());
-            job.setJobStateId(newStateId);
-            if (Objects.equals(jobState.getJobStateCode(), "COMPACTED") || jobState.getJobStateId() == 15){
+            //UPDATE STATE
+            job.setJobStateId(updateStateRequest.getStateJob());
+            //DA LAM GON
+            if (updateStateRequest.getStateJob() == 15){
                 job.setCollectFinishTime(new Timestamp(date.getTime()));
             }
-            if (Objects.equals(jobState.getJobStateCode(), "WEIGHTED") || jobState.getJobStateId() == 20){
-                job.setWeightTime(new Timestamp(date.getTime()));
+            //DA CAN
+            if (updateStateRequest.getStateJob() == 20){
+                job.setPaymentMethod(updateStateRequest.getPaymentMethod());
+                Integer paymentStateId = repositoryImp.findByStateStatus(updateStateRequest.getPaymentStateStatus());
+                job.setPaymentStateId(paymentStateId);
+                if (updateStateRequest.getPaymentStateStatus() == 1 && updateStateRequest.getPaymentMethod() == 1){ //nv ung tien va da thanh toan
+                    job.setAmountPaidEmp(updateStateRequest.getAmountPaidEmp());
+                    job.setAmount(updateStateRequest.getAmountTotal());
+                }
+                if (updateStateRequest.getPaymentStateStatus() == 1 && updateStateRequest.getPaymentMethod() == 2){ // bank & da thanh toan
+                    job.setAmount(updateStateRequest.getAmountTotal());
+                    job.setWeightTime(new Timestamp(date.getTime()));
+                    /* type: info; receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
+                    repositoryImp.pushNotifyStateWeighted(updateStateRequest);
+                }
+                if (updateStateRequest.getPaymentStateStatus() == 0 && updateStateRequest.getPaymentMethod() == -1){ //chua thanh toan
+                    job.setAmount(updateStateRequest.getAmountTotal());
+                }
             }
-            if (Objects.equals(jobState.getJobStateCode(), "DONE") || jobState.getJobStateId() == 30){
+            //DA XONG
+            if (updateStateRequest.getStateJob() == 30){
                 job.setFinishTime(new Timestamp(date.getTime()));
             }
 
+
             Jobs jobsNew = repositoryImp.saveJob(job);
-            if (newStateId != 30){
-                repositoryImp.pushNotifyUpdateJobState(jobsNew);
+            if (updateStateRequest.getStateJob() != 30 && !(updateStateRequest.getStateJob() == 20
+                    && updateStateRequest.getPaymentStateStatus() == 1
+                    && updateStateRequest.getPaymentMethod() == 2)){
+                repositoryImp.pushNotifyUpdateJobState(jobsNew, updateStateRequest.getStateJob());
             }
 
         } else {
