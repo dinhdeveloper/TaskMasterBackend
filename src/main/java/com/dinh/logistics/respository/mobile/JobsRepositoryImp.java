@@ -1,10 +1,7 @@
 package com.dinh.logistics.respository.mobile;
 
 import com.dinh.logistics.dto.FirebaseDataDto;
-import com.dinh.logistics.dto.mobile.DataUpdateJobRequest;
-import com.dinh.logistics.dto.mobile.JobDetailsDTO;
-import com.dinh.logistics.dto.mobile.MaterialJob;
-import com.dinh.logistics.dto.mobile.MediaDto;
+import com.dinh.logistics.dto.mobile.*;
 import com.dinh.logistics.model.*;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -23,6 +20,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dinh.logistics.LogictisUtil.formatMoney;
+
 @Slf4j
 @Repository
 @Transactional
@@ -34,7 +33,7 @@ public class JobsRepositoryImp {
     @Autowired
     UtilsNotification utilsNotification;
 
-    public void addJobs(int jobType,int jobStateId, int idNV1, int idNV2, int assignId, List<Integer> listIdPoint, String ghiChu) {
+    public void addJobs(int jobType, int jobStateId, int idNV1, int idNV2, int assignId, List<Integer> listIdPoint, String ghiChu) {
         for (int i = 0; i < listIdPoint.size(); i++) {
             String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id,job_state_id ) VALUES (?, ?, ?, ?, ?,?) RETURNING job_id";
             Integer generatedId = (Integer) entityManager.createNativeQuery(sql)
@@ -55,7 +54,7 @@ public class JobsRepositoryImp {
 
             pushNotifyAddTask(idNV1, generatedId, assignId);
 
-            if (idNV2 != -1){
+            if (idNV2 != -1) {
                 String sql3 = "INSERT INTO job_employee(job_id, emp_id, serial_number) VALUES (?, ?, ?)";
                 entityManager.createNativeQuery(sql3)
                         .setParameter(1, generatedId)
@@ -85,7 +84,7 @@ public class JobsRepositoryImp {
                 String jsonData = gson.toJson(sendFirebaseData);
 
                 // Gửi
-                if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()){
+                if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
                     Message message = Message.builder()
                             .setToken(notifyTopic.getFirebase_token())
                             .putData("data", jsonData)
@@ -106,7 +105,8 @@ public class JobsRepositoryImp {
     }
 
     public JobDetailsDTO jobsDetails(Integer job_id, Integer emp_id) {
-        String query = "SELECT j.job_id, jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note,jt.job_state_code,j.amount_paid_emp  " +
+        String query = "SELECT j.job_id, jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, " +
+                "j.note,jt.job_state_code,j.amount_paid_emp, j.payment_method, j.payment_state_id  " +
                 "FROM jobs j " +
                 "LEFT JOIN job_state jt ON j.job_state_id = jt.job_state_id " +
                 "LEFT JOIN collect_point cp ON j.colle_point_id = cp.colle_point_id " +
@@ -181,6 +181,8 @@ public class JobsRepositoryImp {
             dto.setNoteJob((String) singleResult[6]);
             dto.setJobStateCode((String) singleResult[7]);
             dto.setAmountPaidEmp((BigDecimal) singleResult[8]);
+            dto.setPaymentMethod((BigDecimal) singleResult[9]);
+            dto.setPaymentStateId((Integer) singleResult[10]);
             dto.setJobMedia(mediaDtoList);
             dto.setJobMaterial(materialDtoList);
             dto.setEmployeeJobs(employeeJobsList);
@@ -204,7 +206,7 @@ public class JobsRepositoryImp {
         return entityManager.merge(job);
     }
 
-    public void pushNotifyUpdateJobState(Jobs jobsNew) {
+    public void pushNotifyUpdateJobState(Jobs jobsNew, int stateJob) {
         if (jobsNew == null) {
             return;
         }
@@ -218,12 +220,18 @@ public class JobsRepositoryImp {
             List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(data, jobsNew.getJob_id());
             for (NotifyTopic notifyTopic : notifyTopicList) {
                 if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId()) {
-                    String content = "Nhân viên: " + notifyTopic.getName() +
-                            ", Loại công việc: " + notifyTopic.getJtName() +
-                            ", Địa điểm: " + notifyTopic.getCpName();
+                    String contentState = null;
+                    if (stateJob == 15){
+                        contentState = " đã làm gọn";
+                    }
+                    if (stateJob == 20){
+                        contentState = " đã cân";
+                    }
+
+                    String content = "Địa điểm: " + notifyTopic.getCpName() + contentState;
 
                     FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
-                    sendFirebaseData.setTitle("Công việc mới");
+                    sendFirebaseData.setTitle("Cập nhật trạng thái thành công.");
                     sendFirebaseData.setType("WORK");
                     sendFirebaseData.setBody(content);
                     sendFirebaseData.setData(String.valueOf(jobsNew.getJob_id()));
@@ -232,7 +240,7 @@ public class JobsRepositoryImp {
                     String jsonData = gson.toJson(sendFirebaseData);
 
                     // Gửi
-                    if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()){
+                    if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
                         Message message = Message.builder()
                                 .setToken(notifyTopic.getFirebase_token())
                                 .putData("data", jsonData)
@@ -254,29 +262,132 @@ public class JobsRepositoryImp {
     }
 
     public Jobs updateJobSave(DataUpdateJobRequest dataUpdateJobRequest, Jobs job) {
-        if (job != null){
-            if (dataUpdateJobRequest.getTotalMoney() != null){
-                job.setAmount(Integer.parseInt(dataUpdateJobRequest.getTotalMoney()));
+        if (job != null) {
+            if (dataUpdateJobRequest.getTotalMoney() != null) {
+                job.setAmount(dataUpdateJobRequest.getTotalMoney());
             }
-            if (dataUpdateJobRequest.getPriority() != -1 || dataUpdateJobRequest.getPriority() != null){
+            if (dataUpdateJobRequest.getPriority() != -1 || dataUpdateJobRequest.getPriority() != null) {
                 job.setPriority(dataUpdateJobRequest.getPriority());
             }
-            if (dataUpdateJobRequest.getAmountPaidEmp() != null){
-                job.setAmountPaidEmp(Integer.parseInt(dataUpdateJobRequest.getAmountPaidEmp()));
+            if (dataUpdateJobRequest.getAmountPaidEmp() != null) {
+                job.setAmountPaidEmp(dataUpdateJobRequest.getAmountPaidEmp());
             }
-            if (dataUpdateJobRequest.getNote() != null){
+            if (dataUpdateJobRequest.getNote() != null) {
                 job.setNote(dataUpdateJobRequest.getNote());
             }
 
-            String sqlQueryJobEmployee = "UPDATE JobEmployee SET empId = :empIdNew WHERE empId = :empIdOld AND jobId = :jodId";
-            Query queryJobEmployee = entityManager.createQuery(sqlQueryJobEmployee);
-            queryJobEmployee.setParameter("empIdNew", dataUpdateJobRequest.getEmpNewId());
-            queryJobEmployee.setParameter("empIdOld", dataUpdateJobRequest.getEmpOldId());
-            queryJobEmployee.setParameter("jodId", dataUpdateJobRequest.getJodId());
-            queryJobEmployee.executeUpdate();
+            if (dataUpdateJobRequest.getEmpNewId() != -1){
+                String sqlQueryJobEmployee = "UPDATE JobEmployee SET empId = :empIdNew WHERE empId = :empIdOld AND jobId = :jodId";
+                Query queryJobEmployee = entityManager.createQuery(sqlQueryJobEmployee);
+                queryJobEmployee.setParameter("empIdNew", dataUpdateJobRequest.getEmpNewId());
+                queryJobEmployee.setParameter("empIdOld", dataUpdateJobRequest.getEmpOldId());
+                queryJobEmployee.setParameter("jodId", dataUpdateJobRequest.getJodId());
+                queryJobEmployee.executeUpdate();
+                pushNotifyAddTask(dataUpdateJobRequest.getEmpNewId(),dataUpdateJobRequest.getJodId(),dataUpdateJobRequest.getEmpAssignId());
+            }
 
-           return entityManager.merge(job);
+            return entityManager.merge(job);
         }
         return job;
+    }
+
+    public Integer findByStateStatus(int paymentStateStatus) {
+        String sqlQuery = "SELECT jm.paymentStateId FROM PaymentState jm WHERE jm.paymentStateStatus = :status";
+        Query query = entityManager.createQuery(sqlQuery);
+        query.setParameter("status", paymentStateStatus);
+        Integer singleResult = (Integer) query.getSingleResult();
+        return singleResult;
+    }
+
+    public void pushNotifyStateWeighted(UpdateStateRequest updateStateRequest) {
+        /*receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
+        String sql = "SELECT c.customName, c.bankAcctName, c.bankAcct, " +
+                "c.bankAcctNumber, cl.name as collectPointName, j.amount, j.empAssignId " +
+                "FROM Customers c " +
+                "LEFT JOIN CollectPoint cl ON cl.customId = c.cusId " +
+                "LEFT JOIN Jobs j ON j.collePointId = cl.collectPointId " +
+                "WHERE j.job_id = :jobID";
+        Query query = entityManager.createQuery(sql);
+        query.setParameter("jobID", updateStateRequest.getJobsId());
+
+        Object[] singleResult = (Object[]) query.getSingleResult();
+        DataUserUpdateStateWeight dto = new DataUserUpdateStateWeight();
+        dto.setCustomName((String) singleResult[0]);
+        dto.setBankAcctName((String) singleResult[1]);
+        dto.setBankAcct((String) singleResult[2]);
+        dto.setBankAcctNumber((String) singleResult[3]);
+        dto.setCollectPointName((String) singleResult[4]);
+        dto.setAmount((Long) singleResult[5]);
+        dto.setEmpAssignId((Integer) singleResult[6]);
+
+        //get master
+        String queryMaster = "SELECT e.emp_id, e.name, e.team_id, ud.firebase_token, ud.access_token, " +
+                "ud.device_id, ud.device_name, ud.is_active_access_token, t.leader_id " +
+                "FROM employee e " +
+                "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
+                "JOIN user_devices ud ON ud.user_id = uv.user_id " +
+                "JOIN role_pj rp ON rp.role_id = e.role_id " +
+                "JOIN team t ON t.team_code = 'MASTER' "+
+                "WHERE rp.role_code = 'MASTER'";
+
+        Query queryM = entityManager.createNativeQuery(queryMaster);
+        List<Object[]> masterData = queryM.getResultList();
+
+        List<NotifyTopic> notifyTopicList = new ArrayList<>();
+
+        for (Object[] masData : masterData) {
+            NotifyTopic mediaDto = new NotifyTopic();
+            mediaDto.setEmp_id((Integer) masData[0]);
+            mediaDto.setName(dto.getCustomName());
+            mediaDto.setTeam_id((Integer) masData[2]);
+            mediaDto.setFirebase_token((String) masData[3]);
+            mediaDto.setAccess_token((String) masData[4]);
+            mediaDto.setDevice_id((String) masData[5]);
+            mediaDto.setDevice_name((String) masData[6]);
+            mediaDto.setIs_active_access_token((Boolean) masData[7]);
+            mediaDto.setLeader_id((Integer) masData[8]);
+            notifyTopicList.add(mediaDto);
+        }
+        if (notifyTopicList.isEmpty()){
+            return;
+        }
+
+        for (NotifyTopic notifyTopic : notifyTopicList){
+
+            String currencyCode = "VNĐ";
+            String formattedAmount = formatMoney(String.valueOf(dto.getAmount()), currencyCode);
+
+            if (notifyTopic.getEmp_id() != dto.getEmpAssignId()) {
+                String content = "CK cho: " + dto.getCustomName() +
+                        ", Địa điểm: " + dto.getCollectPointName() +
+                        ", Số tiền: " + formattedAmount +
+                        ", Số tài khoản: " + dto.getBankAcctNumber() +
+                        ", Chủ tài khoản: " + dto.getBankAcctName() +
+                        ", Ngân hàng: " + dto.getBankAcct();
+
+                FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
+                sendFirebaseData.setTitle("Chuyển khoản");
+                sendFirebaseData.setType("INFO");
+                sendFirebaseData.setBody(content);
+                sendFirebaseData.setData(String.valueOf(updateStateRequest.getJobsId()));
+
+                Gson gson = new Gson();
+                String jsonData = gson.toJson(sendFirebaseData);
+
+                // Gửi
+                if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
+                    Message message = Message.builder()
+                            .setToken(notifyTopic.getFirebase_token())
+                            .putData("data", jsonData)
+                            .build();
+                    try {
+                        FirebaseMessaging.getInstance().send(message);
+                    } catch (FirebaseMessagingException e) {
+                        // Xử lý ngoại lệ ở đây
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

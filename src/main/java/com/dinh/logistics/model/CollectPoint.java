@@ -11,7 +11,7 @@ public class CollectPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "colle_point_id")
-    private Integer empId;
+    private Integer collectPointId;
 
     @Column(name = "name")
     private String name;

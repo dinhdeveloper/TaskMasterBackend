@@ -18,6 +18,9 @@ public class PaymentState {
     @Column(name = "payment_state_desc")
     private String paymentStateDesc;
 
+    @Column(name = "payment_state_status")
+    private Integer paymentStateStatus;
+
     @Column(name = "state")
     private boolean state;
 }
