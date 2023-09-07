@@ -8,8 +8,8 @@ import java.util.List;
 
 @Data
 public class JobDetailsDTO {
-    private int jobId;
-    private int jobStateId;
+    private Integer jobId;
+    private Integer jobStateId;
     private String stateDecs;
     private String numAddress;
     private String namePoint;
@@ -17,6 +17,8 @@ public class JobDetailsDTO {
     private String noteJob;
     private String jobStateCode;
     private BigDecimal amountPaidEmp;
+    private BigDecimal paymentMethod;
+    private Integer paymentStateId;
     private List<MediaDto> jobMedia;
     private List<MaterialJob> jobMaterial;
     private List<EmployeeJob> employeeJobs;

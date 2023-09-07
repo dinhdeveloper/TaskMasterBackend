@@ -105,7 +105,8 @@ public class JobsRepositoryImp {
     }
 
     public JobDetailsDTO jobsDetails(Integer job_id, Integer emp_id) {
-        String query = "SELECT j.job_id, jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, j.note,jt.job_state_code,j.amount_paid_emp  " +
+        String query = "SELECT j.job_id, jt.job_state_id, jt.job_state_desc, cp.num_address, cp.name, j.priority, " +
+                "j.note,jt.job_state_code,j.amount_paid_emp, j.payment_method, j.payment_state_id  " +
                 "FROM jobs j " +
                 "LEFT JOIN job_state jt ON j.job_state_id = jt.job_state_id " +
                 "LEFT JOIN collect_point cp ON j.colle_point_id = cp.colle_point_id " +
@@ -180,6 +181,8 @@ public class JobsRepositoryImp {
             dto.setNoteJob((String) singleResult[6]);
             dto.setJobStateCode((String) singleResult[7]);
             dto.setAmountPaidEmp((BigDecimal) singleResult[8]);
+            dto.setPaymentMethod((BigDecimal) singleResult[9]);
+            dto.setPaymentStateId((Integer) singleResult[10]);
             dto.setJobMedia(mediaDtoList);
             dto.setJobMaterial(materialDtoList);
             dto.setEmployeeJobs(employeeJobsList);

@@ -16,7 +16,15 @@ public class MaterialRepositoryImp {
     private EntityManager entityManager;
 
     @Transactional
-    public void addMaterial(int mateId,int jobId, long weight, long weightToCus, long price) {
+    public void addMaterial(int mateId, int jobId, Long weight, Long weightToCus, long price) {
+        // Kiểm tra nếu weightToCus là null, thay thế nó bằng 0
+        if (weightToCus == null) {
+            weightToCus = 0L;
+        }
+        if (weight == null) {
+            weight = 0L;
+        }
+
         String sql = "INSERT INTO job_material(mate_id, job_id, weight, weight_to_cus, unit_price) VALUES (?, ?, ?, ?, ?)";
         entityManager.createNativeQuery(sql)
                 .setParameter(1, mateId)
@@ -26,4 +34,5 @@ public class MaterialRepositoryImp {
                 .setParameter(5, price)
                 .executeUpdate();
     }
+
 }
