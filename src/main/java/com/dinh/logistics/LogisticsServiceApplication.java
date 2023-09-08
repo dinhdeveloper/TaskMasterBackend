@@ -70,7 +70,8 @@ public class LogisticsServiceApplication {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("*") // Cho phép tất cả các nguồn
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Cho phép các phương thức yêu cầu
+                        .allowedMethods("*")
+//                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Cho phép các phương thức yêu cầu
                         .allowedHeaders("*"); // Cho phép tất cả các tiêu đề
             }
         };

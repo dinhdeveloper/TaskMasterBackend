@@ -23,13 +23,7 @@ public class ReportManagement {
 	
 	public List<Object[]> getReportListResponse(String startDate, String endDate, String cusName) {
 		
-		reportListResponseDto jobListResponseDto = new reportListResponseDto();
-	
 		List<Object[]> reportList = reportDao.getReportByFilter(startDate, endDate, cusName);
-		
-//		jobListResponseDto.setData(reportList);
-//	
-//		return jobListResponseDto;
 		
 		return reportList;
 		

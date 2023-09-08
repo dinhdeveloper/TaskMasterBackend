@@ -60,7 +60,7 @@ public class AuthController {
 	@Autowired UserDeviceRepository userDeviceRepository;
 	
 	@PostMapping("/login")
-    public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginDto loginDto){
+    public ResponseEntity<Object> loginUser(@RequestBody LoginDto loginDto){
 		if(StringUtils.isEmpty(loginDto.getUsername()) || StringUtils.isEmpty(loginDto.getPassword())) {
 			return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.ERROR, null);
 		}

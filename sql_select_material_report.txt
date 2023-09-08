@@ -607,9 +607,9 @@ from
         where
                 j.colle_point_id = cp.colle_point_id
           and cp.custom_id = c.custom_id
-          and DATE_TRUNC('day', j.weight_time) >= TO_DATE(:startDate,'dd/MM/yyyy')
-          and DATE_TRUNC('day', j.weight_time) <= TO_DATE(:endDate,'dd/MM/yyyy')
-          and unaccent(c.custom_name) ILIKE unaccent(:cusName)
+          and DATE_TRUNC('day', j.weight_time) >= TO_DATE(?,'dd/MM/yyyy')
+          and DATE_TRUNC('day', j.weight_time) <= TO_DATE(?,'dd/MM/yyyy')
+          and unaccent(c.custom_name) ILIKE unaccent(?)
           --and c.custom_id = 2
         group by
             c.custom_id, --c.custom_name,
@@ -1314,9 +1314,9 @@ from
                 where
                         j.colle_point_id = cp.colle_point_id
                   and cp.custom_id = c.custom_id
-                  and DATE_TRUNC('day', j.weight_time) >= TO_DATE(:startDate,'dd/MM/yyyy')
-                  and DATE_TRUNC('day', j.weight_time) <= TO_DATE(:endDate,'dd/MM/yyyy')
-                  and unaccent(c.custom_name) ILIKE unaccent(:cusName)
+                  and DATE_TRUNC('day', j.weight_time) >= TO_DATE(?,'dd/MM/yyyy')
+                  and DATE_TRUNC('day', j.weight_time) <= TO_DATE(?,'dd/MM/yyyy')
+                  and unaccent(c.custom_name) ILIKE unaccent(?)
                   --and c.custom_id = 2
                 group by
                     c.custom_id, --c.custom_name,

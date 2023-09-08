@@ -1,10 +1,16 @@
 package com.dinh.logistics.dao.impl;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +20,11 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -38,6 +49,7 @@ public class ReportDaoImpl implements ReportDao {
     	try {
     		StringBuilder builder = new StringBuilder();
             
+    		// Lấy file chứa câu sql
             Path path = Paths.get(sqlSelectMaterialReportPath);
             byte[] bytes = Files.readAllBytes(path);
 
@@ -48,7 +60,14 @@ public class ReportDaoImpl implements ReportDao {
 //            generateSearchFilter(builder, startDate, endDate, cusName);
             Query query = entityManager.createNativeQuery(builder.toString());
 
-            setSearchFilter(query, startDate, endDate, cusName);
+            query.setParameter(1, startDate);
+            query.setParameter(2, endDate);
+            query.setParameter(3, "%" + cusName + "%");
+            query.setParameter(4, startDate);
+            query.setParameter(5, endDate);
+            query.setParameter(6, "%" + cusName + "%");
+            
+//            setSearchFilter(query, startDate, endDate, cusName);
 
 //            query.setFirstResult((page - 1) * size);
 //            query.setMaxResults(size);
@@ -63,24 +82,89 @@ public class ReportDaoImpl implements ReportDao {
     }
     
     @Override
-    public int getCountAllJobByFilter(String startDate,String endDate, String cusName) {
-        StringBuilder builder = new StringBuilder();
+	public File exportToExcelWithResultSet(String excel_output_file, int row_start, int column_start, String startDate,String endDate, String cusName) {
+		
+		// Lấy Session từ EntityManager
+        Session session = entityManager.unwrap(Session.class);
 
-        builder.append(" SELECT count(*) ");
-        builder.append(" FROM jobs j ");
-        builder.append(" LEFT JOIN collect_point cp on cp.colle_point_id = j.colle_point_id ");
-        builder.append(" LEFT JOIN job_type jt on jt.job_type_id = j.job_type_id ");
-        builder.append(" WHERE 1=1 ");
-        generateSearchFilter(builder, startDate, endDate, cusName);
-        Query query = entityManager.createNativeQuery(builder.toString());
+        // Lấy Connection từ Session
+        Connection connection = session.doReturningWork(sessionConnection  -> {
+            return sessionConnection ;
+        });
+        try {
+        	// Lấy file chứa câu sql
+            Path path = Paths.get(sqlSelectMaterialReportPath);
+            byte[] bytes = Files.readAllBytes(path);
 
-        setSearchFilter(query, startDate, endDate, cusName);
+            // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
+            String sql = new String(bytes, StandardCharsets.UTF_8);
+        	PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        	
+        	// Truyền tham số
+        	preparedStatement.setString(1, startDate);
+        	preparedStatement.setString(2, endDate);
+        	preparedStatement.setString(3, "%" + cusName + "%");
+        	preparedStatement.setString(4, startDate);
+        	preparedStatement.setString(5, endDate);
+        	preparedStatement.setString(6, "%" + cusName + "%");
+        	
+            // Thực hiện truy vấn SQL để lấy ResultSet
+            ResultSet resultSet = preparedStatement.executeQuery();
+            
+            List<String> headerValues=new ArrayList<String>();
+    	    XSSFWorkbook workbook = new XSSFWorkbook();
+            
+    	    XSSFSheet spreadsheet = workbook.createSheet("data");
+			XSSFRow row = spreadsheet.createRow(0);
+			XSSFCell cell;
+			int cc = resultSet.getMetaData().getColumnCount();
+			for (int i = 1; i <= cc; i++) {
+				String headerVal = resultSet.getMetaData().getColumnName(i);
+				headerValues.add(headerVal);
+				cell = row.createCell(i - 1);
+				cell.setCellValue(resultSet.getMetaData().getColumnName(i));
+			}
+			// System.out.println(headerValues);
+			int i = row_start;
+			while (resultSet.next()) {
+				XSSFRow row1 = spreadsheet.createRow((short) i);
+				for (int j = 1; j < cc + column_start; j++) {
+					String type = resultSet.getMetaData().getColumnTypeName(j);
+					String value = resultSet.getString(resultSet.getMetaData().getColumnName(j));
+					if(resultSet.getMetaData().getColumnTypeName(j) == "bool") {
+						if(resultSet.getBoolean(resultSet.getMetaData().getColumnName(j)) == true) {
+							row1.createCell((short) j-1)
+							.setCellValue("true");
+						}else {
+							row1.createCell((short) j-1)
+							.setCellValue("false");
+						}
+					}else {
+						row1.createCell((short) j-1)
+						.setCellValue(resultSet.getString(resultSet.getMetaData().getColumnName(j)));
+					}
+					
+				}
+				i++;
+			}
 
-        int total = query.getSingleResult() != null ? Integer.parseInt(query.getSingleResult().toString()) : 0;
+//			FileOutputStream out = new FileOutputStream(new File(excel_output_file));
+//			workbook.write(out);
+//			out.close();
+			// System.out.println("exceldatabase.xlsx written successfully");
 
-        return total;
-    }
-    
+			// Ghi dữ liệu đã sửa vào tệp mới
+            File outputFile = new File(excel_output_file);
+            try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+                workbook.write(outputStream);
+            }
+            workbook.close();
+            return outputFile;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+	}
     
     public void generateSearchFilter(StringBuilder stringBuilder, String startDate,String endDate, String cusName){
 
