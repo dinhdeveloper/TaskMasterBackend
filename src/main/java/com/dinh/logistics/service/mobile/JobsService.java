@@ -103,19 +103,24 @@ public class JobsService {
     }
     
     public JobSearchResponse searchJobByFilter(Integer empStatus, Integer empId, Integer status, Integer paymentStatus, String startDate,
-			String endDate, Integer jobId, String collectPoint) {
+                                               String endDate, Integer jobId, String collectPoint, Integer empRequest) {
     	
     	JobSearchResponse jobSearchResponse = new JobSearchResponse();
     	if(empStatus == 1) {
-    		List<JobSearchResponseDto> resultList = jobDao.searchJobByFilter(empId, status, paymentStatus, startDate, endDate, jobId, collectPoint);
+    		List<JobSearchResponseDto> resultList = jobDao.searchJobByFilter(empId, status, paymentStatus, startDate, endDate, jobId, collectPoint, -1);
     		jobSearchResponse.setData(resultList);
     	}else if(empStatus == 2) {
     		Employee emp = employeeRepository.findById(empId).orElse(null);
     		Team team = teamRepository.findById(emp.getTeamId()).orElse(null);
-    		List<JobSearchResponseDto> resultList = jobDao.searchJobByFilter(team.getLeaderId(), status, paymentStatus, startDate, endDate, jobId, collectPoint);
+    		List<JobSearchResponseDto> resultList = jobDao.searchJobByFilter(null, status, paymentStatus, startDate, endDate, jobId, collectPoint, team.getTeamId());
     		jobSearchResponse.setData(resultList);
     	}else {
-    		List<JobSearchResponseDto> resultList = jobDao.searchJobByFilter(null, status, paymentStatus, startDate, endDate, jobId, collectPoint);
+            List<JobSearchResponseDto> resultList = null;
+    	    if (empRequest != empId){
+               resultList = jobDao.searchJobByFilter(empRequest, status, paymentStatus, startDate, endDate, jobId, collectPoint, -1);
+            }else {
+                resultList = jobDao.searchJobByFilter(null, status, paymentStatus, startDate, endDate, jobId, collectPoint, -1);
+            }
     		jobSearchResponse.setData(resultList);
     	}
     	
