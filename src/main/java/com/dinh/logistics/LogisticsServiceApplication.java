@@ -72,7 +72,9 @@ public class LogisticsServiceApplication {
                         .allowedOrigins("*") // Cho phép tất cả các nguồn
                         .allowedMethods("*")
 //                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Cho phép các phương thức yêu cầu
-                        .allowedHeaders("*"); // Cho phép tất cả các tiêu đề
+                        .allowedHeaders("*")// Cho phép tất cả các tiêu đề
+                        .allowCredentials(true);
+                        ; 
             }
         };
     }

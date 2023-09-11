@@ -39,7 +39,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
 
         // Thực hiện kiểm tra token và xác thực người dùng
         String jwtToken = token.substring(7);
-        UserDevice userDevice = userDeviceRepository.findByAccessTokenAndIsActiveAccessTokenTrue(jwtToken).orElse(new UserDevice());
+        UserDevice userDevice = userDeviceRepository.findByAccessTokenAndIsActiveAccessTokenTrue(jwtToken).orElse(null);
 
         if (Objects.isNull(userDevice)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
