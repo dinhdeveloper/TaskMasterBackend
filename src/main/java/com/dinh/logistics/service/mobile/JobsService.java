@@ -79,7 +79,7 @@ public class JobsService {
                     job.setAmount(updateStateRequest.getAmountTotal());
                     job.setWeightTime(new Timestamp(date.getTime()));
                     /* type: info; receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
-                    repositoryImp.pushNotifyStateWeighted(updateStateRequest);
+                    repositoryImp.pushNotifyStateWeighted(updateStateRequest,job);
                 }
                 if (updateStateRequest.getPaymentStateStatus() == 0 && updateStateRequest.getPaymentMethod() == -1){ //chua thanh toan
                     job.setAmount(updateStateRequest.getAmountTotal());
@@ -92,10 +92,9 @@ public class JobsService {
 
 
             Jobs jobsNew = repositoryImp.saveJob(job);
-            if (updateStateRequest.getStateJob() != 30 && !(updateStateRequest.getStateJob() == 20
-                    && updateStateRequest.getPaymentStateStatus() == 1
-                    && updateStateRequest.getPaymentMethod() == 2)){
-                repositoryImp.pushNotifyUpdateJobState(jobsNew, updateStateRequest.getStateJob());
+            if (updateStateRequest.getStateJob() != 30){
+                //repositoryImp.pushNotifyUpdateJobState(jobsNew, updateStateRequest.getStateJob());
+                repositoryImp.pushNotifyUpdateState(jobsNew, updateStateRequest);
             }
 
         } else {
