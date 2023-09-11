@@ -42,7 +42,7 @@ public class UtilsNotification {
                         "FROM employee e " +
                         "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
                         "LEFT JOIN user_devices ud ON ud.user_id = uv.user_id " +
-                        "WHERE e.emp_id = :empID";
+                        "WHERE e.emp_id = :empID and e.state = true";
         Query queryEmp = entityManager.createNativeQuery(queryEmployee);
         queryEmp.setParameter("empID", empID);
         List<Object[]> empResultList = queryEmp.getResultList();
@@ -54,7 +54,7 @@ public class UtilsNotification {
                 "FROM employee e " +
                 "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
                 "LEFT JOIN user_devices ud ON ud.user_id = uv.user_id " +
-                "WHERE e.emp_id = :leaderId";
+                "WHERE e.emp_id = :leaderId and e.state = true";
 
         Query queryLead = entityManager.createNativeQuery(queryLeader);
         queryLead.setParameter("leaderId", leaderId);
@@ -81,7 +81,7 @@ public class UtilsNotification {
                 "JOIN user_devices ud ON ud.user_id = uv.user_id " +
                 "JOIN role_pj rp ON rp.role_id = e.role_id " +
                 "JOIN team t ON t.team_code = 'MASTER' "+
-                "WHERE rp.role_code = 'MASTER'";
+                "WHERE rp.role_code = 'MASTER' and e.state = true";
 
         Query queryM = entityManager.createNativeQuery(queryMaster);
         List<Object[]> masterData = queryM.getResultList();

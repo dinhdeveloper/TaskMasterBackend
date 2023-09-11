@@ -306,7 +306,7 @@ public class JobsRepositoryImp {
                 "FROM Customers c " +
                 "LEFT JOIN CollectPoint cl ON cl.customId = c.cusId " +
                 "LEFT JOIN Jobs j ON j.collePointId = cl.collectPointId " +
-                "WHERE j.job_id = :jobID";
+                "WHERE j.job_id = :jobID and c.state = true";
         Query query = entityManager.createQuery(sql);
         query.setParameter("jobID", updateStateRequest.getJobsId());
 
@@ -328,7 +328,7 @@ public class JobsRepositoryImp {
                 "JOIN user_devices ud ON ud.user_id = uv.user_id " +
                 "JOIN role_pj rp ON rp.role_id = e.role_id " +
                 "JOIN team t ON t.team_code = 'MASTER' "+
-                "WHERE rp.role_code = 'MASTER'";
+                "WHERE rp.role_code = 'MASTER' and e.state = true";
 
         Query queryM = entityManager.createNativeQuery(queryMaster);
         List<Object[]> masterData = queryM.getResultList();

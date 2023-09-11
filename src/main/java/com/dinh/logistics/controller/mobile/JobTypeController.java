@@ -29,7 +29,7 @@ public class JobTypeController {
 
     @GetMapping("/job_type/list")
     public ResponseEntity<Object> getListJobType(){
-        List<JobType> data = jobTypeRepository.findAll();
+        List<JobType> data = jobTypeRepository.findAllJobTypeByState();
         if (data.isEmpty()){
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         } else {

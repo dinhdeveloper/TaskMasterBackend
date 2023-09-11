@@ -16,7 +16,7 @@ public class EmployeeRepositoryImp {
     public List<Employee> findEmployeesByJobId(Integer jobId) {
         String hql = "SELECT e FROM Employee e " +
                 "LEFT JOIN JobEmployee jm ON e.empId = jm.empId AND jm.jobId = :jobId " +
-                "WHERE jm.JobEmpId IS NULL";
+                "WHERE jm.JobEmpId IS NULL  AND e.state = true";
         TypedQuery<Employee> query = entityManager.createQuery(hql, Employee.class);
         query.setParameter("jobId", jobId);
         return query.getResultList();
