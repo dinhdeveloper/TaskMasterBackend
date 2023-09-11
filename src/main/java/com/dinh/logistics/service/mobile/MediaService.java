@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +31,15 @@ public class MediaService {
 
     @Autowired
     private JobMediaRepository jobMediaRepository;
+
+    private String getFolderDateYear(){
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1; // Tháng bắt đầu từ 0
+        int date = calendar.get(Calendar.DAY_OF_MONTH);
+        String subFolderPath = String.format("/%d/%02d/%02d/", year, month, date);
+        return subFolderPath;
+    }
 
     public boolean uploadVideos(int jobId, MultipartFile urlVideo){
         try {
@@ -49,7 +59,7 @@ public class MediaService {
                 if (urlVideo != null && !urlVideo.isEmpty()) {
                     String videoFilename = urlVideo.getOriginalFilename();
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy_HH_mm");
+                    SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy_HHmmss");
                     String newVideoFileNameWithoutExtension = sdf.format(new Date()) + "_video";
                     String videoExtension = getFileExtension(videoFilename);
                     String newVideoFileName = newVideoFileNameWithoutExtension + "." + videoExtension;
@@ -59,13 +69,13 @@ public class MediaService {
                         Path folder = Paths.get(mediaFileLocation).toAbsolutePath().normalize();
                         Files.createDirectories(folder);
                         // Tạo đường dẫn tuyệt đối cho file video
-                        Path targetVideoLocation = Paths.get(mediaFileLocation).toAbsolutePath().normalize().resolve(newVideoFileName);
+                        Path targetVideoLocation = Paths.get(mediaFileLocation+ getFolderDateYear()).toAbsolutePath().normalize().resolve(newVideoFileName);
                         // Lưu video
                         Files.copy(urlVideo.getInputStream(), targetVideoLocation, StandardCopyOption.REPLACE_EXISTING);
                         // Lưu dữ liệu vào bảng JobMedia cho video
                         JobMediaDto videoJobMedia = new JobMediaDto();
                         videoJobMedia.setJobId(jobId);
-                        videoJobMedia.setUrl(mediaFileLocation + "/" + newVideoFileName);
+                        videoJobMedia.setUrl(mediaFileLocation + getFolderDateYear() + newVideoFileName);
                         videoJobMedia.setMediaType(2);
                         jobMediaRepository.insertJobMedia(videoJobMedia.getUrl(), videoJobMedia.getMediaType(), videoJobMedia.getJobId());
                     } catch (IOException ex) {
@@ -99,7 +109,7 @@ public class MediaService {
                     count ++;
                     String filename = image.getOriginalFilename();
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy_HH_mm");
+                    SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy_HHmmss");
                     String newFileNameWithoutExtension = sdf.format(new Date()) + "_IMG_" + count;
                     // Lấy phần mở rộng của tập tin gốc
                     String extension = getFileExtension(filename);
@@ -107,11 +117,11 @@ public class MediaService {
                     String newFileName = newFileNameWithoutExtension + "." + extension;
                     try {
                         // Tạo folder nếu chưa có
-                        Path folder = Paths.get(mediaFileLocation).toAbsolutePath().normalize();
+                        Path folder = Paths.get(mediaFileLocation + getFolderDateYear()).toAbsolutePath().normalize();
                         Files.createDirectories(folder);
 
                         // Tạo đường dẫn tuyệt đối cho file
-                        Path targetLocation = Paths.get(mediaFileLocation).toAbsolutePath().normalize().resolve(newFileName);
+                        Path targetLocation = Paths.get(mediaFileLocation + getFolderDateYear()).toAbsolutePath().normalize().resolve(newFileName);
 
                         // Lưu file
                         Files.copy(image.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
@@ -123,7 +133,7 @@ public class MediaService {
                     // Lưu dữ liệu vào bảng JobMedia
                     JobMediaDto jobMedia = new JobMediaDto();
                     jobMedia.setJobId(jobId);
-                    jobMedia.setUrl(mediaFileLocation + "/" + newFileName);
+                    jobMedia.setUrl(mediaFileLocation + getFolderDateYear() + newFileName);
                     jobMedia.setMediaType(1);
                     jobMediaRepository.insertJobMedia(jobMedia.getUrl(), jobMedia.getMediaType(), jobMedia.getJobId());
                 }

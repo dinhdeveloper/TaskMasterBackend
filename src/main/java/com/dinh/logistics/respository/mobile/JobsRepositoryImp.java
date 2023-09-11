@@ -299,7 +299,7 @@ public class JobsRepositoryImp {
         return singleResult;
     }
 
-    public void pushNotifyStateWeighted(UpdateStateRequest updateStateRequest) {
+    public void pushNotifyStateWeighted(UpdateStateRequest updateStateRequest, Jobs job) {
         /*receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
         String sql = "SELECT c.customName, c.bankAcctName, c.bankAcct, " +
                 "c.bankAcctNumber, cl.name as collectPointName, j.amount, j.empAssignId " +
@@ -356,17 +356,30 @@ public class JobsRepositoryImp {
 
             String currencyCode = "VNĐ";
             String formattedAmount = formatMoney(String.valueOf(dto.getAmount()), currencyCode);
+            String content = null;
+            FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
 
             if (notifyTopic.getEmp_id() != dto.getEmpAssignId()) {
-                String content = "CK cho: " + dto.getCustomName() +
-                        ", Địa điểm: " + dto.getCollectPointName() +
-                        ", Số tiền: " + formattedAmount +
-                        ", Số tài khoản: " + dto.getBankAcctNumber() +
-                        ", Chủ tài khoản: " + dto.getBankAcctName() +
-                        ", Ngân hàng: " + dto.getBankAcct();
+                if (updateStateRequest.getEmpUpdate() != notifyTopic.getEmp_id()){
+                    sendFirebaseData.setTitle("Thông tin chuyển khoản");
+                    content = "CK cho: " + dto.getCustomName() +
+                            ", Địa điểm: " + dto.getCollectPointName() +
+                            ", Số tiền: " + formattedAmount +
+                            ", Số tài khoản: " + dto.getBankAcctNumber() +
+                            ", Chủ tài khoản: " + dto.getBankAcctName() +
+                            ", Ngân hàng: " + dto.getBankAcct();
+                }else{
+                    sendFirebaseData.setTitle("Thông tin chuyển khoản, trạng thái địa điểm");
+                    content =
+                            "Địa điểm: " + dto.getCollectPointName() + " đã cân"+
+                            ", CK cho: " + dto.getCustomName() +
+                            ", Địa điểm: " + dto.getCollectPointName() +
+                            ", Số tiền: " + formattedAmount +
+                            ", Số tài khoản: " + dto.getBankAcctNumber() +
+                            ", Chủ tài khoản: " + dto.getBankAcctName() +
+                            ", Ngân hàng: " + dto.getBankAcct();
+                }
 
-                FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
-                sendFirebaseData.setTitle("Chuyển khoản");
                 sendFirebaseData.setType("INFO");
                 sendFirebaseData.setBody(content);
                 sendFirebaseData.setData(String.valueOf(updateStateRequest.getJobsId()));
@@ -385,6 +398,61 @@ public class JobsRepositoryImp {
                     } catch (FirebaseMessagingException e) {
                         // Xử lý ngoại lệ ở đây
                         e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    public void pushNotifyUpdateState(Jobs jobsNew, UpdateStateRequest updateStateRequest) {
+        if (jobsNew == null) {
+            return;
+        }
+
+        String query = "SELECT je.empId FROM JobEmployee je WHERE je.jobId = :job_id";
+        Query queryData = entityManager.createQuery(query);
+        queryData.setParameter("job_id", jobsNew.getJob_id());
+        List<Integer> dataNVID = queryData.getResultList();
+
+        for (Integer data : dataNVID) {
+            List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(data, jobsNew.getJob_id());
+            for (NotifyTopic notifyTopic : notifyTopicList) {
+                if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != updateStateRequest.getEmpUpdate()) {
+                    String contentState = null;
+                    if (updateStateRequest.getStateJob() == 15){
+                        contentState = " đã làm gọn";
+                    }
+                    if (updateStateRequest.getStateJob() == 20){
+                        contentState = " đã cân";
+                    }
+
+                    String content = "Địa điểm: " + notifyTopic.getCpName() + contentState;
+
+                    FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
+                    sendFirebaseData.setTitle("Cập nhật trạng thái thành công.");
+                    sendFirebaseData.setType("WORK");
+                    sendFirebaseData.setBody(content);
+                    sendFirebaseData.setData(String.valueOf(jobsNew.getJob_id()));
+
+                    Gson gson = new Gson();
+                    String jsonData = gson.toJson(sendFirebaseData);
+
+                    // Gửi
+                    if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
+                        Message message = Message.builder()
+                                .setToken(notifyTopic.getFirebase_token())
+                                .putData("data", jsonData)
+                                .build();
+                        try {
+                            FirebaseMessaging.getInstance().send(message);
+//                        String response = FirebaseMessaging.getInstance().send(message);
+//                        if (response != null){
+//                            utilsNotification.insertDataToNotification(data,jobsNew.getJob_id());
+//                        }
+                        } catch (FirebaseMessagingException e) {
+                            // Xử lý ngoại lệ ở đây
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

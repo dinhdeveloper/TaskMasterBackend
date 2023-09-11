@@ -94,10 +94,11 @@ public class JobsController {
 			@RequestParam(name = "status",required = false,defaultValue = "")  Integer status,
 			@RequestParam(name = "paymentStatus",required = false,defaultValue = "")  Integer paymentStatus,
 			@RequestParam(name = "jobId",required = false,defaultValue = "")  Integer jobId,
+			@RequestParam(name = "empRequest",required = false,defaultValue = "")  Integer empRequest,
 			@RequestParam(name = "collectPoint",required = false,defaultValue = "")  String collectPoint){
     	
     	JobSearchResponse jobSearchResponse = new JobSearchResponse();
-    	jobSearchResponse = jobsService.searchJobByFilter(empStatus, empId, status, paymentStatus, startDate, endDate, jobId, collectPoint);
+    	jobSearchResponse = jobsService.searchJobByFilter(empStatus, empId, status, paymentStatus, startDate, endDate, jobId, collectPoint,empRequest);
     	
     	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, jobSearchResponse);
     }

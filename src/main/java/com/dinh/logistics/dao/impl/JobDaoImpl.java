@@ -1,7 +1,6 @@
 package com.dinh.logistics.dao.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,8 +16,6 @@ import com.dinh.logistics.dao.JobDao;
 import com.dinh.logistics.dto.UserDeviceDto;
 import com.dinh.logistics.dto.mobile.JobSearchResponseDto;
 import com.dinh.logistics.dto.portal.JobListDto;
-import com.dinh.logistics.model.UserDevice;
-import com.dinh.logistics.ultils.DateHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -88,7 +85,7 @@ public class JobDaoImpl implements JobDao{
     }
 
     @Override
-    public List<JobSearchResponseDto> searchJobByFilter(Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint) {
+    public List<JobSearchResponseDto> searchJobByFilter(Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint, Integer teamId) {
         StringBuilder builder = new StringBuilder();
 
         builder.append(" select j.job_id, cp.name as collect_point_name, e.name as employee_name, js.job_state_desc, j.priority, j.creation_time, je.emp_id ");
@@ -99,10 +96,10 @@ public class JobDaoImpl implements JobDao{
         builder.append(" left join collect_point cp on j.colle_point_id = cp.colle_point_id ");
         builder.append(" left join employee e on e.emp_id = je.emp_id ");
         builder.append(" WHERE 1=1 ");
-        generateSearchFilter(builder, empId, status, paymentStatus, startDate,  endDate, jobId, collectPoint);
+        generateSearchFilter(builder, empId, status, paymentStatus, startDate,  endDate, jobId, collectPoint, teamId);
         Query query = entityManager.createNativeQuery(builder.toString());
 
-        setSearchFilter(query, empId, status, paymentStatus, startDate,  endDate, jobId, collectPoint);
+        setSearchFilter(query, empId, status, paymentStatus, startDate,  endDate, jobId, collectPoint, teamId);
 
         List<Object[]> results = query.getResultList();
 
@@ -182,7 +179,7 @@ public class JobDaoImpl implements JobDao{
 		}
     }
     
-    public void generateSearchFilter(StringBuilder stringBuilder, Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint){
+    public void generateSearchFilter(StringBuilder stringBuilder, Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint, Integer teamId){
 
     	if (!StringUtils.isEmpty(startDate)) {
             stringBuilder.append(" AND DATE_TRUNC('day', j.creation_time) >= TO_DATE(:startDate,'dd/MM/yyyy') ");
@@ -211,6 +208,9 @@ public class JobDaoImpl implements JobDao{
         if (jobId != null) {
             stringBuilder.append(" and j.job_id = :jobId ");
         }
+        if (teamId != -1){
+            stringBuilder.append(" and e.team_id = :teamId ");
+        }
         if (!StringUtils.isEmpty(collectPoint)) {
             stringBuilder.append(" and lower(cp.name) like lower(:collectPoint) ");
         }
@@ -221,7 +221,7 @@ public class JobDaoImpl implements JobDao{
         
     }
     
-    public void setSearchFilter(Query query, Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint){
+    public void setSearchFilter(Query query, Integer empId, Integer status, Integer paymentStatus, String startDate, String endDate, Integer jobId, String collectPoint, Integer teamId){
 
         if (!StringUtils.isEmpty(startDate)) {
             query.setParameter("startDate",startDate);
@@ -234,6 +234,10 @@ public class JobDaoImpl implements JobDao{
         if (empId != null) {
             query.setParameter("empId",empId);
         }
+        if (teamId != -1) {
+            query.setParameter("teamId",teamId);
+        }
+
 
 //        if (status != null) {
 //            query.setParameter("status",status);

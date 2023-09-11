@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class UpdateStateRequest {
+    private int empUpdate;
     private int jobsId;
     private int stateJob;
     private int paymentMethod;
