@@ -89,7 +89,7 @@ public class AuthController {
 	            	
 	            	Authentication auth = new Authentication();
 	            	auth.setTokenAuth(token);
-	            	if(user.getEmployeeId() != null) {
+	            	if(user.getEmployeeId() != 0) {
 	            		Employee empl = employeeRepository.findById(user.getEmployeeId()).orElse(null);
 		            	if(empl != null) {
 		            		RolePj role = rolePjRepository.findById(empl.getRoleId()).orElse(null);
