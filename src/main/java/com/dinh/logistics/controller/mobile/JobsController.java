@@ -2,6 +2,7 @@ package com.dinh.logistics.controller.mobile;
 
 import com.dinh.logistics.dao.JobDao;
 import com.dinh.logistics.dto.mobile.*;
+import com.dinh.logistics.model.CollectPointLatLng;
 import com.dinh.logistics.model.Jobs;
 import com.dinh.logistics.model.NotifyTopic;
 import com.dinh.logistics.respository.UserDeviceRepository;
@@ -17,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mobile")
@@ -107,5 +110,13 @@ public class JobsController {
     public ResponseEntity<Object> saveA(@PathVariable Integer id, @PathVariable Integer jobId){
         List<NotifyTopic> notifyTopic = utilsNotification.pushNotifyByEmpId(id, jobId);
         return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, notifyTopic);
+    }
+
+    @GetMapping("/collect_point/latlng")
+    public ResponseEntity<Object> getCollectPointLatLng(){
+        List<CollectPointLatLng> collectPointLatLng = jobsService.getCollectPointLatLng();
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("listItem", collectPointLatLng);
+        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, responseData);
     }
 }
