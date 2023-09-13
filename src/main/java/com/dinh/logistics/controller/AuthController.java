@@ -89,11 +89,16 @@ public class AuthController {
 	            	
 	            	Authentication auth = new Authentication();
 	            	auth.setTokenAuth(token);
-	            	Employee empl = employeeRepository.findById(user.getEmployeeId()).orElse(null);
-	            	if(empl != null) {
-	            		RolePj role = rolePjRepository.findById(empl.getRoleId()).orElse(null);
-	            		auth.setRole(role.getRoleCode());
+	            	if(user.getEmployeeId() != null) {
+	            		Employee empl = employeeRepository.findById(user.getEmployeeId()).orElse(null);
+		            	if(empl != null) {
+		            		RolePj role = rolePjRepository.findById(empl.getRoleId()).orElse(null);
+		            		auth.setRole(role.getRoleCode());
+		            	}
+	            	}else {
+	            		auth.setRole("CUSTOMER");
 	            	}
+	            	
 	            	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, auth);
 	            } else {
 	            	return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Sai mật khẩu");
