@@ -13,5 +13,10 @@ public interface CollectPointRepository extends JpaRepository<CollectPoint, Inte
 	
 	@Query(value = "select colle_point_id from collect_point", nativeQuery = true)
 	List<Integer> findAllCollectPointId();
+
+	@Query(value = "select * from collect_point WHERE state = true", nativeQuery = true)
+	List<CollectPoint> findAllCollectPointByState();
+
+
 	
 }

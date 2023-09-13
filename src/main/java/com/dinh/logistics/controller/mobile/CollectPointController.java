@@ -29,7 +29,7 @@ public class CollectPointController {
 
     @GetMapping("/collect_point")
     public ResponseEntity<Object> getAllCollectPoint() {
-        List<CollectPoint> collectPoints = collectPointRepository.findAll();
+        List<CollectPoint> collectPoints = collectPointRepository.findAllCollectPointByState();
 
         if (collectPoints.isEmpty()) {
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);

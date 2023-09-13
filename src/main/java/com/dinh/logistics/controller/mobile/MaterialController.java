@@ -36,7 +36,7 @@ public class MaterialController {
 
     @GetMapping("/material_list")
     public ResponseEntity<Object> getAllMaterial(){
-        List<Material> collectPoints = materialRepository.findAll();
+        List<Material> collectPoints = materialRepository.findAllMaterialByState();
         if (collectPoints.isEmpty()){
             return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, null);
         } else {
