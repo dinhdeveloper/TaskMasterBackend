@@ -77,7 +77,7 @@ public class ExcelFileService {
 	@Autowired
 	JobDao jobDao;
 
-	public File uploadJobs (MultipartFile file) {
+	public File uploadJobs (MultipartFile file, Integer emp_id) {
 		try {
             // Đọc dữ liệu từ tệp Excel và lưu vào cơ sở dữ liệu
             Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -166,6 +166,7 @@ public class ExcelFileService {
                         
                         job.setCreationTime(currentTimestamp);
                         job.setAssignTime(currentTimestamp);
+                        job.setEmpAssignId(emp_id);
                     	
                     	Jobs newJob = jobRepository.save(job);
                     	

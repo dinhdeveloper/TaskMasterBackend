@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -35,6 +36,8 @@ import com.dinh.logistics.dto.portal.JobListResponseDto;
 import com.dinh.logistics.model.CollectPoint;
 import com.dinh.logistics.model.UserDevice;
 import com.dinh.logistics.model.Users;
+import com.dinh.logistics.respository.UserDeviceRepository;
+import com.dinh.logistics.respository.UserRepository;
 import com.dinh.logistics.service.portal.ExcelFileService;
 import com.dinh.logistics.service.portal.JobManagement;
 import com.dinh.logistics.ultils.ResponseHandler;
@@ -53,12 +56,19 @@ public class JobController {
 	
 	@Autowired
 	JobManagement jobManagement;
+	
+	@Autowired
+	UserRepository userRepository;
 
 	@PostMapping("/uploadJobs")
-    public ResponseEntity<Resource> uploadJobs(@RequestParam(name = "file", required = true) MultipartFile file){
+    public ResponseEntity<Resource> uploadJobs(@RequestParam(name = "file", required = true) MultipartFile file,
+    		@RequestParam(name = "userName", required = true) String userName){
         try {
+        	
+        	Users user = userRepository.findUserByUserName(userName);
+        	
         	//upload jobs
-        	File outputFile = excelFileService.uploadJobs(file);
+        	File outputFile = excelFileService.uploadJobs(file, user.getEmployeeId());
         	
         	// Tạo ResponseEntity để trả về tệp xuất ra để tải về
             InputStreamResource resource = new InputStreamResource(new FileInputStream(outputFile));
