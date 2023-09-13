@@ -83,7 +83,7 @@ public class ReportController {
 			){
 		try {
 			
-        	File outputFile = reportDao.exportToExcelWithResultSet( "report-export", 1, 1, startDate, endDate, cusName);
+        	File outputFile = reportDao.exportToExcelWithResultSet( "report-export", 2, 1, startDate, endDate, cusName);
         	
         	// Tạo ResponseEntity để trả về tệp xuất ra để tải về
             InputStreamResource resource = new InputStreamResource(new FileInputStream(outputFile));

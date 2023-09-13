@@ -115,7 +115,18 @@ public class ReportDaoImpl implements ReportDao {
     	    XSSFWorkbook workbook = new XSSFWorkbook();
             
     	    XSSFSheet spreadsheet = workbook.createSheet("data");
-			XSSFRow row = spreadsheet.createRow(0);
+    	    
+    	    // fromDate 
+    	    XSSFRow row0 = spreadsheet.createRow(0);
+    	    XSSFCell cellFromDate = row0.createCell(0);
+    	    cellFromDate.setCellValue("from date: " + startDate);
+    	    
+    	    // toDate
+    	    XSSFCell cellToDate = row0.createCell(1);
+    	    cellToDate.setCellValue("to date: " + endDate);
+    	    
+    	    //data
+			XSSFRow row = spreadsheet.createRow(row_start - 1);
 			XSSFCell cell;
 			int cc = resultSet.getMetaData().getColumnCount();
 			for (int i = 1; i <= cc; i++) {
