@@ -45,12 +45,14 @@ public class ReportController {
 			@RequestParam(name = "size", defaultValue = "1") Integer size,
 			@RequestParam(name = "fromDate",required = false,defaultValue = "")  String startDate,
 			@RequestParam(name = "toDate",required = false,defaultValue = "")  String endDate,
-			@RequestParam(name = "cusName",required = false,defaultValue = "")  String cusName
+			@RequestParam(name = "cusName",required = false,defaultValue = "")  String cusName,
+			@RequestParam(name = "role",required = false,defaultValue = "")  String role,
+			@RequestParam(name = "userName",required = false,defaultValue = "")  String userName
 			){
 		try {
 //			reportListResponseDto response = new reportListResponseDto();
 			
-			List<Object[]> listObj = reportManagement.getReportListResponse(startDate, endDate, cusName);
+			List<Object[]> listObj = reportManagement.getReportListResponse(startDate, endDate, cusName, role, userName);
 			
 			// Tạo danh sách mới để chứa danh sách con List<String>
 	        List<List<String>> resultList = new ArrayList<>();
@@ -79,11 +81,13 @@ public class ReportController {
 			@RequestParam(name = "size", defaultValue = "1") Integer size,
 			@RequestParam(name = "fromDate",required = false,defaultValue = "")  String startDate,
 			@RequestParam(name = "toDate",required = false,defaultValue = "")  String endDate,
-			@RequestParam(name = "cusName",required = false,defaultValue = "")  String cusName
+			@RequestParam(name = "cusName",required = false,defaultValue = "")  String cusName,
+			@RequestParam(name = "role",required = false,defaultValue = "")  String role,
+			@RequestParam(name = "userName",required = false,defaultValue = "")  String userName
 			){
 		try {
 			
-        	File outputFile = reportDao.exportToExcelWithResultSet( "report-export", 2, 1, startDate, endDate, cusName);
+        	File outputFile = reportDao.exportToExcelWithResultSet( "report-export", 2, 1, startDate, endDate, cusName, role, userName);
         	
         	// Tạo ResponseEntity để trả về tệp xuất ra để tải về
             InputStreamResource resource = new InputStreamResource(new FileInputStream(outputFile));

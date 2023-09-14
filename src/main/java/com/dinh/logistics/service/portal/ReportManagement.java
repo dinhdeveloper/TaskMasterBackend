@@ -21,9 +21,9 @@ public class ReportManagement {
 	@Autowired
 	ReportDao reportDao;
 	
-	public List<Object[]> getReportListResponse(String startDate, String endDate, String cusName) {
+	public List<Object[]> getReportListResponse(String startDate, String endDate, String cusName, String role, String userName) {
 		
-		List<Object[]> reportList = reportDao.getReportByFilter(startDate, endDate, cusName);
+		List<Object[]> reportList = reportDao.getReportByFilter(startDate, endDate, cusName, role, userName);
 		
 		return reportList;
 		

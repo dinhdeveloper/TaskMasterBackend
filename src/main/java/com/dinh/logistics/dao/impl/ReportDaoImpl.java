@@ -25,12 +25,15 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.dinh.logistics.dao.ReportDao;
 import com.dinh.logistics.dto.portal.JobListDto;
 import com.dinh.logistics.dto.portal.ReportListDto;
+import com.dinh.logistics.model.Users;
+import com.dinh.logistics.respository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,35 +46,62 @@ public class ReportDaoImpl implements ReportDao {
 	
 	@Value("${app.file.sql-select-material-report}")
     private String sqlSelectMaterialReportPath;
+	
+	@Value("${app.file.sql-select-material-report-customer}")
+    private String sqlSelectMaterialReportCustomerPath;
+	
+	@Autowired
+	UserRepository userRepository;
 
     @Override
-    public List<Object[]> getReportByFilter(String startDate,String endDate, String cusName) {
+    public List<Object[]> getReportByFilter(String startDate,String endDate, String cusName, String role, String userName) {
     	try {
+    		List<Object[]> results = null;
     		StringBuilder builder = new StringBuilder();
             
-    		// Lấy file chứa câu sql
-            Path path = Paths.get(sqlSelectMaterialReportPath);
-            byte[] bytes = Files.readAllBytes(path);
+    		if(StringUtils.equalsIgnoreCase(role, "CUSTOMER")) {
+    			// Lấy file chứa câu sql
+                Path path = Paths.get(sqlSelectMaterialReportCustomerPath);
+                byte[] bytes = Files.readAllBytes(path);
 
-            // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
-            String content = new String(bytes, StandardCharsets.UTF_8);
+                // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
+                String content = new String(bytes, StandardCharsets.UTF_8);
+                
+                // Lấy user
+                Users user = userRepository.findUserByUserName(userName);
 
-            builder.append(content);
-//            generateSearchFilter(builder, startDate, endDate, cusName);
-            Query query = entityManager.createNativeQuery(builder.toString());
+                builder.append(content);
+                Query query = entityManager.createNativeQuery(builder.toString());
 
-            query.setParameter(1, startDate);
-            query.setParameter(2, endDate);
-            query.setParameter(3, "%" + cusName + "%");
-            query.setParameter(4, startDate);
-            query.setParameter(5, endDate);
-            query.setParameter(6, "%" + cusName + "%");
-            
-//            setSearchFilter(query, startDate, endDate, cusName);
+                query.setParameter(1, startDate);
+                query.setParameter(2, endDate);
+                query.setParameter(3, user.getCusId());
+                query.setParameter(4, startDate);
+                query.setParameter(5, endDate);
+                query.setParameter(6, user.getCusId());
+                
+                results = query.getResultList();
+    		}else {
+    			// Lấy file chứa câu sql
+                Path path = Paths.get(sqlSelectMaterialReportPath);
+                byte[] bytes = Files.readAllBytes(path);
 
-//            query.setFirstResult((page - 1) * size);
-//            query.setMaxResults(size);
-            List<Object[]> results = query.getResultList();
+                // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
+                String content = new String(bytes, StandardCharsets.UTF_8);
+
+                builder.append(content);
+                Query query = entityManager.createNativeQuery(builder.toString());
+
+                query.setParameter(1, startDate);
+                query.setParameter(2, endDate);
+                query.setParameter(3, "%" + cusName + "%");
+                query.setParameter(4, startDate);
+                query.setParameter(5, endDate);
+                query.setParameter(6, "%" + cusName + "%");
+                
+                results = query.getResultList();
+    		}
+    		
 
             return results;
 //            return convertJob(results);
@@ -82,7 +112,7 @@ public class ReportDaoImpl implements ReportDao {
     }
     
     @Override
-	public File exportToExcelWithResultSet(String excel_output_file, int row_start, int column_start, String startDate,String endDate, String cusName) {
+	public File exportToExcelWithResultSet(String excel_output_file, int row_start, int column_start, String startDate,String endDate, String cusName, String role, String userName) {
 		
 		// Lấy Session từ EntityManager
         Session session = entityManager.unwrap(Session.class);
@@ -92,24 +122,50 @@ public class ReportDaoImpl implements ReportDao {
             return sessionConnection ;
         });
         try {
-        	// Lấy file chứa câu sql
-            Path path = Paths.get(sqlSelectMaterialReportPath);
-            byte[] bytes = Files.readAllBytes(path);
+        	ResultSet resultSet = null;
+        	if(StringUtils.equalsIgnoreCase(role, "CUSTOMER")) {
+        		// Lấy file chứa câu sql
+                Path path = Paths.get(sqlSelectMaterialReportCustomerPath);
+                byte[] bytes = Files.readAllBytes(path);
 
-            // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
-            String sql = new String(bytes, StandardCharsets.UTF_8);
-        	PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
+                String sql = new String(bytes, StandardCharsets.UTF_8);
+            	PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            	
+            	// Lấy user
+                Users user = userRepository.findUserByUserName(userName);
+                
+            	// Truyền tham số
+            	preparedStatement.setString(1, startDate);
+            	preparedStatement.setString(2, endDate);
+            	preparedStatement.setInt(3, user.getCusId());
+            	preparedStatement.setString(4, startDate);
+            	preparedStatement.setString(5, endDate);
+            	preparedStatement.setInt(6, user.getCusId());
+            	
+                // Thực hiện truy vấn SQL để lấy ResultSet
+                resultSet = preparedStatement.executeQuery();
+        	}else {
+        		// Lấy file chứa câu sql
+                Path path = Paths.get(sqlSelectMaterialReportPath);
+                byte[] bytes = Files.readAllBytes(path);
+
+                // Chuyển đổi các byte thành chuỗi sử dụng UTF-8 hoặc một bộ mã khác (tuỳ thuộc vào tệp)
+                String sql = new String(bytes, StandardCharsets.UTF_8);
+            	PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            	
+            	// Truyền tham số
+            	preparedStatement.setString(1, startDate);
+            	preparedStatement.setString(2, endDate);
+            	preparedStatement.setString(3, "%" + cusName + "%");
+            	preparedStatement.setString(4, startDate);
+            	preparedStatement.setString(5, endDate);
+            	preparedStatement.setString(6, "%" + cusName + "%");
+            	
+                // Thực hiện truy vấn SQL để lấy ResultSet
+                resultSet = preparedStatement.executeQuery();
+        	}
         	
-        	// Truyền tham số
-        	preparedStatement.setString(1, startDate);
-        	preparedStatement.setString(2, endDate);
-        	preparedStatement.setString(3, "%" + cusName + "%");
-        	preparedStatement.setString(4, startDate);
-        	preparedStatement.setString(5, endDate);
-        	preparedStatement.setString(6, "%" + cusName + "%");
-        	
-            // Thực hiện truy vấn SQL để lấy ResultSet
-            ResultSet resultSet = preparedStatement.executeQuery();
             
             List<String> headerValues=new ArrayList<String>();
     	    XSSFWorkbook workbook = new XSSFWorkbook();
