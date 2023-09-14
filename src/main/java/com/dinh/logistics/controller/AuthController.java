@@ -2,6 +2,8 @@ package com.dinh.logistics.controller;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,6 +77,10 @@ public class AuthController {
 	            for (byte b : hash) {
 	                hexString.append(String.format("%02x", b));
 	            }
+				Instant instant = Instant.now();
+				// Chuyển đổi Instant thành Timestamp
+				Timestamp currentTimestamp = Timestamp.from(instant);
+
 	            if(StringUtils.equals(user.getPassword(), hexString.toString())) {
 	            	String token = tokenGenerator.generateToken(loginDto.getUsername(), loginDto.getPassword());
 	            	UserDevice userDevice = userDeviceRepository.findByUserId(user.getUser_id()).orElse(new UserDevice());
@@ -83,6 +89,7 @@ public class AuthController {
 	            	userDevice.setDeviceId(loginDto.getDeviceId());
 	            	userDevice.setFirebaseToken(null);
 	            	userDevice.setDeviceName(loginDto.getDeviceName());
+	            	userDevice.setDateCreateLogin(currentTimestamp);
 	            	tokenManager.addToken(userDevice);
 	            	
 	            	
