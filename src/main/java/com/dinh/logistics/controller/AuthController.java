@@ -94,6 +94,11 @@ public class AuthController {
 		            	if(empl != null) {
 		            		RolePj role = rolePjRepository.findById(empl.getRoleId()).orElse(null);
 		            		auth.setRole(role.getRoleCode());
+		            		if(StringUtils.equalsIgnoreCase(role.getRoleCode(), "ADMIN") || StringUtils.equalsIgnoreCase(role.getRoleCode(), "MASTER")) {
+		            			//
+		            		}else {
+//		            			return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Role này không có quyền!");
+		            		}
 		            	}
 	            	}else {
 	            		auth.setRole("CUSTOMER");
