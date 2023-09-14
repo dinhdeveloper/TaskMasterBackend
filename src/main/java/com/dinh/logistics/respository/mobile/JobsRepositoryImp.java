@@ -458,4 +458,31 @@ public class JobsRepositoryImp {
             }
         }
     }
+
+    public List<CollectPointLatLng> getCollectPointLatLng() {
+        String query = "SELECT j.job_id, cp.posLat, cp.posLong, cp.name as cpName, e.name as fullName, js.jobStateDesc " +
+                "FROM CollectPoint cp " +
+                "LEFT JOIN Jobs j on cp.collectPointId = j.collePointId " +
+                "LEFT JOIN JobEmployee je on j.job_id = je.jobId " +
+                "LEFT JOIN JobState js on j.jobStateId = js.jobStateId " +
+                "LEFT JOIN Employee e on e.empId = je.empId " +
+                "WHERE j.jobStateId = 1";
+        Query queryData = entityManager.createQuery(query);
+        List<Object[]> resultList = queryData.getResultList();
+
+        List<CollectPointLatLng> listPoint = new ArrayList<>();
+        for (Object[] data : resultList) {
+            CollectPointLatLng collectPointLatLng = new CollectPointLatLng();
+
+            collectPointLatLng.setJobId((Integer) data[0]);
+            collectPointLatLng.setLatitude((String) data[1]);
+            collectPointLatLng.setLongitude((String) data[2]);
+            collectPointLatLng.setCpName((String) data[3]);
+            collectPointLatLng.setFullName((String) data[4]);
+            collectPointLatLng.setJobStateDesc((String) data[5]);
+            listPoint.add(collectPointLatLng);
+        }
+
+        return listPoint;
+    }
 }

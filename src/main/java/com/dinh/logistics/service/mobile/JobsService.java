@@ -136,4 +136,8 @@ public class JobsService {
             return null; // Thêm dữ liệu thất bại
         }
     }
+
+    public List<CollectPointLatLng> getCollectPointLatLng() {
+        return repositoryImp.getCollectPointLatLng();
+    }
 }
