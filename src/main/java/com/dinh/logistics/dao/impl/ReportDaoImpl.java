@@ -32,7 +32,9 @@ import org.springframework.stereotype.Repository;
 import com.dinh.logistics.dao.ReportDao;
 import com.dinh.logistics.dto.portal.JobListDto;
 import com.dinh.logistics.dto.portal.ReportListDto;
+import com.dinh.logistics.model.Customers;
 import com.dinh.logistics.model.Users;
+import com.dinh.logistics.respository.CustomerRepository;
 import com.dinh.logistics.respository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +54,9 @@ public class ReportDaoImpl implements ReportDao {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	CustomerRepository customerRepository;
 
     @Override
     public List<Object[]> getReportByFilter(String startDate,String endDate, String cusName, String role, String userName) {
@@ -122,6 +127,9 @@ public class ReportDaoImpl implements ReportDao {
             return sessionConnection ;
         });
         try {
+        	// Lấy user
+        	Users user = userRepository.findUserByUserName(userName);
+        	
         	ResultSet resultSet = null;
         	if(StringUtils.equalsIgnoreCase(role, "CUSTOMER")) {
         		// Lấy file chứa câu sql
@@ -132,9 +140,6 @@ public class ReportDaoImpl implements ReportDao {
                 String sql = new String(bytes, StandardCharsets.UTF_8);
             	PreparedStatement preparedStatement = connection.prepareStatement(sql);
             	
-            	// Lấy user
-                Users user = userRepository.findUserByUserName(userName);
-                
             	// Truyền tham số
             	preparedStatement.setString(1, startDate);
             	preparedStatement.setString(2, endDate);
@@ -180,6 +185,19 @@ public class ReportDaoImpl implements ReportDao {
     	    // toDate
     	    XSSFCell cellToDate = row0.createCell(1);
     	    cellToDate.setCellValue("to date: " + endDate);
+    	    
+    	    // cusName
+    	    XSSFCell cellCusName = row0.createCell(2);
+    	    if(StringUtils.equalsIgnoreCase(role, "CUSTOMER")) {
+    	    	Customers cus = customerRepository.findById(user.getCusId()).orElse(null);
+    	    	cellCusName.setCellValue("customer name: " + cus.getCustomName());
+    	    }else {
+    	    	if(StringUtils.isEmpty(userName)) {
+    	    		cellCusName.setCellValue("customer name: All");
+    	    	}else {
+    	    		cellCusName.setCellValue("customer name: " + cusName);
+    	    	}
+    	    }
     	    
     	    //data
 			XSSFRow row = spreadsheet.createRow(row_start - 1);
