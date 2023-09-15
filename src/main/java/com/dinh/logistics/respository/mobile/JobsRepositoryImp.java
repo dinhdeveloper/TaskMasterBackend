@@ -277,9 +277,13 @@ public class JobsRepositoryImp {
             }
             if (dataUpdateJobRequest.getPaymentStateId() != 3){
                 job.setPaymentStateId(dataUpdateJobRequest.getPaymentStateId());
+            }else {
+                job.setPaymentStateId(1);
             }
             if (dataUpdateJobRequest.getPaymentMethod() != 3){
                 job.setPaymentMethod(dataUpdateJobRequest.getPaymentMethod());
+            }else {
+                job.setPaymentMethod(-1);
             }
 
             if (dataUpdateJobRequest.getEmpNewId() != -1){
