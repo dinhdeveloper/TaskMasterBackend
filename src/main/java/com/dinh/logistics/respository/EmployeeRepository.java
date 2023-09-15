@@ -20,5 +20,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query(value = "SELECT * FROM employee e JOIN role_pj rp ON e.role_id = rp.role_id WHERE rp.role_code NOT IN ('MASTER', 'ADMIN') AND e.state = true", nativeQuery = true)
     List<Employee> findEmployeesExcludingRoles();
+    
+    Optional<Employee> findByEmpIdAndStateTrue(Integer employeeId);
 
 }
