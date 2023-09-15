@@ -1,5 +1,6 @@
 package com.dinh.logistics;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -11,11 +12,14 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class LogictisUtil {
+
+    @Value("${base.url}")
+    static String baseUrl;
     public static String getBaseUrl() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes instanceof ServletRequestAttributes) {
             HttpServletRequest req = ((ServletRequestAttributes) requestAttributes).getRequest();
-            return req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getContextPath();
+            return req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getContextPath() + baseUrl;
             // build URL from request
         } else {
             // fallback logic if request won't work...

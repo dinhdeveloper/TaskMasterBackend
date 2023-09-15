@@ -5,6 +5,7 @@ public class MediaDto {
     private Integer jobId;
     private Integer mediaId;
     private String url;
+    private String urlHard;
     private Integer mediaType;
 
 
@@ -30,6 +31,14 @@ public class MediaDto {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getUrlHard() {
+        return urlHard;
+    }
+
+    public void setUrlHard(String urlHard) {
+        this.urlHard = urlHard;
     }
 
     public Integer getMediaType() {
