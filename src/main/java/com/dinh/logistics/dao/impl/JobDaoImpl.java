@@ -25,6 +25,25 @@ public class JobDaoImpl implements JobDao{
 
 	@PersistenceContext
     private EntityManager entityManager;
+	
+	@Override
+    public List<JobListDto> getAllJobNotiByFilter(List<Integer> ids) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(" SELECT j.job_id, cp.num_address, j.creation_time, jt.job_type_name, j.priority, j.note,  ");
+        builder.append(" FROM jobs j ");
+        builder.append(" LEFT JOIN collect_point cp on cp.colle_point_id = j.colle_point_id ");
+        builder.append(" LEFT JOIN job_type jt on jt.job_type_id = j.job_type_id ");
+        builder.append(" WHERE 1=1 ");
+        generateSearchFilter(builder, ids);
+        Query query = entityManager.createNativeQuery(builder.toString());
+
+        setSearchFilter(ids, query);
+
+        List<Object[]> results = query.getResultList();
+
+        return convertJob(results);
+    }
 
     @Override
     public List<JobListDto> getAllJobByFilter(String startDate,String endDate, int page, int size) {
@@ -139,7 +158,7 @@ public class JobDaoImpl implements JobDao{
 			return storedProcedureResults.stream().map(result -> {
 				JobListDto jobListDto = new JobListDto((Integer) result[0], (String) result[1],
 						(Date) result[2], (String) result[3], null,
-						null, null, (BigDecimal) result[4], (String) result[5]);
+						null, null, (BigDecimal) result[4], (String) result[5], null, null, null);
 				return jobListDto;
 			}).collect(Collectors.toList());
 		} catch (Exception e) {
@@ -155,6 +174,14 @@ public class JobDaoImpl implements JobDao{
         }
 
     	stringBuilder.append(" and ud.is_active_access_token = true ");
+    }
+    
+    public void generateSearchFilter(StringBuilder stringBuilder, List<Integer> ids){
+
+    	if (ids != null) {
+            stringBuilder.append(" and j.job_id in (:ids) ");
+        }
+
     }
     
     public void setSearchFilter(List<Integer> ids, Query query){

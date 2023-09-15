@@ -18,4 +18,6 @@ public interface JobDao {
 	List<JobSearchResponseDto> searchJobByFilter(Integer empId, Integer status, Integer paymentStatus, String startDate,
 												 String endDate, Integer jobId, String collectPoint, Integer teamId);
 
+	List<JobListDto> getAllJobNotiByFilter(List<Integer> ids);
+
 }
