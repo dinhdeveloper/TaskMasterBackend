@@ -92,6 +92,10 @@ public class AuthController {
 	            	if(user.getEmployeeId() != 0) {
 	            		Employee empl = employeeRepository.findById(user.getEmployeeId()).orElse(null);
 		            	if(empl != null) {
+		            		if(!empl.isState()) {
+		            			return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "User bị khóa!");
+		            		}
+		            		
 		            		RolePj role = rolePjRepository.findById(empl.getRoleId()).orElse(null);
 		            		auth.setRole(role.getRoleCode());
 		            		if(StringUtils.equalsIgnoreCase(role.getRoleCode(), "ADMIN") || StringUtils.equalsIgnoreCase(role.getRoleCode(), "MASTER")) {

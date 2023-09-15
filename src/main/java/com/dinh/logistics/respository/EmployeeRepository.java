@@ -1,11 +1,13 @@
 package com.dinh.logistics.respository;
 
 import com.dinh.logistics.model.Employee;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
@@ -18,5 +20,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query(value = "SELECT * FROM employee e JOIN role_pj rp ON e.role_id = rp.role_id WHERE rp.role_code NOT IN ('MASTER', 'ADMIN') AND e.state = true", nativeQuery = true)
     List<Employee> findEmployeesExcludingRoles();
+
+	Optional<Employee> findByIdAndStateTrue(Integer employeeId);
 
 }
