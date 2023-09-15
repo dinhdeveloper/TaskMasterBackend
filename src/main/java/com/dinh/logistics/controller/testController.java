@@ -1,5 +1,6 @@
 package com.dinh.logistics.controller;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -17,6 +18,8 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -164,6 +167,28 @@ public class testController {
         } catch (Exception e) {
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, e);
         }
+    }
+	
+	@GetMapping("/download")
+    public ResponseEntity<Resource> downloadFile(@RequestParam String path) throws IOException {
+        // Đường dẫn tới tệp cần tải về
+        Path filePath = Paths.get(path);
+        Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+
+        // Lấy đuôi file
+        int lastDotIndex = path.lastIndexOf('.');
+        String extension = path.substring(lastDotIndex + 1);
+        
+        // Thiết lập header để trình duyệt hiểu cách xử lý tệp
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=file." + extension);
+
+        // Trả về ResponseEntity
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(Files.size(filePath))
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 	
 	public void generateSearchFilter(String startDate,String endDate, StringBuilder stringBuilder, boolean isCount){
