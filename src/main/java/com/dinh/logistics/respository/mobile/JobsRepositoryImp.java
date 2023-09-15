@@ -275,6 +275,12 @@ public class JobsRepositoryImp {
             if (dataUpdateJobRequest.getNote() != null) {
                 job.setNote(dataUpdateJobRequest.getNote());
             }
+            if (dataUpdateJobRequest.getPaymentStateId() != 3){
+                job.setPaymentStateId(dataUpdateJobRequest.getPaymentStateId());
+            }
+            if (dataUpdateJobRequest.getPaymentMethod() != 3){
+                job.setPaymentMethod(dataUpdateJobRequest.getPaymentMethod());
+            }
 
             if (dataUpdateJobRequest.getEmpNewId() != -1){
                 String sqlQueryJobEmployee = "UPDATE JobEmployee SET empId = :empIdNew WHERE empId = :empIdOld AND jobId = :jodId";

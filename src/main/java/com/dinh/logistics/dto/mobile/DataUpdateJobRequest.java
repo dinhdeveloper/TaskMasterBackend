@@ -8,7 +8,8 @@ public class DataUpdateJobRequest {
     Integer jodId;
     Integer empOldId;
     Integer empNewId;
-    Integer statusPayment;
+    Integer paymentMethod;
+    Integer paymentStateId;
     Integer empAssignId;
     Long amountPaidEmp;
     Long totalMoney;
