@@ -84,7 +84,7 @@ public class JobsRepositoryImp {
                 String jsonData = gson.toJson(sendFirebaseData);
 
                 // Gửi
-                if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
+                if (notifyTopic.getFirebase_token() != null) {
                     Message message = Message.builder()
                             .setToken(notifyTopic.getFirebase_token())
                             .putData("data", jsonData)
@@ -240,7 +240,7 @@ public class JobsRepositoryImp {
                     String jsonData = gson.toJson(sendFirebaseData);
 
                     // Gửi
-                    if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
+                    if (notifyTopic.getFirebase_token() != null) {
                         Message message = Message.builder()
                                 .setToken(notifyTopic.getFirebase_token())
                                 .putData("data", jsonData)
@@ -328,7 +328,8 @@ public class JobsRepositoryImp {
                 "JOIN user_devices ud ON ud.user_id = uv.user_id " +
                 "JOIN role_pj rp ON rp.role_id = e.role_id " +
                 "JOIN team t ON t.team_code = 'MASTER' "+
-                "WHERE rp.role_code = 'MASTER' and e.state = true";
+                "WHERE rp.role_code = 'MASTER' and e.state = true " +
+                "AND ud.date_create_login = (SELECT MAX(ud2.date_create_login) FROM user_devices ud2 WHERE ud2.user_id = ud.user_id )LIMIT 1";
 
         Query queryM = entityManager.createNativeQuery(queryMaster);
         List<Object[]> masterData = queryM.getResultList();
@@ -388,7 +389,7 @@ public class JobsRepositoryImp {
                 String jsonData = gson.toJson(sendFirebaseData);
 
                 // Gửi
-                if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
+                if (notifyTopic.getFirebase_token() != null) {
                     Message message = Message.builder()
                             .setToken(notifyTopic.getFirebase_token())
                             .putData("data", jsonData)
@@ -438,7 +439,7 @@ public class JobsRepositoryImp {
                     String jsonData = gson.toJson(sendFirebaseData);
 
                     // Gửi
-                    if (notifyTopic.getFirebase_token() != null && notifyTopic.getIs_active_access_token()) {
+                    if (notifyTopic.getFirebase_token() != null) {
                         Message message = Message.builder()
                                 .setToken(notifyTopic.getFirebase_token())
                                 .putData("data", jsonData)

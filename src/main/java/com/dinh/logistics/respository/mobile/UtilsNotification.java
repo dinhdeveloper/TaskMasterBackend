@@ -42,7 +42,8 @@ public class UtilsNotification {
                         "FROM employee e " +
                         "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
                         "LEFT JOIN user_devices ud ON ud.user_id = uv.user_id " +
-                        "WHERE e.emp_id = :empID and e.state = true";
+                        "WHERE e.emp_id = :empID and e.state = true " +
+                "AND ud.date_create_login = (SELECT MAX(ud2.date_create_login) FROM user_devices ud2 WHERE ud2.user_id = ud.user_id )LIMIT 1";
         Query queryEmp = entityManager.createNativeQuery(queryEmployee);
         queryEmp.setParameter("empID", empID);
         List<Object[]> empResultList = queryEmp.getResultList();
@@ -54,7 +55,8 @@ public class UtilsNotification {
                 "FROM employee e " +
                 "LEFT JOIN users uv ON e.emp_id = uv.employee_id " +
                 "LEFT JOIN user_devices ud ON ud.user_id = uv.user_id " +
-                "WHERE e.emp_id = :leaderId and e.state = true";
+                "WHERE e.emp_id = :leaderId and e.state = true " +
+                "AND ud.date_create_login = (SELECT MAX(ud2.date_create_login) FROM user_devices ud2 WHERE ud2.user_id = ud.user_id )LIMIT 1";
 
         Query queryLead = entityManager.createNativeQuery(queryLeader);
         queryLead.setParameter("leaderId", leaderId);
@@ -81,7 +83,8 @@ public class UtilsNotification {
                 "JOIN user_devices ud ON ud.user_id = uv.user_id " +
                 "JOIN role_pj rp ON rp.role_id = e.role_id " +
                 "JOIN team t ON t.team_code = 'MASTER' "+
-                "WHERE rp.role_code = 'MASTER' and e.state = true";
+                "WHERE rp.role_code = 'MASTER' and e.state = true " +
+                "AND ud.date_create_login = (SELECT MAX(ud2.date_create_login) FROM user_devices ud2 WHERE ud2.user_id = ud.user_id )LIMIT 1";
 
         Query queryM = entityManager.createNativeQuery(queryMaster);
         List<Object[]> masterData = queryM.getResultList();

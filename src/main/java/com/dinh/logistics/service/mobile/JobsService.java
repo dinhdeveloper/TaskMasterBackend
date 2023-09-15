@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -138,6 +139,37 @@ public class JobsService {
     }
 
     public List<CollectPointLatLng> getCollectPointLatLng() {
-        return repositoryImp.getCollectPointLatLng();
+        List<CollectPointLatLng> collectPointLatLngList = repositoryImp.getCollectPointLatLng();
+
+        collectPointLatLngList.sort((a, b) -> {
+            int latitudeComparison = a.getLatitude().compareTo(b.getLatitude());
+            if (latitudeComparison != 0) {
+                return latitudeComparison;
+            }
+            return a.getLongitude().compareTo(b.getLongitude());
+        });
+
+        // Tạo danh sách mới với các mục đã gộp lại
+        List<CollectPointLatLng> mergedList = new ArrayList<>();
+        CollectPointLatLng current = null;
+
+        for (CollectPointLatLng item : collectPointLatLngList) {
+            if (current == null || !current.getLatitude().equals(item.getLatitude()) || !current.getLongitude().equals(item.getLongitude())) {
+                // Tạo một mục mới nếu latitude hoặc longitude khác với mục hiện tại
+                current = new CollectPointLatLng();
+                current.setJobId(item.getJobId());
+                current.setLatitude(item.getLatitude());
+                current.setLongitude(item.getLongitude());
+                current.setCpName(item.getCpName());
+                current.setFullName(item.getFullName());
+                current.setJobStateDesc(item.getJobStateDesc());
+                mergedList.add(current);
+            } else {
+                // Gộp các giá trị fullName của các mục có cùng latitude và longitude
+                current.setFullName(current.getFullName() + ",\n" + item.getFullName());
+            }
+        }
+
+        return mergedList;
     }
 }

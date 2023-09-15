@@ -10,6 +10,9 @@ import javax.persistence.Table;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 @Entity
 @Data
 @Table(name = "user_devices")
@@ -37,5 +40,10 @@ public class UserDevice {
 	
 	@Column(name = "device_name")
 	private String deviceName;
+
+	@Column(name = "date_create_login")
+	private Timestamp dateCreateLogin;
+
+
 	
 }
