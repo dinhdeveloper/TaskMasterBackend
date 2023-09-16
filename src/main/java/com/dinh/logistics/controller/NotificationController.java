@@ -88,14 +88,19 @@ public class NotificationController {
 						Users user = userRepository.findByEmployeeId(employee.getEmpId());
 						UserDevice userDevice = userDeviceRepository.findByUserId(user.getUser_id()).orElse(null);
 						
-						notificationService.pushNotification(userDevice.getFirebaseToken(), title, type, message);
+						if(userDevice != null && !StringUtils.isEmpty(userDevice.getFirebaseToken())) {
+							notificationService.pushNotification(userDevice.getFirebaseToken(), title, type, message);
+						}
 						
 						// Bắn noti cho leader
 						Team team = teamRepository.findById(employee.getEmpId()).orElse(null);
 						Users lead = userRepository.findByEmployeeId(team.getLeaderId());
 						UserDevice userDeviceLead = userDeviceRepository.findByUserId(lead.getUser_id()).orElse(null);
 						
-						notificationService.pushNotification(userDeviceLead.getFirebaseToken(), title, type, message);
+						if(userDeviceLead != null && !StringUtils.isEmpty(userDeviceLead.getFirebaseToken())) {
+							notificationService.pushNotification(userDeviceLead.getFirebaseToken(), title, type, message);
+
+						}
 						
 					}
 				}
