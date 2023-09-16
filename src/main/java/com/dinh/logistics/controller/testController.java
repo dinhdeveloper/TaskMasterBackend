@@ -1,5 +1,6 @@
 package com.dinh.logistics.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -18,6 +19,7 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -25,11 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import com.dinh.logistics.dto.FirebaseDataDto;
@@ -189,6 +187,67 @@ public class testController {
                 .contentLength(Files.size(filePath))
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @GetMapping("/view/test1/")
+    public ResponseEntity<FileSystemResource> viewImage(@RequestParam("path") String path) {
+        try {
+            File imageFile = new File(path);
+
+            if (imageFile.exists() && imageFile.isFile()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG) // Loại hình ảnh của bạn (có thể thay đổi)
+                        .body(new FileSystemResource(imageFile));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/view/{path1}/{path2}/{path3}/{path4}/{path5:.+}")
+    public ResponseEntity<FileSystemResource> viewImage3(
+            @PathVariable("path1") String path1,
+            @PathVariable("path2") String path2,
+            @PathVariable("path3") String path3,
+            @PathVariable("path4") String path4,
+            @PathVariable("path5") String path5
+    ) {
+        try {
+            File imageFile = new File(path1+"/"+path2+"/"+path3+"/"+path4+"/"+path5);
+
+            if (imageFile.exists() && imageFile.isFile()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG) // Loại hình ảnh của bạn (có thể thay đổi)
+                        .body(new FileSystemResource(imageFile));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
+    @GetMapping("/view/{imagePath:.+}")
+    public ResponseEntity<FileSystemResource> viewImage2(@PathVariable("imagePath") String imagePath) {
+        try {
+            String fullPath = "media/" + imagePath; // Đường dẫn đầy đủ đến hình ảnh
+
+            File imageFile = new File(fullPath);
+
+            if (imageFile.exists() && imageFile.isFile()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG) // Loại hình ảnh của bạn (có thể thay đổi)
+                        .body(new FileSystemResource(imageFile));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 	
 	public void generateSearchFilter(String startDate,String endDate, StringBuilder stringBuilder, boolean isCount){

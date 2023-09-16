@@ -9,12 +9,17 @@ import com.google.firebase.messaging.Message;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -144,6 +149,7 @@ public class JobsRepositoryImp {
                 MediaDto mediaDto = new MediaDto();
                 mediaDto.setMediaId((Integer) mediaData[0]);
                 mediaDto.setUrl((String) mediaData[1]);
+                mediaDto.setUrlHard((String) getUrlMedia() + mediaData[1]);
                 mediaDto.setMediaType((Integer) mediaData[2]);
                 mediaDto.setJobId((Integer) mediaData[3]);
                 mediaDtoList.add(mediaDto);
@@ -495,5 +501,19 @@ public class JobsRepositoryImp {
         }
 
         return listPoint;
+    }
+
+    @Value("${media.url}")
+    String mediaUrl;
+    public String getUrlMedia() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes) {
+            HttpServletRequest req = ((ServletRequestAttributes) requestAttributes).getRequest();
+            return req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getContextPath() + mediaUrl;
+            // build URL from request
+        } else {
+            // fallback logic if request won't work...
+            return "Nothing";
+        }
     }
 }
