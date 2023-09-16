@@ -93,10 +93,10 @@ public class ExcelFileService {
             List<Integer> jobTypeIds = jobTypeRepository.findAllJobTypeId();
             
             //Nhân viên Id
-            List<Integer> nvIds = employeeRepository.findAllIdByRole("NV");
+//            List<Integer> nvIds = employeeRepository.findAllIdByRole("NV");
             
             //Tài xế
-            List<Integer> txIds = employeeRepository.findAllIdByRole("TX");
+//            List<Integer> txIds = employeeRepository.findAllIdByRole("TX");
             
             while (rowIterator.hasNext()) {
             	count++;
@@ -122,9 +122,9 @@ public class ExcelFileService {
                     
                     String column4Validate = validateUploadJobsCellString("Địa điểm", cell4, collectPointIds);
                     String column5Validate = validateUploadJobsCellString("Loại việc", cell5, jobTypeIds);
-                    String column6Validate = validateUploadJobsCellString("NV TG 1", cell6, nvIds);
-                    String column7Validate = validateUploadJobsCellString("NV TG 2", cell7, nvIds);
-                    String column8Validate = validateUploadJobsCellString("Tài xế", cell8, txIds);
+                    String column6Validate = validateUploadJobsCellString2("NV TG 1", cell6);
+                    String column7Validate = validateUploadJobsCellString2("NV TG 2", cell7);
+                    String column8Validate = validateUploadJobsCellString2("Tài xế", cell8);
                     String column9Validate = validateUploadJobsCellString2("Ưu tiên", cell9);
 
                     if(column4Validate != null) {
