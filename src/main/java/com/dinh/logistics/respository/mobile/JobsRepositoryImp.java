@@ -376,53 +376,31 @@ public class JobsRepositoryImp {
 //            String content = null;
             FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
 
-            if (notifyTopic.getEmp_id() != dto.getEmpAssignId()) {
-//                if (updateStateRequest.getEmpUpdate() != notifyTopic.getEmp_id()){
-//                    sendFirebaseData.setTitle("Thông tin chuyển khoản");
-//                    content = "CK cho: " + dto.getCustomName() +
-//                            ", Địa điểm: " + dto.getCollectPointName() +
-//                            ", Số tiền: " + formattedAmount +
-//                            ", Số tài khoản: " + dto.getBankAcctNumber() +
-//                            ", Chủ tài khoản: " + dto.getBankAcctName() +
-//                            ", Ngân hàng: " + dto.getBankAcct();
-//                }else{
-//                    sendFirebaseData.setTitle("Thông tin chuyển khoản");
-//                    content =
-//                            "Địa điểm: " + dto.getCollectPointName() + " đã cân"+
-//                            ", CK cho: " + dto.getCustomName() +
-//                            ", Địa điểm: " + dto.getCollectPointName() +
-//                            ", Số tiền: " + formattedAmount +
-//                            ", Số tài khoản: " + dto.getBankAcctNumber() +
-//                            ", Chủ tài khoản: " + dto.getBankAcctName() +
-//                            ", Ngân hàng: " + dto.getBankAcct();
-//                }
+            sendFirebaseData.setTitle("Thông tin chuyển khoản");
+            String content =
+                    "Địa điểm: " + dto.getCollectPointName() + " đã cân. "
+                            + formattedAmount + ", "
+                            + dto.getBankAcctNumber() + ", "
+                            + dto.getBankAcct();
 
-                sendFirebaseData.setTitle("Thông tin chuyển khoản");
-                String content =
-                        "Địa điểm: " + dto.getCollectPointName() + " đã cân. "
-                                + formattedAmount + ", "
-                                + dto.getBankAcctNumber() + ", "
-                                + dto.getBankAcct();
+            sendFirebaseData.setType("INFO");
+            sendFirebaseData.setBody(content);
+            sendFirebaseData.setData(String.valueOf(updateStateRequest.getJobsId()));
 
-                sendFirebaseData.setType("INFO");
-                sendFirebaseData.setBody(content);
-                sendFirebaseData.setData(String.valueOf(updateStateRequest.getJobsId()));
+            Gson gson = new Gson();
+            String jsonData = gson.toJson(sendFirebaseData);
 
-                Gson gson = new Gson();
-                String jsonData = gson.toJson(sendFirebaseData);
-
-                // Gửi
-                if (notifyTopic.getFirebase_token() != null) {
-                    Message message = Message.builder()
-                            .setToken(notifyTopic.getFirebase_token())
-                            .putData("data", jsonData)
-                            .build();
-                    try {
-                        FirebaseMessaging.getInstance().send(message);
-                    } catch (FirebaseMessagingException e) {
-                        // Xử lý ngoại lệ ở đây
-                        e.printStackTrace();
-                    }
+            // Gửi
+            if (notifyTopic.getFirebase_token() != null) {
+                Message message = Message.builder()
+                        .setToken(notifyTopic.getFirebase_token())
+                        .putData("data", jsonData)
+                        .build();
+                try {
+                    FirebaseMessaging.getInstance().send(message);
+                } catch (FirebaseMessagingException e) {
+                    // Xử lý ngoại lệ ở đây
+                    e.printStackTrace();
                 }
             }
         }
