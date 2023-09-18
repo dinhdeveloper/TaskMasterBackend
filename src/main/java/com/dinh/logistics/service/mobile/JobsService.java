@@ -70,8 +70,7 @@ public class JobsService {
             //DA CAN
             if (updateStateRequest.getStateJob() == 20){
                 job.setPaymentMethod(updateStateRequest.getPaymentMethod());
-                Integer paymentStateId = repositoryImp.findByStateStatus(updateStateRequest.getPaymentStateStatus());
-                job.setPaymentStateId(paymentStateId);
+                job.setPaymentStateId(updateStateRequest.getPaymentStateStatus());
                 if (updateStateRequest.getPaymentStateStatus() == 1 && updateStateRequest.getPaymentMethod() == 1){ //nv ung tien va da thanh toan
                     job.setAmountPaidEmp(updateStateRequest.getAmountPaidEmp());
                     job.setAmount(updateStateRequest.getAmountTotal());
