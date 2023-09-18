@@ -317,12 +317,10 @@ public class JobsRepositoryImp {
 
     public void pushNotifyStateWeighted(UpdateStateRequest updateStateRequest, Jobs job) {
         /*receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
-        String sql = "SELECT c.customName, c.bankAcctName, c.bankAcct, " +
-                "c.bankAcctNumber, cl.name as collectPointName, j.amount, j.empAssignId " +
-                "FROM Customers c " +
-                "LEFT JOIN CollectPoint cl ON cl.customId = c.cusId " +
-                "LEFT JOIN Jobs j ON j.collePointId = cl.collectPointId " +
-                "WHERE j.job_id = :jobID and c.state = true";
+        String sql = "SELECT c.customName, cp.bankAcctName, cp.bankAcct, " +
+                "cp.bankAcctNumber, cp.name as collectPointName, j.amount, j.empAssignId " +
+                "FROM Customers c, CollectPoint  cp, Jobs j " +
+                "WHERE j.collePointId = cp.collectPointId and cp.customId = c.cusId and j.job_id = :jobID and c.state = true";
         Query query = entityManager.createQuery(sql);
         query.setParameter("jobID", updateStateRequest.getJobsId());
 
