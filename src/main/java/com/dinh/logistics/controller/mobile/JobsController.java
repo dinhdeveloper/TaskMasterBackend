@@ -54,10 +54,24 @@ public class JobsController {
         }
     }
 
-    @PutMapping("/update/update_state_job")
-    public ResponseEntity<Object> updateStateJob(@RequestBody UpdateStateRequest updateStateRequest) {
+    @PutMapping("/update/update_state_job_weighted")
+    public ResponseEntity<Object> updateStateJob(@RequestBody UpdateStateWeightedRequest updateStateWeightedRequest) {
         try {
-            jobsService.updateStateJob(updateStateRequest);
+            jobsService.updateStateWeightedJob(updateStateWeightedRequest);
+            UpdateJobsResponse response = new UpdateJobsResponse();
+            response.setStateJobs(updateStateWeightedRequest.getStateJob());
+            response.setDescription("Cập nhật thành công");
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
+        } catch (Exception e) {
+            log.error("Error updating job state: ", e.getMessage());
+            return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
+        }
+    }
+
+    @PutMapping("/update/update_state_job_compacted_done")
+    public ResponseEntity<Object> updateStateJobCompactedAndDone(@RequestBody CompactedAndDoneRequest updateStateRequest) {
+        try {
+            jobsService.updateStateJobCompactedAndDone(updateStateRequest);
             UpdateJobsResponse response = new UpdateJobsResponse();
             response.setStateJobs(updateStateRequest.getStateJob());
             response.setDescription("Cập nhật thành công");
