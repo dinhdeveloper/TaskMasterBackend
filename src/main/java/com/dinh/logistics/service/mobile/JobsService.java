@@ -71,7 +71,7 @@ public class JobsService {
             job.setJobStateId(updateStateWeightedRequest.getStateJob());
 
             Jobs jobsNew = repositoryImp.saveJob(job);
-            repositoryImp.pushNotifyUpdateState(jobsNew, updateStateWeightedRequest);
+            repositoryImp.pushNotifyUpdateState(jobsNew, updateStateWeightedRequest.getEmpUpdate(), updateStateWeightedRequest.getStateJob());
 
         } else {
             // Handle the case when the job with the given ID doesn't exist
@@ -166,8 +166,7 @@ public class JobsService {
             Jobs jobsNew = repositoryImp.saveJob(job);
 
             if (updateStateRequest.getStateJob() != 30){
-                //repositoryImp.pushNotifyUpdateJobState(jobsNew, updateStateRequest.getStateJob());
-                repositoryImp.pushNotifyUpdateStateCompactedAndDone(jobsNew, updateStateRequest);
+                repositoryImp.pushNotifyUpdateState(jobsNew, updateStateRequest.getEmpUpdate(), updateStateRequest.getStateJob());
             }
 
         } else {

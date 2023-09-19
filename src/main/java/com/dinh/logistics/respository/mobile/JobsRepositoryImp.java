@@ -86,26 +86,7 @@ public class JobsRepositoryImp {
                 sendFirebaseData.setBody(content);
                 sendFirebaseData.setData(String.valueOf(generatedJobId));
 
-                Gson gson = new Gson();
-                String jsonData = gson.toJson(sendFirebaseData);
-
-                // Gửi
-                if (notifyTopic.getFirebase_token() != null) {
-                    Message message = Message.builder()
-                            .setToken(notifyTopic.getFirebase_token())
-                            .putData("data", jsonData)
-                            .build();
-                    try {
-                        FirebaseMessaging.getInstance().send(message);
-//                        String response = FirebaseMessaging.getInstance().send(message);
-//                        if (response != null){
-//                            utilsNotification.insertDataToNotification(data,jobsNew.getJob_id());
-//                        }
-                    } catch (FirebaseMessagingException e) {
-                        // Xử lý ngoại lệ ở đây
-                        e.printStackTrace();
-                    }
-                }
+                pushNotify(notifyTopic,sendFirebaseData);
             }
         }
     }
@@ -243,26 +224,7 @@ public class JobsRepositoryImp {
                     sendFirebaseData.setBody(content);
                     sendFirebaseData.setData(String.valueOf(jobsNew.getJob_id()));
 
-                    Gson gson = new Gson();
-                    String jsonData = gson.toJson(sendFirebaseData);
-
-                    // Gửi
-                    if (notifyTopic.getFirebase_token() != null) {
-                        Message message = Message.builder()
-                                .setToken(notifyTopic.getFirebase_token())
-                                .putData("data", jsonData)
-                                .build();
-                        try {
-                            FirebaseMessaging.getInstance().send(message);
-//                        String response = FirebaseMessaging.getInstance().send(message);
-//                        if (response != null){
-//                            utilsNotification.insertDataToNotification(data,jobsNew.getJob_id());
-//                        }
-                        } catch (FirebaseMessagingException e) {
-                            // Xử lý ngoại lệ ở đây
-                            e.printStackTrace();
-                        }
-                    }
+                    pushNotify(notifyTopic,sendFirebaseData);
                 }
             }
         }
@@ -418,79 +380,7 @@ public class JobsRepositoryImp {
             sendFirebaseData.setBody(content);
             sendFirebaseData.setData(String.valueOf(updateStateWeightedRequest.getJodId()));
 
-            Gson gson = new Gson();
-            String jsonData = gson.toJson(sendFirebaseData);
-
-            // Gửi
-            if (notifyTopic.getFirebase_token() != null) {
-                Message message = Message.builder()
-                        .setToken(notifyTopic.getFirebase_token())
-                        .putData("data", jsonData)
-                        .build();
-                try {
-                    FirebaseMessaging.getInstance().send(message);
-                } catch (FirebaseMessagingException e) {
-                    // Xử lý ngoại lệ ở đây
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public void pushNotifyUpdateState(Jobs jobsNew, UpdateStateWeightedRequest updateStateWeightedRequest) {
-        if (jobsNew == null) {
-            return;
-        }
-
-        List<NotifyTopic> notifyTopicList = null;
-
-        String query = "SELECT je.empId FROM JobEmployee je WHERE je.jobId = :job_id";
-        Query queryData = entityManager.createQuery(query);
-        queryData.setParameter("job_id", jobsNew.getJob_id());
-        List<Integer> dataNVID = queryData.getResultList();
-
-        for (Integer data : dataNVID) {
-            notifyTopicList = utilsNotification.pushNotifyByEmpId(data, jobsNew.getJob_id());
-        }
-
-        if (notifyTopicList != null){
-            for (NotifyTopic notifyTopic : notifyTopicList) {
-                if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != updateStateWeightedRequest.getEmpUpdate()) {
-                    String contentState = null;
-                    if (updateStateWeightedRequest.getStateJob() == 20){
-                        contentState = " đã cân";
-                    }
-
-                    String content = "Địa điểm: " + notifyTopic.getCpName() + contentState;
-
-                    FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
-                    sendFirebaseData.setTitle("Cập nhật trạng thái thành công.");
-                    sendFirebaseData.setType("WORK");
-                    sendFirebaseData.setBody(content);
-                    sendFirebaseData.setData(String.valueOf(jobsNew.getJob_id()));
-
-                    Gson gson = new Gson();
-                    String jsonData = gson.toJson(sendFirebaseData);
-
-                    // Gửi
-                    if (notifyTopic.getFirebase_token() != null) {
-                        Message message = Message.builder()
-                                .setToken(notifyTopic.getFirebase_token())
-                                .putData("data", jsonData)
-                                .build();
-                        try {
-                            FirebaseMessaging.getInstance().send(message);
-//                        String response = FirebaseMessaging.getInstance().send(message);
-//                        if (response != null){
-//                            utilsNotification.insertDataToNotification(data,jobsNew.getJob_id());
-//                        }
-                        } catch (FirebaseMessagingException e) {
-                            // Xử lý ngoại lệ ở đây
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
+            pushNotify(notifyTopic,sendFirebaseData);
         }
     }
 
@@ -535,7 +425,7 @@ public class JobsRepositoryImp {
         }
     }
 
-    public void pushNotifyUpdateStateCompactedAndDone(Jobs jobsNew, CompactedAndDoneRequest updateStateRequest) {
+    public void pushNotifyUpdateState(Jobs jobsNew, int empUpdate,int stateJob) {
         if (jobsNew == null) {
             return;
         }
@@ -551,32 +441,42 @@ public class JobsRepositoryImp {
         }
         if (notifyTopicList != null){
             for (NotifyTopic notifyTopic : notifyTopicList) {
-                if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != updateStateRequest.getEmpUpdate()) {
+                if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != empUpdate) {
+                    String contentState = null;
+                    if (stateJob == 20){
+                        contentState = "Địa điểm: " + notifyTopic.getCpName() + " đã cân";
+                    }
+                    if (stateJob == 15){
+                        contentState = "Địa điểm: " + notifyTopic.getCpName() + " đã làm gọn";
+                    }
 
-                    String content = "Địa điểm: " + notifyTopic.getCpName() + " đã làm gọn";
                     FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
                     sendFirebaseData.setTitle("Cập nhật trạng thái thành công.");
                     sendFirebaseData.setType("WORK");
-                    sendFirebaseData.setBody(content);
+                    sendFirebaseData.setBody(contentState);
                     sendFirebaseData.setData(String.valueOf(jobsNew.getJob_id()));
 
-                    Gson gson = new Gson();
-                    String jsonData = gson.toJson(sendFirebaseData);
-
-                    // Gửi
-                    if (notifyTopic.getFirebase_token() != null) {
-                        Message message = Message.builder()
-                                .setToken(notifyTopic.getFirebase_token())
-                                .putData("data", jsonData)
-                                .build();
-                        try {
-                            FirebaseMessaging.getInstance().send(message);
-                        } catch (FirebaseMessagingException e) {
-                            // Xử lý ngoại lệ ở đây
-                            e.printStackTrace();
-                        }
-                    }
+                    pushNotify(notifyTopic,sendFirebaseData);
                 }
+            }
+        }
+    }
+
+    private void pushNotify(NotifyTopic notifyTopic, FirebaseDataDto sendFirebaseData) {
+        Gson gson = new Gson();
+        String jsonData = gson.toJson(sendFirebaseData);
+
+        // Gửi
+        if (notifyTopic.getFirebase_token() != null) {
+            Message message = Message.builder()
+                    .setToken(notifyTopic.getFirebase_token())
+                    .putData("data", jsonData)
+                    .build();
+            try {
+                FirebaseMessaging.getInstance().send(message);
+            } catch (FirebaseMessagingException e) {
+                // Xử lý ngoại lệ ở đây
+                e.printStackTrace();
             }
         }
     }
