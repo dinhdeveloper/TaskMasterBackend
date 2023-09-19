@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import javax.transaction.Transactional;
 
@@ -54,48 +53,23 @@ public class JobsService {
 
 
     @Transactional
-    public void updateStateJob(UpdateStateRequest updateStateRequest) {
+    public void updateStateWeightedJob(UpdateStateWeightedRequest updateStateWeightedRequest) {
 
         Date date = new Date();
+        Jobs job = repositoryImp.findJobById(updateStateWeightedRequest.getJodId());
 
-        Jobs job = repositoryImp.findJobById(updateStateRequest.getJobsId());
+        repositoryImp.updateJobSaveWeighted(updateStateWeightedRequest,job);
+
         if (job != null) {
-            JobState jobState = repositoryImp.findJobStateById(job.getJobStateId());
-            //UPDATE STATE
-            job.setJobStateId(updateStateRequest.getStateJob());
-            //DA LAM GON
-            if (updateStateRequest.getStateJob() == 15){
-                job.setCollectFinishTime(new Timestamp(date.getTime()));
-            }
-            //DA CAN
-            if (updateStateRequest.getStateJob() == 20){
-                job.setPaymentMethod(updateStateRequest.getPaymentMethod());
-                job.setPaymentStateId(updateStateRequest.getPaymentStateStatus());
-                if (updateStateRequest.getPaymentStateStatus() == 1 && updateStateRequest.getPaymentMethod() == 1){ //nv ung tien va da thanh toan
-                    job.setAmountPaidEmp(updateStateRequest.getAmountPaidEmp());
-                    job.setAmount(updateStateRequest.getAmountTotal());
-                }
-                if (updateStateRequest.getPaymentStateStatus() == 1 && updateStateRequest.getPaymentMethod() == 2){ // bank & da thanh toan
-                    job.setAmount(updateStateRequest.getAmountTotal());
+            if (updateStateWeightedRequest.getStateJob() == 20){
+                if (updateStateWeightedRequest.getPaymentStateId() == 1 && updateStateWeightedRequest.getPaymentMethod() == 2){ // bank & da thanh toan
                     job.setWeightTime(new Timestamp(date.getTime()));
                     /* type: info; receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
-                    repositoryImp.pushNotifyStateWeighted(updateStateRequest,job);
-                }
-                if (updateStateRequest.getPaymentStateStatus() == 0 && updateStateRequest.getPaymentMethod() == -1){ //chua thanh toan
-                    job.setAmount(updateStateRequest.getAmountTotal());
+                    repositoryImp.pushNotifyStateWeighted(updateStateWeightedRequest,job);
                 }
             }
-            //DA XONG
-            if (updateStateRequest.getStateJob() == 30){
-                job.setFinishTime(new Timestamp(date.getTime()));
-            }
-
-
             Jobs jobsNew = repositoryImp.saveJob(job);
-            if (updateStateRequest.getStateJob() != 30){
-                //repositoryImp.pushNotifyUpdateJobState(jobsNew, updateStateRequest.getStateJob());
-                repositoryImp.pushNotifyUpdateState(jobsNew, updateStateRequest);
-            }
+            repositoryImp.pushNotifyUpdateState(jobsNew, updateStateWeightedRequest);
 
         } else {
             // Handle the case when the job with the given ID doesn't exist
@@ -170,5 +144,32 @@ public class JobsService {
         }
 
         return mergedList;
+    }
+
+    public void updateStateJobCompactedAndDone(CompactedAndDoneRequest updateStateRequest) {
+        Date date = new Date();
+
+        Jobs job = repositoryImp.findJobById(updateStateRequest.getJobsId());
+        if (job != null) {
+            //UPDATE STATE
+            job.setJobStateId(updateStateRequest.getStateJob());
+
+            if (updateStateRequest.getStateJob() == 15){
+                job.setCollectFinishTime(new Timestamp(date.getTime()));
+            }
+            if (updateStateRequest.getStateJob() == 30){
+                job.setFinishTime(new Timestamp(date.getTime()));
+            }
+
+            Jobs jobsNew = repositoryImp.saveJob(job);
+
+            if (updateStateRequest.getStateJob() != 30){
+                //repositoryImp.pushNotifyUpdateJobState(jobsNew, updateStateRequest.getStateJob());
+                repositoryImp.pushNotifyUpdateStateCompactedAndDone(jobsNew, updateStateRequest);
+            }
+
+        } else {
+            // Handle the case when the job with the given ID doesn't exist
+        }
     }
 }

@@ -40,14 +40,15 @@ public class JobsRepositoryImp {
 
     public void addJobs(int jobType, int jobStateId, int idNV1, int idNV2, int assignId, List<Integer> listIdPoint, String ghiChu) {
         for (int i = 0; i < listIdPoint.size(); i++) {
-            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id,job_state_id ) VALUES (?, ?, ?, ?, ?,?) RETURNING job_id";
+            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id,job_state_id,payment_method ) VALUES (?, ?, ?, ?, ?,?) RETURNING job_id";
             Integer generatedId = (Integer) entityManager.createNativeQuery(sql)
                     .setParameter(1, listIdPoint.get(i))
                     .setParameter(2, jobType)
-                    .setParameter(3, 1)
+                    .setParameter(3, 0)
                     .setParameter(4, ghiChu)
                     .setParameter(5, assignId)
                     .setParameter(6, jobStateId)
+                    .setParameter(7, -1)
                     .getSingleResult();
 
             String sql2 = "INSERT INTO job_employee(job_id, emp_id, serial_number ) VALUES (?, ?, ?)";
@@ -281,15 +282,11 @@ public class JobsRepositoryImp {
             if (dataUpdateJobRequest.getNote() != null) {
                 job.setNote(dataUpdateJobRequest.getNote());
             }
-            if (dataUpdateJobRequest.getPaymentStateId() != 3){
+            if (dataUpdateJobRequest.getPaymentStateId() != 5){
                 job.setPaymentStateId(dataUpdateJobRequest.getPaymentStateId());
-            }else {
-                job.setPaymentStateId(1);
             }
-            if (dataUpdateJobRequest.getPaymentMethod() != 3){
+            if (dataUpdateJobRequest.getPaymentMethod() != 5){
                 job.setPaymentMethod(dataUpdateJobRequest.getPaymentMethod());
-            }else {
-                job.setPaymentMethod(-1);
             }
 
             if (dataUpdateJobRequest.getEmpNewId() != -1){
@@ -307,6 +304,42 @@ public class JobsRepositoryImp {
         return job;
     }
 
+    public Jobs updateJobSaveWeighted(UpdateStateWeightedRequest dataUpdateJobRequest, Jobs job) {
+        if (job != null) {
+            if (dataUpdateJobRequest.getTotalMoney() != null) {
+                job.setAmount(dataUpdateJobRequest.getTotalMoney());
+            }
+            if (dataUpdateJobRequest.getPriority() != -1) {
+                job.setPriority(dataUpdateJobRequest.getPriority());
+            }
+            if (dataUpdateJobRequest.getAmountPaidEmp() != null) {
+                job.setAmountPaidEmp(dataUpdateJobRequest.getAmountPaidEmp());
+            }
+            if (dataUpdateJobRequest.getNote() != null) {
+                job.setNote(dataUpdateJobRequest.getNote());
+            }
+            if (dataUpdateJobRequest.getPaymentStateId() != 5){
+                job.setPaymentStateId(dataUpdateJobRequest.getPaymentStateId());
+            }
+            if (dataUpdateJobRequest.getPaymentMethod() != 5){
+                job.setPaymentMethod(dataUpdateJobRequest.getPaymentMethod());
+            }
+
+            if (dataUpdateJobRequest.getEmpNewId() != -1){
+                String sqlQueryJobEmployee = "UPDATE JobEmployee SET empId = :empIdNew WHERE empId = :empIdOld AND jobId = :jodId";
+                Query queryJobEmployee = entityManager.createQuery(sqlQueryJobEmployee);
+                queryJobEmployee.setParameter("empIdNew", dataUpdateJobRequest.getEmpNewId());
+                queryJobEmployee.setParameter("empIdOld", dataUpdateJobRequest.getEmpOldId());
+                queryJobEmployee.setParameter("jodId", dataUpdateJobRequest.getJodId());
+                queryJobEmployee.executeUpdate();
+                pushNotifyAddTask(dataUpdateJobRequest.getEmpNewId(),dataUpdateJobRequest.getJodId(),dataUpdateJobRequest.getEmpUpdate());
+            }
+
+            return entityManager.merge(job);
+        }
+        return job;
+    }
+
     public Integer findByStateStatus(int paymentStateStatus) {
         String sqlQuery = "SELECT jm.paymentStateId FROM PaymentState jm WHERE jm.paymentStateStatus = :status";
         Query query = entityManager.createQuery(sqlQuery);
@@ -315,14 +348,14 @@ public class JobsRepositoryImp {
         return singleResult;
     }
 
-    public void pushNotifyStateWeighted(UpdateStateRequest updateStateRequest, Jobs job) {
+    public void pushNotifyStateWeighted(UpdateStateWeightedRequest updateStateWeightedRequest, Jobs job) {
         /*receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
         String sql = "SELECT c.customName, cp.bankAcctName, cp.bankAcct, " +
                 "cp.bankAcctNumber, cp.name as collectPointName, j.amount, j.empAssignId " +
                 "FROM Customers c, CollectPoint  cp, Jobs j " +
                 "WHERE j.collePointId = cp.collectPointId and cp.customId = c.cusId and j.job_id = :jobID and c.state = true";
         Query query = entityManager.createQuery(sql);
-        query.setParameter("jobID", updateStateRequest.getJobsId());
+        query.setParameter("jobID", updateStateWeightedRequest.getJodId());
 
         Object[] singleResult = (Object[]) query.getSingleResult();
         DataUserUpdateStateWeight dto = new DataUserUpdateStateWeight();
@@ -383,7 +416,7 @@ public class JobsRepositoryImp {
 
             sendFirebaseData.setType("INFO");
             sendFirebaseData.setBody(content);
-            sendFirebaseData.setData(String.valueOf(updateStateRequest.getJobsId()));
+            sendFirebaseData.setData(String.valueOf(updateStateWeightedRequest.getJodId()));
 
             Gson gson = new Gson();
             String jsonData = gson.toJson(sendFirebaseData);
@@ -404,10 +437,12 @@ public class JobsRepositoryImp {
         }
     }
 
-    public void pushNotifyUpdateState(Jobs jobsNew, UpdateStateRequest updateStateRequest) {
+    public void pushNotifyUpdateState(Jobs jobsNew, UpdateStateWeightedRequest updateStateWeightedRequest) {
         if (jobsNew == null) {
             return;
         }
+
+        List<NotifyTopic> notifyTopicList = null;
 
         String query = "SELECT je.empId FROM JobEmployee je WHERE je.jobId = :job_id";
         Query queryData = entityManager.createQuery(query);
@@ -415,14 +450,17 @@ public class JobsRepositoryImp {
         List<Integer> dataNVID = queryData.getResultList();
 
         for (Integer data : dataNVID) {
-            List<NotifyTopic> notifyTopicList = utilsNotification.pushNotifyByEmpId(data, jobsNew.getJob_id());
+            notifyTopicList = utilsNotification.pushNotifyByEmpId(data, jobsNew.getJob_id());
+        }
+
+        if (notifyTopicList != null){
             for (NotifyTopic notifyTopic : notifyTopicList) {
-                if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != updateStateRequest.getEmpUpdate()) {
+                if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != updateStateWeightedRequest.getEmpUpdate()) {
                     String contentState = null;
-                    if (updateStateRequest.getStateJob() == 15){
+                    if (updateStateWeightedRequest.getStateJob() == 15){
                         contentState = " đã làm gọn";
                     }
-                    if (updateStateRequest.getStateJob() == 20){
+                    if (updateStateWeightedRequest.getStateJob() == 20){
                         contentState = " đã cân";
                     }
 
@@ -497,6 +535,52 @@ public class JobsRepositoryImp {
         } else {
             // fallback logic if request won't work...
             return "Nothing";
+        }
+    }
+
+    public void pushNotifyUpdateStateCompactedAndDone(Jobs jobsNew, CompactedAndDoneRequest updateStateRequest) {
+        if (jobsNew == null) {
+            return;
+        }
+        List<NotifyTopic> notifyTopicList = null;
+
+        String query = "SELECT je.empId FROM JobEmployee je WHERE je.jobId = :job_id";
+        Query queryData = entityManager.createQuery(query);
+        queryData.setParameter("job_id", jobsNew.getJob_id());
+        List<Integer> dataNVID = queryData.getResultList();
+
+        for (Integer data : dataNVID) {
+            notifyTopicList = utilsNotification.pushNotifyByEmpId(data, jobsNew.getJob_id());
+        }
+        if (notifyTopicList != null){
+            for (NotifyTopic notifyTopic : notifyTopicList) {
+                if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != updateStateRequest.getEmpUpdate()) {
+
+                    String content = "Địa điểm: " + notifyTopic.getCpName() + " đã làm gọn";
+                    FirebaseDataDto sendFirebaseData = new FirebaseDataDto();
+                    sendFirebaseData.setTitle("Cập nhật trạng thái thành công.");
+                    sendFirebaseData.setType("WORK");
+                    sendFirebaseData.setBody(content);
+                    sendFirebaseData.setData(String.valueOf(jobsNew.getJob_id()));
+
+                    Gson gson = new Gson();
+                    String jsonData = gson.toJson(sendFirebaseData);
+
+                    // Gửi
+                    if (notifyTopic.getFirebase_token() != null) {
+                        Message message = Message.builder()
+                                .setToken(notifyTopic.getFirebase_token())
+                                .putData("data", jsonData)
+                                .build();
+                        try {
+                            FirebaseMessaging.getInstance().send(message);
+                        } catch (FirebaseMessagingException e) {
+                            // Xử lý ngoại lệ ở đây
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
         }
     }
 }
