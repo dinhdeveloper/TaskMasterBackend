@@ -40,7 +40,7 @@ public class JobsRepositoryImp {
 
     public void addJobs(int jobType, int jobStateId, int idNV1, int idNV2, int assignId, List<Integer> listIdPoint, String ghiChu) {
         for (int i = 0; i < listIdPoint.size(); i++) {
-            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id,job_state_id,payment_method ) VALUES (?, ?, ?, ?, ?,?) RETURNING job_id";
+            String sql = "INSERT INTO jobs(colle_point_id, job_type_id,payment_state_id, note, emp_assign_id,job_state_id,payment_method ) VALUES (?, ?, ?, ?, ?,?,?) RETURNING job_id";
             Integer generatedId = (Integer) entityManager.createNativeQuery(sql)
                     .setParameter(1, listIdPoint.get(i))
                     .setParameter(2, jobType)
@@ -457,9 +457,6 @@ public class JobsRepositoryImp {
             for (NotifyTopic notifyTopic : notifyTopicList) {
                 if (notifyTopic.getEmp_id() != jobsNew.getEmpAssignId() && notifyTopic.getEmp_id() != updateStateWeightedRequest.getEmpUpdate()) {
                     String contentState = null;
-                    if (updateStateWeightedRequest.getStateJob() == 15){
-                        contentState = " đã làm gọn";
-                    }
                     if (updateStateWeightedRequest.getStateJob() == 20){
                         contentState = " đã cân";
                     }

@@ -68,6 +68,8 @@ public class JobsService {
                     repositoryImp.pushNotifyStateWeighted(updateStateWeightedRequest,job);
                 }
             }
+            job.setJobStateId(updateStateWeightedRequest.getStateJob());
+
             Jobs jobsNew = repositoryImp.saveJob(job);
             repositoryImp.pushNotifyUpdateState(jobsNew, updateStateWeightedRequest);
 
