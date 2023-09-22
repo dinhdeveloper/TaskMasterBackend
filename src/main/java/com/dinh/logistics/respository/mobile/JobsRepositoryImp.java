@@ -392,8 +392,8 @@ public class JobsRepositoryImp {
         notifyTopicList = utilsNotification.pushNotifyByEmpId(jobs.getJob_id(),dataNVID);
         if (notifyTopicList != null){
             for (NotifyTopic notifyTopic : notifyTopicList) {
-                if (notifyTopic.getEmp_id() != jobs.getEmpAssignId()
-                        && notifyTopic.getEmp_id() != empUpdate
+                if (
+                        notifyTopic.getEmp_id() != empUpdate
                         && !notifyTopic.getRole_code().equals("EMPLOYEE")
                         && !notifyTopic.getRole_code().equals("COLLECTOR")
                         && !notifyTopic.getRole_code().equals("ADMIN")
