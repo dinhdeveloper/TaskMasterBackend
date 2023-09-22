@@ -8,11 +8,12 @@ public class NotifyTopic {
     String name;
     Integer team_id;
     Integer leader_id;
-    String firebase_token;
-    String access_token;
-    String device_id;
-    String device_name;
+    String firebase_token = null;
+    String access_token= null;
+    String device_id= null;
+    String device_name= null;
     Boolean is_active_access_token;
-    String cpName;
-    String jtName;
+    String role_code= null;
+    String cpName= null;
+    String jtName= null;
 }

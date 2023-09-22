@@ -65,13 +65,17 @@ public class JobsService {
                 if (updateStateWeightedRequest.getPaymentStateId() == 1 && updateStateWeightedRequest.getPaymentMethod() == 2){ // bank & da thanh toan
                     job.setWeightTime(new Timestamp(date.getTime()));
                     /* type: info; receiver: master user; content: CK cho [khách hàng], [địa điểm], [số tiền], [số tàikhoản], [ngân hàng của khách hàng]*/
-                    repositoryImp.pushNotifyStateWeighted(updateStateWeightedRequest,job);
+                    repositoryImp.pushNotiBankInfo(updateStateWeightedRequest,job);
                 }
             }
             job.setJobStateId(updateStateWeightedRequest.getStateJob());
 
             Jobs jobsNew = repositoryImp.saveJob(job);
-            repositoryImp.pushNotifyUpdateState(jobsNew, updateStateWeightedRequest.getEmpUpdate(), updateStateWeightedRequest.getStateJob());
+            repositoryImp.pushNotifyUpdateState(jobsNew,
+                    updateStateWeightedRequest.getEmpUpdate(),
+                    updateStateWeightedRequest.getStateJob(),
+                    updateStateWeightedRequest.getPaymentMethod(),
+                    updateStateWeightedRequest.getPaymentStateId());
 
         } else {
             // Handle the case when the job with the given ID doesn't exist
@@ -165,8 +169,8 @@ public class JobsService {
 
             Jobs jobsNew = repositoryImp.saveJob(job);
 
-            if (updateStateRequest.getStateJob() != 30){
-                repositoryImp.pushNotifyUpdateState(jobsNew, updateStateRequest.getEmpUpdate(), updateStateRequest.getStateJob());
+            if (updateStateRequest.getStateJob() == 15 || updateStateRequest.getStateJob() == 20){
+                repositoryImp.pushNotifyUpdateState(jobsNew, updateStateRequest.getEmpUpdate(), updateStateRequest.getStateJob(), 5,5);
             }
 
         } else {

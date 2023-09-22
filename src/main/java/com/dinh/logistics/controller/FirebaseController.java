@@ -2,6 +2,7 @@ package com.dinh.logistics.controller;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,10 +44,15 @@ public class FirebaseController {
 			return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, null);
 		}
 		Instant instant = Instant.now();
-		// Chuyển đổi Instant thành Timestamp
 		Timestamp currentTimestamp = Timestamp.from(instant);
 
 		String jwtToken = token.substring(7);
+		List<UserDevice> userDeviceList = userDeviceRepository.getListUserDeviceByDeviceId(deviceId);
+		for (UserDevice userDevice : userDeviceList){
+			userDevice.setFirebaseToken(null);
+			userDeviceRepository.save(userDevice);
+		}
+
 		UserDevice userDevice = userDeviceRepository.findByAccessTokenAndIsActiveAccessTokenTrue(jwtToken).orElse(new UserDevice());
         if (!Objects.isNull(userDevice)){
         	userDevice.setFirebaseToken(firebaseToken);

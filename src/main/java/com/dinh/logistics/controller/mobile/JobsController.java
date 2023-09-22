@@ -61,7 +61,7 @@ public class JobsController {
             UpdateJobsResponse response = new UpdateJobsResponse();
             response.setStateJobs(updateStateWeightedRequest.getStateJob());
             response.setDescription("Cập nhật thành công");
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
         } catch (Exception e) {
             log.error("Error updating job state: ", e.getMessage());
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
@@ -75,7 +75,7 @@ public class JobsController {
             UpdateJobsResponse response = new UpdateJobsResponse();
             response.setStateJobs(updateStateRequest.getStateJob());
             response.setDescription("Cập nhật thành công");
-            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, response);
+            return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, "Cập nhật thành công");
         } catch (Exception e) {
             log.error("Error updating job state: ", e.getMessage());
             return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, "Cập nhật thất bại");
@@ -118,12 +118,6 @@ public class JobsController {
     	jobSearchResponse = jobsService.searchJobByFilter(empStatus, empId, status, paymentStatus, startDate, endDate, jobId, collectPoint,empRequest);
     	
     	return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, jobSearchResponse);
-    }
-
-    @PostMapping("/mozi/{id}/{jobId}")
-    public ResponseEntity<Object> saveA(@PathVariable Integer id, @PathVariable Integer jobId){
-        List<NotifyTopic> notifyTopic = utilsNotification.pushNotifyByEmpId(id, jobId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, 0, StatusResult.SUCCESS, notifyTopic);
     }
 
     @GetMapping("/collect_point/latlng")

@@ -1,5 +1,6 @@
 package com.dinh.logistics.respository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +24,6 @@ public interface UserDeviceRepository extends JpaRepository<UserDevice, Integer>
 	
 	Optional <UserDevice> findByDeviceId(String deviceId);
 
+	@Query(value = "SELECT * FROM user_devices WHERE device_id = ?1", nativeQuery = true)
+	List<UserDevice> getListUserDeviceByDeviceId(String deviceId);
 }
