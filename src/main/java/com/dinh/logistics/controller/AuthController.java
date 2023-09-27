@@ -87,7 +87,7 @@ public class AuthController {
 	            	userDevice.setAccessToken(token);
 	            	userDevice.setUserId(user.getUser_id().intValue());
 	            	userDevice.setDeviceId(loginDto.getDeviceId());
-	            	userDevice.setFirebaseToken(null);
+//	            	userDevice.setFirebaseToken(null);
 	            	userDevice.setDeviceName(loginDto.getDeviceName());
 	            	userDevice.setDateCreateLogin(currentTimestamp);
 	            	tokenManager.addToken(userDevice);
