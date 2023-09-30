@@ -2,6 +2,8 @@ package com.dinh.logistics.model;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 import javax.persistence.*;
 
 @Data
@@ -23,4 +25,7 @@ public class JobMedia {
 
     @Column(name = "media_cate_id")
     private Integer mediaCateId;
+    
+    @Column(name = "create_date")
+    private Timestamp createDate;
 }
