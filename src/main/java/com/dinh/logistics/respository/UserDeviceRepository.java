@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.dinh.logistics.model.UserDevice;
@@ -26,4 +25,6 @@ public interface UserDeviceRepository extends JpaRepository<UserDevice, Integer>
 
 	@Query(value = "SELECT * FROM user_devices WHERE device_id = ?1", nativeQuery = true)
 	List<UserDevice> getListUserDeviceByDeviceId(String deviceId);
+	
+	Optional<UserDevice> findByDeviceId(Integer user_id);
 }

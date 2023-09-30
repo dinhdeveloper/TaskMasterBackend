@@ -27,7 +27,7 @@ public class UserDevice {
 	private String accessToken;
 	
 	@Column(name = "user_id")
-	private int userId;
+	private Integer userId;
 	
 	@Column(name = "is_active_access_token")
 	private boolean isActiveAccessToken;

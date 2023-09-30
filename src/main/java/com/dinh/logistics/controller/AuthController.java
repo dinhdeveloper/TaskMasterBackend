@@ -92,6 +92,12 @@ public class AuthController {
 	            	userDevice.setDateCreateLogin(currentTimestamp);
 	            	tokenManager.addToken(userDevice);
 	            	
+	            	UserDevice userDeviceOld = userDeviceRepository.findByDeviceId(loginDto.getDeviceId()).orElse(null);
+	            	if(userDeviceOld != null) {
+		            	userDevice.setUserId(null);
+		            	userDevice.setDeviceId(loginDto.getDeviceId());
+		            	userDeviceRepository.save(userDeviceOld);
+	            	}
 	            	
 	            	
 	            	Authentication auth = new Authentication();
