@@ -16,7 +16,7 @@ public class JobDetailsDTO {
     private BigDecimal priority;
     private String noteJob;
     private String jobStateCode;
-    private BigDecimal amountPaidEmp;
+    private Double amountPaidEmp;
     private BigDecimal paymentMethod;
     private Integer paymentStateId;
     private List<MediaDto> jobMedia;

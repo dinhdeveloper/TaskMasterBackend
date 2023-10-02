@@ -30,10 +30,10 @@ public class Jobs {
     private Integer priority;
 
     @Column(name = "amount_paid_emp")
-    private Long amountPaidEmp;
+    private Double amountPaidEmp;
 
     @Column(name = "amount")
-    private Long amount;
+    private Double amount;
 
     @Column(name = "job_state_id")
     private Integer jobStateId;
