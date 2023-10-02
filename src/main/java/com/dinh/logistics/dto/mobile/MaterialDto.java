@@ -6,7 +6,7 @@ import lombok.Data;
 public class MaterialDto {
     private Integer mateId;
     private Integer jobId;
-    private Long weight;
-    private Long weightToCus;
-    private Long price;
+    private Double weight;
+    private Double weightToCus;
+    private Double price;
 }

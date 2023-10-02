@@ -11,8 +11,8 @@ public class DataUpdateJobRequest {
     Integer paymentMethod;
     Integer paymentStateId;
     Integer empAssignId;
-    Long amountPaidEmp;
-    Long totalMoney;
+    Double amountPaidEmp;
+    Double totalMoney;
     Integer priority;
     String note;
 }

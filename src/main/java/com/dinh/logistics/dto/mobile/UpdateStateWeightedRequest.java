@@ -8,10 +8,10 @@ public class UpdateStateWeightedRequest {
     private int empUpdate;
     private int jodId;
     private int stateJob;
-    private Long totalMoney;
+    private Double totalMoney;
     private int paymentMethod;
     private int paymentStateId;
-    private Long amountPaidEmp;
+    private Double amountPaidEmp;
     private int priority;
     private int empOldId;
     private int empNewId;

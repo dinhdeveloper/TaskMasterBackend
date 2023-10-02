@@ -142,9 +142,9 @@ public class JobsRepositoryImp {
             for (Object[] mediaData : dataMaterial) {
                 MaterialJob data = new MaterialJob();
                 data.setMateId((Integer) mediaData[0]);
-                data.setWeight((Integer) mediaData[1]);
-                data.setWeightToCus((Integer) mediaData[2]);
-                data.setPrice((Integer) mediaData[3]);
+                data.setWeight((Double) mediaData[1]);
+                data.setWeightToCus((Double) mediaData[2]);
+                data.setPrice((Double) mediaData[3]);
                 data.setJobId((Integer) mediaData[4]);
                 data.setName((String) mediaData[5]);
                 materialDtoList.add(data);
@@ -169,7 +169,7 @@ public class JobsRepositoryImp {
             dto.setPriority((BigDecimal) singleResult[5]);
             dto.setNoteJob((String) singleResult[6]);
             dto.setJobStateCode((String) singleResult[7]);
-            dto.setAmountPaidEmp((BigDecimal) singleResult[8]);
+            dto.setAmountPaidEmp((Double) singleResult[8]);
             dto.setPaymentMethod((BigDecimal) singleResult[9]);
             dto.setPaymentStateId((Integer) singleResult[10]);
             dto.setJobMedia(mediaDtoList);

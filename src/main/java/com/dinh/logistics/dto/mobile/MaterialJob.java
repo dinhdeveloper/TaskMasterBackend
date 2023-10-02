@@ -3,9 +3,9 @@ package com.dinh.logistics.dto.mobile;
 public class MaterialJob {
     private Integer mateId;
     private Integer jobId;
-    private Integer weight;
-    private Integer weightToCus;
-    private Integer price;
+    private Double weight;
+    private Double weightToCus;
+    private Double price;
     private String  name;
 
     public Integer getMateId() {
@@ -24,27 +24,27 @@ public class MaterialJob {
         this.jobId = jobId;
     }
 
-    public Integer getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(Integer weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
-    public Integer getWeightToCus() {
+    public Double getWeightToCus() {
         return weightToCus;
     }
 
-    public void setWeightToCus(Integer weightToCus) {
+    public void setWeightToCus(Double weightToCus) {
         this.weightToCus = weightToCus;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

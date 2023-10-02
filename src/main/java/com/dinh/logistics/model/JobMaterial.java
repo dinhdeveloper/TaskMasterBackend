@@ -19,13 +19,13 @@ public class JobMaterial {
     private Integer mateId;
 
     @Column(name = "weight")
-    private Integer weight;
+    private Double weight;
 
     @Column(name = "weight_to_cus")
-    private Integer WeightToCus;
+    private Double WeightToCus;
 
     @Column(name = "unit_price")
-    private Integer unitPrice;
+    private Double unitPrice;
 
     @Column(name = "material_name")
     private String materialName;
