@@ -16,16 +16,16 @@ public class MaterialRepositoryImp {
     private EntityManager entityManager;
 
     @Transactional
-    public void addMaterial(int mateId, int jobId, Long weight, Long weightToCus, Long price) {
+    public void addMaterial(int mateId, int jobId, Double weight, Double weightToCus, Double price) {
         // Kiểm tra nếu weightToCus là null, thay thế nó bằng 0
         if (weightToCus == null) {
-            weightToCus = 0L;
+            weightToCus = 0.0;
         }
         if (weight == null) {
-            weight = 0L;
+            weight = 0.0;
         }
         if (price == null) {
-            price = 0L;
+            price = 0.0;
         }
 
         String sql = "INSERT INTO job_material(mate_id, job_id, weight, weight_to_cus, unit_price) VALUES (?, ?, ?, ?, ?)";
