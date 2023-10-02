@@ -88,13 +88,15 @@ public class AuthController {
 	            if(StringUtils.equals(user.getPassword(), hexString.toString())) {
 	            	String token = tokenGenerator.generateToken(loginDto.getUsername(), loginDto.getPassword());
 	            	
-	            	List<UserDevice> userDeviceOld = userDeviceRepository.getListUserDeviceByDeviceId(loginDto.getDeviceId());
-	            	for(UserDevice item : userDeviceOld) {
-//	            		item.setUserId(null);
-//	            		item.setDeviceId(null);
-	            		entityManager.remove(item);
+	            	if(StringUtils.isNotBlank(loginDto.getDeviceId())) {
+	            		List<UserDevice> userDeviceOld = userDeviceRepository.getListUserDeviceByDeviceId(loginDto.getDeviceId());
+		            	for(UserDevice item : userDeviceOld) {
+//		            		item.setUserId(null);
+//		            		item.setDeviceId(null);
+		            		entityManager.remove(item);
+		            	}
+//		            	userDeviceRepository.saveAll(userDeviceOld);
 	            	}
-//	            	userDeviceRepository.saveAll(userDeviceOld);
 	            	
 	            	UserDevice userDevice = userDeviceRepository.findByUserId(user.getUser_id()).orElse(new UserDevice());
 	            	userDevice.setAccessToken(token);
