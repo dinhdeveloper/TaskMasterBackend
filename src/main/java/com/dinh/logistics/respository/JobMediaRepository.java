@@ -52,6 +52,18 @@ public class JobMediaRepository {
             return null; // Trả về null nếu không có kết quả thỏa mãn
         }
     }
+    
+    public List<JobMedia> findAll() {
+        String hql = "SELECT * FROM JobMedia";
+        TypedQuery<JobMedia> query = entityManager.createQuery(hql, JobMedia.class);
+        return query.getResultList();
+    }
+
+	public void deleteAll(List<JobMedia> jobMediaListDelete) {
+		for (JobMedia entity : jobMediaListDelete) {
+	        entityManager.remove(entity);
+	    }
+	}
 
 //    @Transactional
 //    public void deleteJobMediaByUrl(String url) {

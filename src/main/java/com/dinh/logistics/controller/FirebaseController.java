@@ -34,26 +34,27 @@ public class FirebaseController {
 	UserDeviceRepository userDeviceRepository;
 	
 	@PostMapping("/save")
-	public ResponseEntity<Object> save(HttpServletRequest request,
+	public ResponseEntity<Object> save(
+//			HttpServletRequest request,
 			@RequestParam String firebaseToken,
 			@RequestParam String deviceId,
 			@RequestParam String deviceName
 	){
-		String token = request.getHeader("Authorization");
-		if(StringUtils.isBlank(token)) {
-			return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, null);
-		}
+//		String token = request.getHeader("Authorization");
+//		if(StringUtils.isBlank(token)) {
+//			return ResponseHandler.generateResponse(HttpStatus.OK, -99, StatusResult.ERROR, null);
+//		}
 		Instant instant = Instant.now();
 		Timestamp currentTimestamp = Timestamp.from(instant);
+//
+//		String jwtToken = token.substring(7);
+//		List<UserDevice> userDeviceList = userDeviceRepository.getListUserDeviceByDeviceId(deviceId);
+//		for (UserDevice userDevice : userDeviceList){
+//			userDevice.setFirebaseToken(null);
+//			userDeviceRepository.save(userDevice);
+//		}
 
-		String jwtToken = token.substring(7);
-		List<UserDevice> userDeviceList = userDeviceRepository.getListUserDeviceByDeviceId(deviceId);
-		for (UserDevice userDevice : userDeviceList){
-			userDevice.setFirebaseToken(null);
-			userDeviceRepository.save(userDevice);
-		}
-
-		UserDevice userDevice = userDeviceRepository.findByAccessTokenAndIsActiveAccessTokenTrue(jwtToken).orElse(new UserDevice());
+		UserDevice userDevice = userDeviceRepository.findByDeviceId(deviceId).orElse(new UserDevice());
         if (!Objects.isNull(userDevice)){
         	userDevice.setFirebaseToken(firebaseToken);
         	userDevice.setDeviceId(deviceId);
