@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -43,6 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class AuthController {
 	
+	@PersistenceContext
+    private EntityManager entityManager;
 	
 	@Autowired
 	UserRepository userRepository;
@@ -83,6 +87,15 @@ public class AuthController {
 
 	            if(StringUtils.equals(user.getPassword(), hexString.toString())) {
 	            	String token = tokenGenerator.generateToken(loginDto.getUsername(), loginDto.getPassword());
+	            	
+	            	List<UserDevice> userDeviceOld = userDeviceRepository.getListUserDeviceByDeviceId(loginDto.getDeviceId());
+	            	for(UserDevice item : userDeviceOld) {
+//	            		item.setUserId(null);
+//	            		item.setDeviceId(null);
+	            		entityManager.remove(item);
+	            	}
+//	            	userDeviceRepository.saveAll(userDeviceOld);
+	            	
 	            	UserDevice userDevice = userDeviceRepository.findByUserId(user.getUser_id()).orElse(new UserDevice());
 	            	userDevice.setAccessToken(token);
 	            	userDevice.setUserId(user.getUser_id().intValue());
@@ -92,12 +105,7 @@ public class AuthController {
 	            	userDevice.setDateCreateLogin(currentTimestamp);
 	            	tokenManager.addToken(userDevice);
 	            	
-	            	UserDevice userDeviceOld = userDeviceRepository.findByDeviceId(loginDto.getDeviceId()).orElse(null);
-	            	if(userDeviceOld != null) {
-		            	userDevice.setUserId(null);
-		            	userDevice.setDeviceId(loginDto.getDeviceId());
-		            	userDeviceRepository.save(userDeviceOld);
-	            	}
+	            	
 	            	
 	            	
 	            	Authentication auth = new Authentication();
