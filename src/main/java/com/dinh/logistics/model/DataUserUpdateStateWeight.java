@@ -10,6 +10,6 @@ public class DataUserUpdateStateWeight {
     private String bankAcct;
     private String bankAcctNumber;
     private String collectPointName;
-    private Long amount;
+    private Double amount;
     private Integer empAssignId;
 }
