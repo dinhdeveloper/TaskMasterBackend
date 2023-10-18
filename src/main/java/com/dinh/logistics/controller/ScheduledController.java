@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.dinh.logistics.model.JobMedia;
 import com.dinh.logistics.respository.JobMediaRepository;
+import com.dinh.logistics.respository.JobMediaV2Repository;
 
 @Component
 public class ScheduledController {
@@ -19,13 +20,16 @@ public class ScheduledController {
 	@Autowired
 	JobMediaRepository jobMediaRepository;
 	
+	@Autowired
+	JobMediaV2Repository jobMediaV2Repository;
+	
 	@Value("${app.deleteFileMedia.time}")
 	private int deleteFileMediaTime;
 
 	@Scheduled(cron = "${app.scheduler.cron.deleteFileMedia}")
     public void deleteMedia() {
 		
-		List<JobMedia> jobMediaList = jobMediaRepository.findAll();
+		List<JobMedia> jobMediaList = jobMediaV2Repository.findAll();
 		List<JobMedia> jobMediaListDelete = new ArrayList<>();
 		Date currentDate = new Date();
 		
@@ -34,7 +38,8 @@ public class ScheduledController {
 				jobMediaListDelete.add(jobMedia);
 			}
 		}
-		jobMediaRepository.deleteAll(jobMediaListDelete);
+		jobMediaV2Repository.deleteAll(jobMediaListDelete);
+//		jobMediaRepository.deleteAll(jobMediaListDelete);
 		
 		for(JobMedia jobMedia : jobMediaListDelete) {
 			File file = new File(jobMedia.getUrl());
