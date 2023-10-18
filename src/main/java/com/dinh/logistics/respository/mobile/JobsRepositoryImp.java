@@ -279,7 +279,7 @@ public class JobsRepositoryImp {
         dto.setBankAcct((String) singleResult[2]);
         dto.setBankAcctNumber((String) singleResult[3]);
         dto.setCollectPointName((String) singleResult[4]);
-        dto.setAmount((Long) singleResult[5]);
+        dto.setAmount((Double) singleResult[5]);
         dto.setEmpAssignId((Integer) singleResult[6]);
 
         //get master
